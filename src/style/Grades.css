@@ -1,0 +1,28 @@
+.grades-container {
+    width: 80%;
+    margin: auto;
+    padding-top: 50px;
+  }
+  
+  .grades-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .grades-table th, .grades-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid   #f4f2f0;
+  }
+  
+  .grades-table th {
+    background-color: #ffffff;
+    color: #145da0;
+    font-size: 20px;
+    padding-bottom: 20px;
+  }
+  
+  .grades-table tr:hover {
+    background-color: #f5f5f5;
+  }

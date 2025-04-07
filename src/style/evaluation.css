@@ -1,0 +1,81 @@
+.evaluation-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+  }
+  
+  .evaluation-title {
+    color: #145da0;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+  }
+  
+  .evaluation-item {
+    background-color: #f4f2f0;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .evaluation-item-title {
+    color: #145da0;
+    font-size: 1.8em;
+    margin-bottom: 10px;
+  }
+  
+  .evaluation-sections {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; 
+  }
+  
+  .evaluation-section {
+    flex: 1;
+  }
+  
+  .evaluation-section-title {
+    color: #145da0;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .evaluation-section-body {
+    color: #333;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+  }
+  
+  .due-date-section {
+    margin-left: 350px; 
+  }
+  
+  .submissions-count {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 5px;
+  }
+  
+  .feedback-section {
+    flex: 1.2; 
+  }
+  .download-instructions {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .download-instructions span {
+    margin-right: 10px; /* Space between text and icon */
+  }
+  
+  .download-icon {
+    color: #145da0; /* Icon color */
+    text-decoration: none; /* Remove underline */
+    display: flex;
+    align-items: center;
+  }
+  
+  .download-icon:hover {
+    color: #0d4a8c; /* Darker shade on hover */
+  }

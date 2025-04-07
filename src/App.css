@@ -1,38 +1,130 @@
-.App {
-  text-align: center;
+.header {
+  background-color: #145da0;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 75px;
+  position: relative;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.icon-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.icon-button:hover {
+  transform: scale(1.1);
+  color: #81b673;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.logo {
+  height: 80px;
+}
+
+
+.icons-container {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  height: 100%;
+  padding-bottom: 10px;
+}
+
+.icon {
+  color: white;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.icon:hover {
+  transform: scale(1.2);
+  color: #81b673;
+}
+/* cards.js */
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 30px; /* Increase gap between cards */
+  padding: 20px;
+}
+
+.card {
+  background-color: #83af70;
+  width: 330px; /* Increase width of cards */
+  height: 230px; /* Increase height of cards */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  border-radius: 15px; /* Rounded corners */
+  box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.card p {
+  margin-top: 10px;
+  font-size: 1.25rem; /* Increase text size */
+  font-weight: bold;
+}
+
+.card span {
+  font-size: 1rem;
+  color: #333;
+}
+
+@media (max-width: 1200px) {
+  .cards-container {
+    justify-content: center;
   }
-  to {
-    transform: rotate(360deg);
+  .card {
+    width: 250px; 
+    height: 160px; 
+  }
+}
+
+@media (max-width: 768px) {
+  .cards-container {
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .card {
+    width: 200px; 
+    height: 150px; 
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-container {
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .card {
+    width: 180px; 
+    height: 140px;
   }
 }

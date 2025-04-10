@@ -16,11 +16,9 @@ import NewMessage from './components/NewMessage';
 import Finance from './components/Finance';
 import Academics from './components/academicsHome';
 import ViewFees from './components/ViewFees';
-//import AuthProvider from './Auth/AuthContext'; 
-//import Login from './Auth/login';
-//import PrivateRoute from './Auth/PrivateRoute';
 import Signup from './components/signup';
 import Login from './components/login';
+import ForgotPassword from './components/ForgotPassword';
 
 function App() {
   return (
@@ -29,6 +27,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/home" element={<Homepage />} />
         <Route path="/course-shell" element={<EnrolledProgram />} />
         <Route path="/course-content" element={<CourseContent />} />

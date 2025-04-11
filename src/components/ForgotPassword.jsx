@@ -10,7 +10,7 @@ const ForgotPassword = () => {
     const handleSubmit = (e) => {
         e.preventDefault();  
 
-        axios.post("http://localhost:5000/auth/forgotPassword", { email})
+        axios.post("https://ocktivwebsite-3.onrender.com/auth/forgotPassword", { email})
             .then(response => {
                 if (response.data.status) {
                     console.log(response.data.message); 

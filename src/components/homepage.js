@@ -4,21 +4,15 @@ import "../App.css";
 import Cards from "./cards";
 import Logo from "../img/logo-with-name.svg";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+//import axios from "axios";
 
 const Homepage = () => {
   const navigate = useNavigate();
   const handleLogout = () => {
-    axios.get("http://localhost:5000/auth/logout")
-      .then(res => {
-        if (res.data.status) {
-          navigate("/login");
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
 
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (

@@ -13,7 +13,7 @@ const Signup = () => {
     const handleSubmit = (e) => {
         e.preventDefault();  
 
-        axios.post("http://localhost:5000/auth/signup", { username, email, password })
+        axios.post("https://ocktivwebsite-3.onrender.com/auth/signup", { username, email, password })
             .then(response => {
                 if (response.data.status) {
                     navigate("/login"); 

@@ -19,7 +19,7 @@ const ResetPassword = () => {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/auth/reset-password", {
+            const response = await axios.post("https://ocktivwebsite-3.onrender.com/auth/reset-password", {
                 token,
                 password
             });

@@ -12,7 +12,7 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault();  
 
-        axios.post("http://localhost:5000/auth/login", { email, password })
+        axios.post("https://ocktivwebsite-3.onrender.com/auth/login", { email, password })
             .then(response => {
                 console.log(response.data);
                 if (response.data.status) {

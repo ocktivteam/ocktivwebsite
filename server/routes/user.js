@@ -69,7 +69,7 @@ router.post('/forgot-password', async (req, res) => {
         await user.save();
         console.log("Generated token and saved user:", token);
 
-        const resetLink = `http://localhost:3000/reset-password/${token}`;
+        const resetLink = `https://ocktivwebsite.vercel.app/reset-password/${token}`;
         console.log("Reset link:", resetLink);
 
         const transporter = nodemailer.createTransport({
@@ -89,10 +89,10 @@ router.post('/forgot-password', async (req, res) => {
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.error("❌ Error sending email:", error);
+                console.error("Error sending email:", error);
                 return res.status(500).json({ message: "Failed to send email" });
             } else {
-                console.log("✅ Email sent:", info.response);
+                console.log("Email sent:", info.response);
                 return res.status(200).json({ message: "Reset email sent" });
             }
         });

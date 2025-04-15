@@ -10,7 +10,7 @@ import { userRouter } from './routes/user.js';
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "https://ocktivwebsite.vercel.app",
   credentials: true,
 }))
 app.use(cookieParser())

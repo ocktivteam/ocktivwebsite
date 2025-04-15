@@ -8,7 +8,7 @@ const ForgotPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:5000/auth/forgot-password", { email });
+            const response = await axios.post("https://ocktivwebsite-3.onrender.com/auth/forgot-password", { email });
             setMessage(response.data.message);
         } catch (err) {
             setMessage("Something went wrong. Try again.");

@@ -1,48 +1,37 @@
-
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
-const ForgotPassword = () => {  
+const ForgotPassword = () => {
     const [email, setEmail] = useState("");
-    const navigate = useNavigate(); 
+    const [message, setMessage] = useState("");
 
-    const handleSubmit = (e) => {
-        e.preventDefault();  
-
-        axios.post("http://localhost:5000/auth/forgotPassword", { email})
-            .then(response => {
-                if (response.data.status) {
-                    console.log(response.data.message); 
-                    alert("Password reset link sent to your email");
-                    navigate("/login"); 
-                    
-                } 
-            })
-            .catch(err => {
-                console.log(err);
-            }); 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post("http://localhost:5000/auth/forgot-password", { email });
+            setMessage(response.data.message);
+        } catch (err) {
+            setMessage("Something went wrong. Try again.");
+        }
     };
 
     return (
-        <div className="sign-up-container">
+        <div>
             <h2>Forgot Password</h2>
-            <form className="sign-up-form" onSubmit={handleSubmit}>
-                <label htmlFor="email">Email:</label>
+            <form onSubmit={handleSubmit}>
                 <input 
                     type="email" 
-                    autoComplete="off" 
-                    placeholder="Email" 
+                    placeholder="Enter your email" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-        
-                <button type="submit">Send</button>
+                <button type="submit">Send Reset Link</button>
             </form>
-            <p>Already have an account? <Link to="/login">Login</Link></p>
+            {message && <p>{message}</p>}
         </div>
     );
 };
 
 export default ForgotPassword;
+

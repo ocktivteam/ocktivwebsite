@@ -121,3 +121,71 @@ p a {
 p a:hover {
     text-decoration: underline;
 }
+
+
+
+/* Reset password Design */
+.reset-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f6f8;
+}
+
+.reset-card {
+  background-color: #fff;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.reset-card h2 {
+  margin-bottom: 25px;
+  color: #333;
+  font-weight: 600;
+}
+
+.reset-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.reset-form input {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.reset-form input:focus {
+  border-color: #81b673;
+}
+
+.reset-form button {
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #81b673;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.reset-form button:hover {
+  background-color: #81b673;
+}
+
+.reset-message {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #d9534f;
+}

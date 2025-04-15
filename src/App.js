@@ -18,6 +18,7 @@ import Academics from './components/academicsHome';
 import ViewFees from './components/ViewFees';
 import Signup from './components/signup';
 import Login from './components/login';
+import ResetPassword from './components/ResetPassword';
 import ForgotPassword from './components/ForgotPassword';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/home" element={<Homepage />} />
         <Route path="/course-shell" element={<EnrolledProgram />} />
         <Route path="/course-content" element={<CourseContent />} />

@@ -26,10 +26,10 @@ const Video = () => {
   };
 
   const onPlayerStateChange = (event) => {
-    if (event.data === 2) { // Video paused
+    if (event.data === 2) {
       const currentTime = event.target.getCurrentTime();
-      localStorage.setItem("lastPlayedTime", currentTime); // Save current time 
-      localStorage.setItem("lastPlayedVideoId", currentVideoId); // Save video ID
+      localStorage.setItem("lastPlayedTime", currentTime); //Save current time 
+      localStorage.setItem("lastPlayedVideoId", currentVideoId); //Save video ID
     }
 
     if (event.data === 1) { // title of Video playing
@@ -44,7 +44,7 @@ const Video = () => {
     playerVars: {
       autoplay: 1,
       listType: "playlist",
-      list: "PLBDA2E52FB1EF80C9", // Playlist ID
+      list: "PLBDA2E52FB1EF80C9", //playlist ID
     },
   };
 

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {  
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   axios.defaults.withCredentials = true;
@@ -16,11 +17,13 @@ const Login = () => {
             .then(response => {
                 console.log(response.data);
                 if (response.data.status) {
+                    setErrorMessage("");
                     navigate ("/home"); 
                 }
             })
             .catch(error => {
                 console.error("There was an error logging in!", error);
+                setErrorMessage("Wrong email or password.");
             }); 
     };
 

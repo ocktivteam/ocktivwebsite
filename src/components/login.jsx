@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {  
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   axios.defaults.withCredentials = true;
@@ -20,10 +20,13 @@ const Login = () => {
                     setErrorMessage("");
                     navigate ("/home"); 
                 }
+                else {
+                    setMessage("Username or password is incorrect.");
+                }
             })
             .catch(error => {
                 console.error("There was an error logging in!", error);
-                setErrorMessage("Wrong email or password.");
+                setMessage("Something went wrong. Please try again.");
             }); 
     };
 
@@ -50,6 +53,11 @@ const Login = () => {
       
             <button type="submit">Login</button>
           </form>
+            {message && (
+                <p className="login-message" style={{ color: "red", marginTop: "10px" }}>
+                    {message}
+                </p>
+            )}
           <Link to="/forgotPassword">Forgot Password?</Link>
           <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
         </div>

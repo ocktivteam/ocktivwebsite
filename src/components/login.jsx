@@ -1,78 +1,91 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "../style/login.css"; 
-import axios from "axios";
+import "../style/login.css";
 
-const Login = () => {  
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
-    const navigate = useNavigate();
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
-    axios.defaults.withCredentials = true;
+  const validate = () => {
+    const errs = {};
+    if (!email) {
+      errs.email = "Please enter your email address.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errs.email = "Please enter a valid email address.";
+    }
+    if (!password) {
+      errs.password = "Please enter your password.";
+    }
+    return errs;
+  };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const errs = validate();
+    setErrors(errs);
+    setTouched({ email: true, password: true });
+    if (Object.keys(errs).length === 0) {
+      alert("Login successful (placeholder)");
+    }
+  };
 
-       axios.post("https://ocktivwebsite-3.onrender.com/auth/login", { email, password })
-            .then(response => {
-                console.log(response.data);
-                if (response.data.status) {
-                    navigate("/home"); 
-                } else {
-                    setMessage("Username or password is incorrect.");
-                }
-            })
-            .catch(error => {
-                console.error("There was an error logging in!", error);
-                setMessage("Something went wrong. Please try again.");
-            }); 
-    };
+  const handleBlur = (field) => {
+    setTouched({ ...touched, [field]: true });
+    setErrors(validate());
+  };
 
-    return (
-        <div id="login-page">
-            <h2>Login</h2>
-            <form id="login-form" onSubmit={handleSubmit}>
-                <label htmlFor="email">Email:</label>
-                <input 
-                    type="email" 
-                    autoComplete="off" 
-                    placeholder="Email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
+  return (
+    <div className="login-page">
+      <div className="login-left">
+        <div className="login-content">
+          <img src="/img/ocktivLogo.png" alt="Ocktiv Logo" className="logo" />
+          <h2 className="login-heading">Log in to your account</h2>
+          <form className="login-form" onSubmit={handleSubmit} noValidate>
+            <div className="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                placeholder="Enter Email ID"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => handleBlur("email")}
+                className={errors.email && touched.email ? "invalid" : ""}
+                autoComplete="username"
+              />
+              {errors.email && touched.email && (
+                <span className="error">{errors.email}</span>
+              )}
+            </div>
 
-                <label htmlFor="password">Password:</label>
-                <input 
-                    type="password" 
-                    placeholder="******" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+            <div className="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                placeholder="Enter Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => handleBlur("password")}
+                className={errors.password && touched.password ? "invalid" : ""}
+                autoComplete="current-password"
+              />
+              {errors.password && touched.password && (
+                <span className="error">{errors.password}</span>
+              )}
+            </div>
 
-                <button type="submit">Login</button>
-            </form>
-
-            {/* Message Display */}
-            {message && (
-                <p className="login-message" style={{ color: "red", marginTop: "10px" }}>
-                    {message}
-                </p>
-            )}
-
-            <Link to="/forgotPassword">Forgot Password?</Link>
-            <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
+            <button type="submit" className="login-btn">
+              Log In <span className="arrow">→</span>
+            </button>
+            <a href="#" className="forgot-link">
+              Forgot your password?
+            </a>
+          </form>
         </div>
-    );
-};
-
-export default Login;
-
-
-
-
-
-
-
-
-
+      </div>
+      <div className="login-right">
+        <img src="/img/LogSignBG.jpg" alt="Login Visual" className="login-image" />
+      </div>
+    </div>
+  );
+}

@@ -2,7 +2,7 @@ import React from "react";
 import { Menu, Bell, User } from "lucide-react";
 import "../App.css";
 import Cards from "./cards";
-import Logo from "../img/logo-with-name.svg";
+//import Logo from "../img/logo-with-name.svg";
 import { useNavigate } from "react-router-dom";
 //import axios from "axios";
 
@@ -26,7 +26,7 @@ const Homepage = () => {
 
         <div className="logo-container">
           <img
-            src={Logo}
+           // src={Logo}
             alt="Ocktiv Logo"
             className="logo"
           />
@@ -42,7 +42,6 @@ const Homepage = () => {
           </button>
         </div>
       </header>
-
 
       <Cards />
       <div className="logout-button-container" onClick={handleLogout}>

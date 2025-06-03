@@ -53,15 +53,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  roles: {
+  role: {
     type: String,
     enum: ['student', 'instructor', 'admin'],
-    required: true,
+    //required: true,
+    default: 'student',  // Default value is 'student'
   },
   gender: {
     type: String,
     enum: ['male', 'female', 'other'],
-    default: null,
+    default: null, // This makes it optional as it'll default to null
   },
   resetToken: {
     type: String,

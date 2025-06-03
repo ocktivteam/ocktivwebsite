@@ -6,6 +6,8 @@ import jwt from 'jsonwebtoken';
 
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+
+/*
 router.post("/signup", async (req, res) => {
     const { username, email, password } = req.body;
     const user = await User.findOne({ email });
@@ -23,8 +25,108 @@ router.post("/signup", async (req, res) => {
     await newUser.save();
     return res.json({ status: true, message: "User created successfully" });
 });
+*/
 
+/*
+// Tested - works - but there is no JWT token generated
+// Sign up - Create an account
+router.post("/signup", async (req, res) => {
+    const { firstName, lastName, email, password } = req.body;
+    
+    // Check if the email already exists
+    const user = await User.findOne({ email });
+    if (user) {
+        return res.json({ message: "User already exists" });
+    }
 
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the new user with the default 'student' role
+    const newUser = new User({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        // No need to include gender as it's defaulted to null
+        // role defaults as student
+    });
+
+    try {
+        // Save the user to the database
+        await newUser.save();
+        return res.json({ status: true, message: "User created successfully" });
+    } catch (error) {
+        console.error("Error creating user:", error);
+        return res.status(500).json({ message: "Error saving user" });
+    }
+});
+*/
+
+// Testing JWT
+// Sign up - Create an account
+router.post("/signup", async (req, res) => {
+    const { firstName, lastName, email, password, role } = req.body;
+  
+    
+  // Default role to 'student' if not provided
+  const userRole = role || 'student';
+
+    // Check if the email already exists
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.json({ message: "User already exists" });
+    }
+  
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+  
+    // Create the new user with the default 'student' role
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      // No need to include gender as it's defaulted to null
+      // role defaults as student
+      role: userRole,  // Ensure role is set correctly
+
+    });
+  
+    try {
+      // Save the user to the database
+      await newUser.save();
+  
+      // Log the newly created user data
+      console.log('New User Data:', {
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        role: newUser.role,  // Assuming role is a part of the user model
+      });
+  
+      // Create JWT token
+      const token = jwt.sign(
+        { userId: newUser._id, username: newUser.firstName }, // Include relevant data
+        process.env.JWT_SECRET, // You should have a JWT_SECRET in your environment variables
+        { expiresIn: '1h' } // Token expiration time (1 hour)
+      );
+  
+      // Log the token (optional: only in development environments for security reasons)
+      console.log('Generated JWT Token:', token);
+  
+      // Send the token to the client (you can also send other user data if necessary)
+      return res.json({
+        status: true,
+        message: "User created successfully",
+        token: token,  // Include token in the response
+      });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return res.status(500).json({ message: "Error saving user" });
+    }
+  });
+  
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -46,7 +148,6 @@ router.post('/login', async (req, res) => {
     })
     return res.json({ status: true, message: "Login successfully" })
 })
-
 
 
 // Forgot Password Route

@@ -1,11 +1,13 @@
-
 import mongoose from "mongoose";
-
+ 
 const userSchema = new mongoose.Schema({
-  username: {
+  firstName: {
     type: String,
     required: true,
-    unique: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
   },
   email: {
     type: String,
@@ -16,16 +18,27 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ['student', 'instructor', 'admin'],
+    //required: true,
+    default: 'student',  // Default value is 'student'
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other'],
+    default: null, // This makes it optional as it'll default to null
+  },
   resetToken: {
-    type: String, // Token for password reset
+    type: String,
     default: null,
   },
   resetTokenExpiration: {
-    type: Date, // Expiry time for the reset token
+    type: Date,
     default: null,
   },
-});
-
+}, { timestamps: true }); // Adds createdAt and updatedAt automatically
+ 
 const UserModel = mongoose.model("User", userSchema);
-
-export { UserModel as User }
+export { UserModel as User };
+ 

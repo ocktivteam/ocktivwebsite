@@ -2,134 +2,156 @@ import express from "express";
 import bcrypt from "bcryptjs";
 const router = express.Router();
 import { User } from "../models/User.js";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 
-import crypto from 'crypto';
-import nodemailer from 'nodemailer';
+// ============ SIGNUP (NO USERNAME, matches your schema) ============
 router.post("/signup", async (req, res) => {
-    const { username, email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (user) {
-        return res.json({ message: "User already existed" });
-    }
-    const hashpassword = await bcrypt.hash(password, 10);
+  const { firstName, lastName, email, password, role } = req.body;
+  const userRole = role || "student";
 
-    const newUser = new User({
-        username,
-        email,
-        password: hashpassword,
-    });
+  // Check if the email already exists
+  const user = await User.findOne({ email });
+  if (user) {
+    return res.json({ message: "User already exists" });
+  }
 
+  // Hash the password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Create the new user
+  const newUser = new User({
+    firstName,
+    lastName,
+    email,
+    password: hashedPassword,
+    role: userRole,
+  });
+
+  try {
     await newUser.save();
-    return res.json({ status: true, message: "User created successfully" });
+    // JWT payload now uses _id, email, firstName
+    const token = jwt.sign(
+      { userId: newUser._id, email: newUser.email, firstName: newUser.firstName },
+      process.env.JWT_SECRET || process.env.KEY, // Support both
+      { expiresIn: "1h" }
+    );
+    return res.json({
+      status: true,
+      message: "User created successfully",
+      token,
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return res.status(500).json({ message: "Error saving user" });
+  }
 });
 
+// ============ LOGIN (NO USERNAME, uses email) ============
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.json({ message: "User is not registered" });
+  }
 
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (!validPassword) {
+    return res.json({ message: "Password is incorrect" });
+  }
+
+  // JWT payload uses user info
+  const token = jwt.sign(
+    { userId: user._id, email: user.email, firstName: user.firstName },
+    process.env.JWT_SECRET || process.env.KEY,
+    { expiresIn: "1h" }
+  );
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    maxAge: 36000000,
+    sameSite: "Lax",
+  });
+  return res.json({ status: true, message: "Login successfully", token });
+});
+
+// ============ FORGOT PASSWORD ============
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  console.log("Received forgot-password request for:", email);
+
+  try {
     const user = await User.findOne({ email });
     if (!user) {
-        return res.json({ message: "User is not registered" })
+      console.log("User not found with email:", email);
+      // For security, always send success msg (don't reveal valid/invalid emails)
+      return res.status(200).json({ message: "If this email is registered, a reset link has been sent." });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password)
-    if (!validPassword) {
-        return res.json({ message: "Password is incorrect" })
-    }
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiration = Date.now() + 3600000; // 1 hour
+    user.resetToken = token;
+    user.resetTokenExpiration = expiration;
+    await user.save();
 
-    const token = jwt.sign({ username: user.username }, process.env.KEY, { expiresIn: "1h" })
+    const resetLink = `https://ocktivwebsite.vercel.app/reset-password/${token}`;
 
-    res.cookie('token', token, {
-        httpOnly: true,
-        maxAge: 36000000,
-        sameSite: 'Lax'
-    })
-    return res.json({ status: true, message: "Login successfully" })
-})
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
 
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Password Reset Request",
+      html: `<p>Click here to reset your password: <a href="${resetLink}">${resetLink}</a></p>`,
+    };
 
-
-// Forgot Password Route
-
-router.post('/forgot-password', async (req, res) => {
-    const { email } = req.body;
-    console.log("Received forgot-password request for:", email);
-
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            console.log("User not found with email:", email);
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        const token = crypto.randomBytes(32).toString("hex");
-        const expiration = Date.now() + 3600000;
-        user.resetToken = token;
-        user.resetTokenExpiration = expiration;
-        await user.save();
-        console.log("Generated token and saved user:", token);
-
-        const resetLink = `https://ocktivwebsite.vercel.app/reset-password/${token}`;
-        console.log("Reset link:", resetLink);
-
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL,
-                pass: process.env.EMAIL_PASSWORD
-            }
-        });
-
-        const mailOptions = {
-            from: process.env.EMAIL,
-            to: email,
-            subject: 'Password Reset Request',
-            html: `<p>Click here to reset your password: <a href="${resetLink}">${resetLink}</a></p>`
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error("Error sending email:", error);
-                return res.status(500).json({ message: "Failed to send email" });
-            } else {
-                console.log("Email sent:", info.response);
-                return res.status(200).json({ message: "Reset email sent" });
-            }
-        });
-
-    } catch (err) {
-        console.error("🔥 Caught error in forgot-password:", err);
-        res.status(500).json({ message: "Something went wrong" });
-    }
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        return res.status(500).json({ message: "Failed to send email" });
+      } else {
+        console.log("Email sent:", info.response);
+        return res.status(200).json({ message: "If this email is registered, a reset link has been sent." });
+      }
+    });
+  } catch (err) {
+    console.error("🔥 Caught error in forgot-password:", err);
+    res.status(500).json({ message: "Something went wrong" });
+  }
 });
 
+// ============ RESET PASSWORD ============
+router.post("/reset-password", async (req, res) => {
+  const { token, password } = req.body;
 
-// Reset Password Route
-router.post('/reset-password', async (req, res) => {
-    const { token, password } = req.body;
+  try {
+    const user = await User.findOne({
+      resetToken: token,
+      resetTokenExpiration: { $gt: Date.now() },
+    });
 
-    try {
-        const user = await User.findOne({
-            resetToken: token,
-            resetTokenExpiration: { $gt: Date.now() }
-        });
-
-        if (!user) {
-            return res.status(400).json({ status: false, message: "Invalid or expired token." });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        user.password = hashedPassword;
-        user.resetToken = null;
-        user.resetTokenExpiration = null;
-
-        await user.save();
-
-        return res.json({ status: true, message: "Password has been reset successfully." });
-    } catch (error) {
-        console.error("Reset password error:", error);
-        return res.status(500).json({ status: false, message: "Server error. Please try again later." });
+    if (!user) {
+      return res.status(400).json({ status: false, message: "Invalid or expired token." });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetToken = null;
+    user.resetTokenExpiration = null;
+    await user.save();
+
+    return res.json({ status: true, message: "Password has been reset successfully." });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    return res.status(500).json({ status: false, message: "Server error. Please try again later." });
+  }
 });
 
 export { router as userRouter };

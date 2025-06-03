@@ -1,44 +1,3 @@
-// import React, { useState } from "react";
-// import axios from "axios";
-
-// const ForgotPassword = () => {
-//     const [email, setEmail] = useState("");
-//     const [message, setMessage] = useState("");
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         try {
-//             const response = await axios.post("https://ocktivwebsite-3.onrender.com/auth/forgot-password", { email });
-//             setMessage(response.data.message);
-//         } catch (err) {
-//             setMessage("Something went wrong. Try again.");
-//         }
-//     };
-
-//     return (
-//         <div>
-//             <h2>Forgot Password</h2>
-//             <form onSubmit={handleSubmit}>
-//                 <input 
-//                     type="email" 
-//                     placeholder="Enter your email" 
-//                     value={email}
-//                     onChange={(e) => setEmail(e.target.value)}
-//                     required
-//                 />
-//                 <button type="submit">Send Reset Link</button>
-//             </form>
-//             {message && <p>{message}</p>}
-//         </div>
-//     );
-// };
-
-// export default ForgotPassword;
-
-
-
-//============ Re modified
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -51,10 +10,12 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // For local development, use localhost:5000
-  // For production, uncomment the onrender/vercel URL
-  const API_URL = "http://localhost:5000/auth/forgot-password";
-  // const API_URL = "https://ocktivwebsite-3.onrender.com/auth/forgot-password";
+  // Automatically use localhost for dev, Vercel for prod (you can keep both for quick swap)
+  const API_URL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:5050/auth/forgot-password"
+      : "https://ocktivwebsite-3.onrender.com/auth/forgot-password";
+  // Or hardcode if you prefer: const API_URL = "http://localhost:5050/auth/forgot-password";
 
   // Validation
   const validate = () => {
@@ -76,7 +37,11 @@ export default function ForgotPassword() {
     if (Object.keys(errs).length === 0) {
       setLoading(true);
       try {
-        const res = await axios.post(API_URL, { email });
+        const res = await axios.post(
+          API_URL,
+          { email },
+          { withCredentials: true }
+        );
         setMessage(
           "If this email is registered, a reset link has been sent. Please check your inbox."
         );
@@ -122,7 +87,8 @@ export default function ForgotPassword() {
             {errors.email && <span className="error">{errors.email}</span>}
             {message && <span className="message">{message}</span>}
             <button type="submit" className="send-btn" disabled={loading}>
-              {loading ? "Sending..." : "Send Email"} <span className="arrow">→</span>
+              {loading ? "Sending..." : "Send Email"}{" "}
+              <span className="arrow">→</span>
             </button>
           </form>
           <button className="back-link" onClick={() => navigate("/login")}>

@@ -1,5 +1,5 @@
 /* Signup Page Styling */
-.sign-up-container {
+/* .sign-up-container {
   width: 350px;
   margin: 50px auto;
   padding: 20px;
@@ -51,7 +51,7 @@ button {
 
 button:hover {
   background: #c4ecb9;
-}
+} */
   /* Login designs  */
 
   #login-page {
@@ -121,8 +121,6 @@ p a {
 p a:hover {
     text-decoration: underline;
 }
-
-
 
 /* Reset password Design */
 .reset-container {

@@ -15,7 +15,6 @@ const Content = () => {
   const { courseId } = useParams();
 
   console.log("Course ID from URL:", courseId); 
-
   
   const formattedCourseId = courseId ? courseId.toLowerCase() : "";
   const courseName = courseNames[formattedCourseId] || "Course Not Found";

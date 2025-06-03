@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../style/login.css";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -77,14 +78,20 @@ export default function Login() {
             <button type="submit" className="login-btn">
               Log In <span className="arrow">→</span>
             </button>
-            <a href="#" className="forgot-link">
+
+            {/* ✅ Link to Forgot Password page */}
+            <Link to="/forgotPassword" className="forgot-link">
               Forgot your password?
-            </a>
+            </Link>
           </form>
         </div>
       </div>
       <div className="login-right">
-        <img src="/img/LogSignBG.jpg" alt="Login Visual" className="login-image" />
+        <img
+          src="/img/LogInBG.jpg"
+          alt="Login Visual"
+          className="login-image"
+        />
       </div>
     </div>
   );

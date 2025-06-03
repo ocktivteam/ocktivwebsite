@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
 import Homepage from "./components/homepage";
-import { BrowserRouter as Router, Routes, Route, BrowserRouter } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import EnrolledProgram from "./components/EnrolledProgram";
 import CourseContent from "./components/CourseContent";
 import Content from "./components/Content";
@@ -23,7 +23,7 @@ import ForgotPassword from './components/ForgotPassword';
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Login />} />
@@ -45,10 +45,8 @@ function App() {
         <Route path="/grades" element={<Grades />} />
         <Route path="/discussion" element={<Discussion />} />
         <Route path="/groups" element={<Groups />} />
-
       </Routes>
-
-    </BrowserRouter>
+    </Router>
   );
 }
 

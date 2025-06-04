@@ -31,6 +31,16 @@ const ResetPassword = () => {
       return;
     }
 
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            setError("Password must contain at least one special character.");
+            return;
+          }
+      
+          if (!/\d/.test(password)) {
+            setError("Password must contain at least one number.");
+            return;
+          }      
+
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;

@@ -75,7 +75,7 @@ router.post("/signup", async (req, res) => {
     // Check if the email already exists
     const user = await User.findOne({ email });
     if (user) {
-      return res.json({ message: "User already exists" });
+        return res.status(400).json({ message: "User already exists" });
     }
   
     // Hash the password
@@ -126,7 +126,7 @@ router.post("/signup", async (req, res) => {
       return res.status(500).json({ message: "Error saving user" });
     }
   });
-  
+/*
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -148,6 +148,43 @@ router.post('/login', async (req, res) => {
     })
     return res.json({ status: true, message: "Login successfully" })
 })
+*/
+// new Login with JWT
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    
+    // Find user by email
+    const user = await User.findOne({ email });
+    
+    // Check if the user exists
+    if (!user) {
+        return res.status(404).json({ message: "User is not registered" });
+    }
+
+    // Compare provided password with the hashed password in the database
+    const validPassword = await bcrypt.compare(password, user.password);
+    
+    if (!validPassword) {
+        return res.status(401).json({ message: "Password is incorrect" });
+    }
+
+    // Create JWT token (similar to signup)
+    const token = jwt.sign(
+        { userId: user._id, username: user.firstName, role: user.role }, // Include relevant user data
+        process.env.JWT_SECRET, // Use your environment variable for the JWT secret
+        { expiresIn: '1h' } // Token expiration time (1 hour)
+    );
+
+    // Log the generated token (only for development purposes)
+    console.log('Generated JWT Token:', token);
+
+    // Send the token as part of the response
+    return res.json({
+        status: true,
+        message: "Login successfully",
+        token: token,  // Send token as part of the response
+    });
+});
 
 
 // Forgot Password Route

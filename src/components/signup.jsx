@@ -321,6 +321,13 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
+    // Password validation regex
+    const validatePassword = (password) => {
+        // Password must be at least 6 characters long, include at least 1 special character and 1 number
+        const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;
+        return passwordRegex.test(password);
+      };
+      
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -329,7 +336,11 @@ const Signup = () => {
     if (!firstName.trim()) newErrors.firstName = "First name is required";
     if (!lastName.trim()) newErrors.lastName = "Last name is required";
     if (!email.trim()) newErrors.email = "Email is required";
-    if (!password.trim()) newErrors.password = "Password is required";
+    if (!password.trim()) {
+        newErrors.password = "Password is required";
+      } else if (!validatePassword(password)) {
+        newErrors.password = "Password must be at least 6 characters long, contain at least 1 number and 1 special character.";
+      }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);

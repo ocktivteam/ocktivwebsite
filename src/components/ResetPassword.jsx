@@ -1,66 +1,94 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../style/login.css"; 
+import "../style/resetpassword.css";
+
+const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5050/auth/reset-password"
+    : "https://ocktivwebsite-3.onrender.com/auth/reset-password";
 
 const ResetPassword = () => {
-    const { token } = useParams();
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [message, setMessage] = useState("");
-    const navigate = useNavigate();
+  const { token } = useParams();
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
 
-        if (password !== confirmPassword) {
-            setMessage("Passwords do not match.");
-            return;
-        }
+    if (!password || !confirmPassword) {
+      setError("Both fields are required.");
+      return;
+    }
 
-        try {
-            const response = await axios.post("https://ocktivwebsite-3.onrender.com/auth/reset-password", {
-                token,
-                password
-            });
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
 
-            setMessage(response.data.message);
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
-            if (response.data.status) {
-                setTimeout(() => {
-                    navigate("/login");
-                }, 2000);
-            }
-        } catch (err) {
-            setMessage("Error resetting password.");
-        }
-    };
+    try {
+      const response = await axios.post(
+        API_URL,
+        { token, password },
+        { withCredentials: true }
+      );
 
-    return (
-        <div className="reset-container">
-            <div className="reset-card">
-                <h2>Reset Your Password</h2>
-                <form onSubmit={handleSubmit} className="reset-form">
-                    <input 
-                        type="password" 
-                        placeholder="New password" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    <input 
-                        type="password" 
-                        placeholder="Confirm password" 
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                    />
-                    <button type="submit">Reset Password</button>
-                </form>
-                {message && <p className="reset-message">{message}</p>}
-            </div>
-        </div>
-    );
+      setMessage(response.data.message);
+      if (response.data.status) {
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
+    } catch (err) {
+      setError("Error resetting password.");
+    }
+  };
+
+  return (
+    <div className="reset-container">
+      <div className="reset-card">
+        <img
+          src="/img/ocktivLogo.png"
+          alt="Ocktiv Logo"
+          className="reset-logo"
+        />
+        <h2 className="reset-title">Reset Your Password</h2>
+        <form onSubmit={handleSubmit} className="reset-form">
+          <input
+            type="password"
+            placeholder="New password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="reset-input"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Confirm password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="reset-input"
+            required
+          />
+          <button type="submit" className="reset-btn">
+            Reset Password
+          </button>
+        </form>
+        {error && <p className="reset-error">{error}</p>}
+        {message && <p className="reset-message">{message}</p>}
+      </div>
+    </div>
+  );
 };
 
 export default ResetPassword;

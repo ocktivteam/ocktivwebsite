@@ -79,7 +79,7 @@ export default function Login() {
               Log In <span className="arrow">→</span>
             </button>
 
-            {/* ✅ Link to Forgot Password page */}
+            {/*Link to Forgot Password page */}
             <Link to="/forgotPassword" className="forgot-link">
               Forgot your password?
             </Link>

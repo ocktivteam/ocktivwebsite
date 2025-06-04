@@ -10,14 +10,12 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Automatically use localhost for dev, Vercel for prod (you can keep both for quick swap)
   const API_URL =
     window.location.hostname === "localhost"
       ? "http://localhost:5050/auth/forgot-password"
       : "https://ocktivwebsite-3.onrender.com/auth/forgot-password";
-  // Or hardcode if you prefer: const API_URL = "http://localhost:5050/auth/forgot-password";
+  //const API_URL = "http://localhost:5050/auth/forgot-password";
 
-  // Validation
   const validate = () => {
     const errs = {};
     if (!email) {
@@ -28,7 +26,6 @@ export default function ForgotPassword() {
     return errs;
   };
 
-  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();

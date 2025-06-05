@@ -24,13 +24,13 @@ const Homepage = () => {
         </button>
 
 
-{/* <div className="logo-container">
-  <img
-    src={Logo}
-    alt="Ocktiv Logo"
-    className="logo"
-  />
-</div> */}
+        <div className="logo-container">
+          <img
+           // src={Logo}
+            alt="Ocktiv Logo"
+            className="logo"
+          />
+        </div>
 
 
         <div className="icons-container">
@@ -42,7 +42,6 @@ const Homepage = () => {
           </button>
         </div>
       </header>
-
 
       <Cards />
       <div className="logout-button-container" onClick={handleLogout}>

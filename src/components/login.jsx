@@ -1,40 +1,64 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import "../style/login.css";
-import { Link } from "react-router-dom";
 
-export default function Login() {
+const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5050/auth/login"
+    : "https://ocktivwebsite-3.onrender.com/auth/login";
+
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({});
+  const navigate = useNavigate();
 
-  const validate = () => {
-    const errs = {};
-    if (!email) {
-      errs.email = "Please enter your email address.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errs.email = "Please enter a valid email address.";
-    }
-    if (!password) {
-      errs.password = "Please enter your password.";
-    }
-    return errs;
-  };
+    // Email format validation
+    const validateEmail = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+      };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const errs = validate();
-    setErrors(errs);
-    setTouched({ email: true, password: true });
-    if (Object.keys(errs).length === 0) {
-      alert("Login successful (placeholder)");
-    }
-  };
 
-  const handleBlur = (field) => {
-    setTouched({ ...touched, [field]: true });
-    setErrors(validate());
-  };
+    // Validation
+    const newErrors = {};
+    if (!email.trim()) newErrors.email = "Email is required";
+    else if (!validateEmail(email)) newErrors.email = "Please enter a valid email address";
+
+    if (!password.trim()) newErrors.password = "Password is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({}); // Clear previous errors
+
+    // Submit to API
+    axios.post(API_URL, {
+      email,
+      password,
+    }).then(response => {
+      if (response.data.status) {
+        // Save the token to localStorage
+        localStorage.setItem("authToken", response.data.token);
+
+        // Redirect to the desired page (e.g., dashboard or home)
+        navigate("/home"); // Change this route as needed
+      } else {
+        setErrors({ general: "Incorrect email or password" }); // General error message
+      }
+    }).catch(error => {
+        if (error.response && error.response.data && error.response.data.message) {
+          setErrors({ general: error.response.data.message }); // Show backend message
+        } else {
+          setErrors({ general: "An error occurred while logging in." });
+        }
+      });
+    }      
 
   return (
     <div className="login-page">
@@ -42,7 +66,7 @@ export default function Login() {
         <div className="login-content">
           <img src="/img/ocktivLogo.png" alt="Ocktiv Logo" className="logo" />
           <h2 className="login-heading">Log in to your account</h2>
-          <form className="login-form" onSubmit={handleSubmit} noValidate>
+          <form onSubmit={handleSubmit} className="login-form" noValidate>
             <div className="form-group">
               <label>Email</label>
               <input
@@ -50,13 +74,10 @@ export default function Login() {
                 placeholder="Enter Email ID"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onBlur={() => handleBlur("email")}
-                className={errors.email && touched.email ? "invalid" : ""}
+                className={errors.email ? "invalid" : ""}
                 autoComplete="username"
               />
-              {errors.email && touched.email && (
-                <span className="error">{errors.email}</span>
-              )}
+              {errors.email && <span className="error">{errors.email}</span>}
             </div>
 
             <div className="form-group">
@@ -66,33 +87,30 @@ export default function Login() {
                 placeholder="Enter Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onBlur={() => handleBlur("password")}
-                className={errors.password && touched.password ? "invalid" : ""}
+                className={errors.password ? "invalid" : ""}
                 autoComplete="current-password"
               />
-              {errors.password && touched.password && (
-                <span className="error">{errors.password}</span>
-              )}
+              {errors.password && <span className="error">{errors.password}</span>}
             </div>
 
-            <button type="submit" className="login-btn">
-              Log In <span className="arrow">→</span>
-            </button>
+            {errors.general && <span className="error">{errors.general}</span>}
 
-            {/*Link to Forgot Password page */}
-            <Link to="/forgotPassword" className="forgot-link">
-              Forgot your password?
-            </Link>
+            <button type="submit" className="login-btn">Log In →</button>
+
+            {/* Link to Forgot Password page */}
+            <Link to="/forgotPassword" className="forgot-link">Forgot your password?</Link>
+
+             {/* Link to Signup page */}
+             <p className="signup-link">Don't have an account? <Link to="/signup">Sign Up</Link></p>
           </form>
         </div>
       </div>
+
       <div className="login-right">
-        <img
-          src="/img/LogInBG.jpg"
-          alt="Login Visual"
-          className="login-image"
-        />
+        <img src="/img/LogInBG.jpg" alt="Login Visual" className="login-image" />
       </div>
     </div>
   );
-}
+};
+
+export default Login;

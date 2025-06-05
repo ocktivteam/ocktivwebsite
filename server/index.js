@@ -7,9 +7,6 @@ import { userRouter } from "./routes/user.js";
 
 dotenv.config();
 
-console.log("Loaded MONGO_URI:", process.env.MONGO_URI);
-console.log("Loaded PORT:", process.env.PORT);
-
 const app = express();
 
 const allowedOrigins = [
@@ -18,24 +15,27 @@ const allowedOrigins = [
   "https://ocktivwebsite-3.onrender.com"
 ];
 
+// This version works with arrays and adds the correct headers!
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true); // Allow Postman, curl, etc.
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS not allowed from this origin: ' + origin), false);
+  },
   credentials: true,
 }));
+
 
 app.use(express.json());
 app.use(cookieParser());
 
-
 app.get('/ping', (req, res) => res.json({ pong: true, origin: req.headers.origin }));
-
 
 app.use('/auth', userRouter);
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB connected successfully');
   })

@@ -68,7 +68,8 @@ const Signup = () => {
                 navigate("/login");
             }
             console.log(response);
-        }).catch(error => {
+        })
+        .catch(error => {
             console.error("There was an error signing up!", error);
         });
     };

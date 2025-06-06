@@ -20,11 +20,13 @@ import Signup from './components/signup';
 import Login from './components/login';
 import ResetPassword from './components/ResetPassword';
 import ForgotPassword from './components/ForgotPassword';
+import AllCourses from "./components/allcourses";
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/courses" element={<AllCourses />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />

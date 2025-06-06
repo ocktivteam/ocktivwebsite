@@ -40,7 +40,7 @@ export default function ForgotPassword() {
           { withCredentials: true }
         );
         setMessage(
-          "If this email is registered, a reset link has been sent. Please check your inbox."
+          "If this email is registered, a reset link has been sent. Please check your inbox or your spam folder."
         );
         setEmail("");
       } catch (err) {

@@ -15,7 +15,7 @@ const Payment = () => {
                     </a>
                 </div>
                 <ul className="navbar-links desktop-nav">
-                    <li><a href="/all-courses">Courses</a></li>
+                    <li><a href="/courses">Courses</a></li>
                     <li><a href="https://ocktiv.com/#About" target="_blank">About</a></li>
                     <li><a href="https://bucolic-profiterole-262b56.netlify.app/" target="_blank">Services</a></li>
                 </ul>

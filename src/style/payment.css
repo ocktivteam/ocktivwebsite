@@ -1,0 +1,134 @@
+/* Navbar */
+
+.ocktiv-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    flex-wrap: wrap;
+    background-color: #69982F;
+  }
+  
+  .navbar-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-links.desktop-nav {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    margin-left: auto; /* Push links and login to the right */
+  }
+  
+  .navbar-login-wrap {
+    margin-left: 16px; /* space between links and login button */
+    display: flex;
+    align-items: center;
+  }
+  
+
+  .label-subtext {
+    font-weight: normal;
+    font-size: 0.9rem;
+    display: block;
+    margin-top: 4px;
+    color: #555; /* Optional: subtle tone */
+  }
+
+  
+/* Container */
+.payment-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 2rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .checkout-left, .checkout-right {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .checkout-title, .order-summary-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.2rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  
+  .order-card {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .order-thumbnail {
+    width: 100px;
+    height: 100px;
+    object-fit: contain; /* instead of cover */
+    border-radius: 6px;
+    background: #f9f9f9;
+  }
+  
+  .order-info .course-title {
+    font-weight: bold;
+  }
+  
+  .order-info .course-price {
+    color: #28a745;
+  }
+  
+  .coupon-section input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+  }
+  
+  .price-summary p {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+  
+  .enroll-btn {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  @media (max-width: 768px) {
+    .payment-container {
+      flex-direction: column;
+    }
+  }
+  

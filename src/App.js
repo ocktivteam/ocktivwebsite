@@ -21,12 +21,16 @@ import Login from './components/login';
 import ResetPassword from './components/ResetPassword';
 import ForgotPassword from './components/ForgotPassword';
 import AllCourses from "./components/allcourses";
-
+import Payment from "./components/payment";
+import CourseDetails from "./components/coursedetails";
+ 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/courses" element={<AllCourses />} />
+        <Route path="/coursedetails" element={<CourseDetails />} />
+        <Route path="/payment" element={<Payment />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />

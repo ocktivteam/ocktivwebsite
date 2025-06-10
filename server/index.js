@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import { userRouter } from "./routes/user.js";
+import { enrollRouter } from "./routes/enrollRoutes.js";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use(cookieParser());
 app.get('/ping', (req, res) => res.json({ pong: true, origin: req.headers.origin }));
 
 app.use('/auth', userRouter);
+app.use("/api", enrollRouter);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

@@ -1,3 +1,5 @@
+// index.js
+
 import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
@@ -5,6 +7,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { userRouter } from "./routes/user.js";
 import { enrollRouter } from "./routes/enrollRoutes.js";
+import { courseRouter } from "./routes/courseRoutes.js";
 
 dotenv.config();
 
@@ -16,10 +19,9 @@ const allowedOrigins = [
   "https://ocktivwebsite-3.onrender.com"
 ];
 
-// This version works with arrays and adds the correct headers!
 app.use(cors({
   origin: function(origin, callback) {
-    if (!origin) return callback(null, true); // Allow Postman, curl, etc.
+    if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
@@ -28,14 +30,17 @@ app.use(cors({
   credentials: true,
 }));
 
-
 app.use(express.json());
 app.use(cookieParser());
 
 app.get('/ping', (req, res) => res.json({ pong: true, origin: req.headers.origin }));
 
 app.use('/auth', userRouter);
-app.use("/api", enrollRouter);
+
+
+app.use("/api/enrollment", enrollRouter);
+
+app.use("/api/courses", courseRouter);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

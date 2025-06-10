@@ -2,6 +2,7 @@ import { Enrollment } from "../models/Enrollment.js";
 import { User } from "../models/User.js";
 import { Course } from "../models/Course.js";
 
+// POST: Enroll user in a course
 export const enrollUser = async (req, res) => {
   const { userId, courseId } = req.body;
 
@@ -45,5 +46,16 @@ export const enrollUser = async (req, res) => {
   } catch (error) {
     console.error("Enrollment error:", error);
     return res.status(500).json({ status: false, message: "Internal server error" });
+  }
+};
+
+
+export const getUserEnrollments = async (req, res) => {
+  try {
+    const enrollments = await Enrollment.find({ user: req.params.userId })
+      .populate("course");
+    res.json({ status: true, enrollments });
+  } catch (err) {
+    res.status(500).json({ status: false, message: err.message });
   }
 };

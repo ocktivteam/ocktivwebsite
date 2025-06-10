@@ -99,14 +99,14 @@ function CourseDetails() {
             <section className="course-section">
               <h3>Course Description</h3>
               <p>
-              Lean Six Sigma Yellow Belt is a professional who is well versed in the foundational elements of the Lean Six Sigma Methodology, who leads limited improvement projects and / or serves as a team member as a part of more complex improvement projects lead by a Certified Green Belt or Certified Black Belt.
+              This Six Sigma Yellow Belt course provides a foundational understanding of the Six Sigma methodology and its role in process improvement. This course introduces participants to key concepts such as DMAIC (Define, Measure, Analyze, Improve, Control), basic data collection and analysis techniques, and the principles of reducing variation and improving quality. Designed for team members and support staff, this course enables participants to contribute effectively to Six Sigma projects and support Green and Black Belt initiatives within their organization.
               </p>
             </section>
  
             <section className="course-section">
               <h3>Certification</h3>
               <p>
-                At Ocktiv, we understand the significance of formal recognition for your hard work and dedication to continuous learning...
+              The Six Sigma Yellow Belt certification is awarded to learners upon successful completion of the Yellow Belt training and assessment, Participants are officially certified as Six Sigma Yellow Belt by a Lean Six Sigma Black Belt professional.
               </p>
             </section>
  

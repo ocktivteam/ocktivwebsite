@@ -211,13 +211,13 @@ function AllCourses() {
   const perPage = 9;
   const navigate = useNavigate();
 
-  // Route protection: redirect if not logged in
-  useEffect(() => {
-    if (!localStorage.getItem("authToken")) {
-      navigate("/login");
-    }
-    // eslint-disable-next-line
-  }, []);
+  // // Route protection: redirect if not logged in
+  // useEffect(() => {
+  //   if (!localStorage.getItem("authToken")) {
+  //     navigate("/login");
+  //   }
+  //   // eslint-disable-next-line
+  // }, []);
 
   // Fetch courses from backend
   useEffect(() => {

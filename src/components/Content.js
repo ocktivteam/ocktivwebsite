@@ -1,7 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import Layout from "./layout";
-import Navbar from "./Navbar";
 
 const courseNames = {
   "comp123": "COMP 123 - Introduction to Programming",
@@ -30,7 +29,6 @@ const Content = () => {
         </div>
       </Layout>
 
-      <Navbar />
     </>
   );
 };

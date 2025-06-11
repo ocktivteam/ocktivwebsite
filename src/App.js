@@ -23,13 +23,13 @@ import ForgotPassword from './components/ForgotPassword';
 import AllCourses from "./components/allcourses";
 import Payment from "./components/payment";
 import CourseDetails from "./components/coursedetails";
- 
+
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/courses" element={<AllCourses />} />
-        <Route path="/coursedetails" element={<CourseDetails />} />
+        <Route path="/coursedetails/:id" element={<CourseDetails />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Login />} />
@@ -38,7 +38,8 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/home" element={<Homepage />} />
         <Route path="/course-shell" element={<EnrolledProgram />} />
-        <Route path="/course-content" element={<CourseContent />} />
+        <Route path="/course-content/:courseId" element={<CourseContent />} />
+        {/* <Route path="/course-content" element={<CourseContent />} /> */}
         <Route path="/course/:courseId" element={<Content />} />
         <Route path="/video" element={<Video />} />
         <Route path="/messages" element={<Messages />} />

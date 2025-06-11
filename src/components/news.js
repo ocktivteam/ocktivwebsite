@@ -1,7 +1,6 @@
 import React from "react";
 import Layout from "./layout"; 
 import "../style/news.css";  
-import Navbar from "./Navbar";
 
 const News = () => {
   const title = "News";  // Title of the page
@@ -45,9 +44,7 @@ const News = () => {
 
   return (
     <div>
-      <Layout title={title} /> 
-      <Navbar />
-      
+      <Layout title={title} />       
     
       <div className="news-container">
         {newsData.map((newsItem) => (

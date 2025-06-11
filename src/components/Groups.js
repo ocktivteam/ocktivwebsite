@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Layout from "./layout";
 import "../style/Groups.css";
-import Navbar from "./Navbar";
 
 const Groups = () => {
   const title = "Groups";
@@ -14,7 +13,6 @@ const Groups = () => {
   return (
     <div className="groups-container">
       <Layout title={title} />
-      <Navbar />
       <h2 className="group-heading">See available groups</h2>
       <div className="group-list">
         <div className="group-item" onClick={() => handleClick("Assignment #2")}>

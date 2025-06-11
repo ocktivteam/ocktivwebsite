@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Layout from "./layout";
 import "../style/Discussion.css";
-import Navbar from "./Navbar";
 
 const Discussion = () => {
   const title = "Discussion";
@@ -28,7 +27,7 @@ const Discussion = () => {
   return (
     <div className="discussion-container">
       <Layout title={title} />
-      <Navbar />
+
       
       {/* Post Thread Section */}
       <div className="post-thread">

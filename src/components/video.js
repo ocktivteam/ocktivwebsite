@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import YouTube from "react-youtube";
 import Layout from "./layout";
 import "../style/video.css";
-import Navbar from "./Navbar";
 
 const Video = () => {
   const title = "Video Lectures";
@@ -57,7 +56,6 @@ const Video = () => {
   return (
     <>
       <Layout title={title} />
-      <Navbar />
       <div className="video-container">
         <h3 className="current-video-title">{currentVideoTitle || "Loading..."}</h3>
         <div className="video-wrapper">

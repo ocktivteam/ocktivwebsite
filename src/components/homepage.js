@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Menu, Bell, User } from "lucide-react";
 import "../App.css";
 import Cards from "./cards";
@@ -8,10 +8,19 @@ import { useNavigate } from "react-router-dom";
 
 const Homepage = () => {
   const navigate = useNavigate();
-  const handleLogout = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
+  // const handleLogout = () => {
+
+  //   localStorage.removeItem("token");
+  //   sessionStorage.removeItem("token");
+  //   navigate("/login");
+  // };
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
     navigate("/login");
   };
 

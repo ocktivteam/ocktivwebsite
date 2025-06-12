@@ -7,9 +7,9 @@ import axios from "axios";
 import Navbar from "./navbar";
 
 const ENROLL_API =
-  window.location.hostname === "localhost"
-    ? "http://localhost:5050/api/enrollment/enroll"
-    : "https://ocktivwebsite-3.onrender.com/api/enrollment/enroll";
+    window.location.hostname === "localhost"
+        ? "http://localhost:5050/api/enrollment/enroll"
+        : "https://ocktivwebsite-3.onrender.com/api/enrollment/enroll";
 
 const Payment = () => {
     const [fullName, setFullName] = useState("");
@@ -17,6 +17,8 @@ const Payment = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
+    const [course, setCourse] = useState(null);
+    const [courseLoading, setCourseLoading] = useState(true);
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -25,6 +27,30 @@ const Payment = () => {
             navigate("/login");
         }
     }, [navigate]);
+
+
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const courseId = params.get("courseId");
+        if (!courseId) return;
+
+        const COURSE_API =
+            window.location.hostname === "localhost"
+                ? `http://localhost:5050/api/courses/${courseId}`
+                : `https://ocktivwebsite-3.onrender.com/api/courses/${courseId}`;
+
+        axios.get(COURSE_API)
+            .then(res => {
+                setCourse(res.data.course);
+                setCourseLoading(false);
+            })
+            .catch(() => {
+                setCourse(null);
+                setCourseLoading(false);
+            });
+    }, [location.search]);
+
 
     const handleEnroll = async () => {
         setError("");
@@ -107,17 +133,25 @@ const Payment = () => {
                     <div className="order-card">
                         <img src="/img/ocktivLogo.png" alt="Course thumbnail" className="order-thumbnail" />
                         <div className="order-info">
-                            <p className="course-title">Your Selected Course</p>
-                            <p className="course-price">$0.00</p>
+                            <p className="course-title">
+                                {courseLoading ? "Loading..." : course?.courseTitle || "Course not found"}
+                            </p>
+                            <p className="course-price">
+                                {courseLoading ? "" : (course?.price === 0 || course?.price === "0" || course?.price === undefined)
+                                    ? "$0.00"
+                                    : `$${course.price}`}
+                            </p>
+
                         </div>
                     </div>
                     <div className="coupon-section">
                         <input type="text" placeholder="Apply Coupon Code" disabled />
                     </div>
                     <div className="price-summary">
-                        <p>Subtotal: <span>$0.00</span></p>
+                        <p>Subtotal: <span>{course?.price ? `$${course.price}` : "$0.00"}</span></p>
                         <p>Discount: <span>$0.00</span></p>
-                        <p>Total: <span>$0.00</span></p>
+                        <p>Total: <span>{course?.price ? `$${course.price}` : "$0.00"}</span></p>
+
                     </div>
                     {error && <div style={{ color: "red", marginBottom: 10 }}>{error}</div>}
                     <button

@@ -1,5 +1,7 @@
+// src/components/EnrolledProgram.jsx
+
 import React, { useEffect, useState } from "react";
-import Layout from "./layout";
+import DashboardNavbar from "./dashboardNavbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../style/EnrolledProgram.css";
@@ -14,7 +16,10 @@ const EnrolledProgram = () => {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const title = "Enrolled Program";
+  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+
+  const perPage = 9;
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -47,43 +52,102 @@ const EnrolledProgram = () => {
       });
   }, []);
 
+  // Filter by search
+  const filtered = enrollments.filter(e =>
+    (e.course?.courseTitle || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Pagination
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
+
+  // --- INDEPENDENT CENTERED BLOCK ---
+  function NoEnrollmentCenter() {
+    return (
+      <div className="no-enrollment-center">
+        <div className="no-results">
+          No enrolled courses found<br />
+        </div>
+        <button
+          className="enroll-now-btn"
+          onClick={() => navigate("/courses")}
+        >
+          Enroll in a course
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="container">
-      <Layout title={title} />
-      <main className="content">
+    <div className="allcourses-bg">
+      <DashboardNavbar />
+      <div className="allcourses-container">
+        <div className="courses-header-row">
+          <h2 className="courses-title">
+            Enrolled Course(s) <span className="courses-count">({enrollments.length})</span>
+          </h2>
+        </div>
+
         {loading ? (
           <div style={{ margin: "2rem" }}>Loading...</div>
         ) : error ? (
-          <div style={{ margin: "2rem", color: "red" }}>{error}</div>
-        ) : enrollments.length === 0 ? (
-          <div style={{ margin: "2rem" }}>You have no enrolled courses.</div>
-        ) : (
-          enrollments.map((enrollment) => (
-            <div
-              className="card clickable-card"
-              key={enrollment._id}
-              onClick={() =>
-                navigate(`/course-content/${enrollment.course?._id || ""}`)
-              }
-            >
-              <div className="image-placeholder">
+          <div className="no-results">{error}</div>
+        ) : paginated.length > 0 ? (
+          <div className="courses-grid">
+            {paginated.map((enrollment) => (
+              <div
+                className="course-card"
+                key={enrollment._id}
+                onClick={() => navigate(`/course-content/${enrollment.course?._id || ""}`)}
+              >
                 <img
                   src="/img/ocktivLogo.png"
                   alt={enrollment.course?.courseTitle || "[Image]"}
-                  style={{ width: "60px", height: "60px", objectFit: "contain" }}
+                  className="card-logo"
                 />
+                <div className="card-title">{enrollment.course?.courseTitle || "Untitled Course"}</div>
+                <div className="card-instructor">
+                  By {enrollment.course?.instructorName || "Ocktiv Instructor"}
+                </div>
+                <div className="card-duration">
+                  Course Duration: {enrollment.course?.duration || "N/A"}
+                </div>
               </div>
-              <h2>{enrollment.course?.courseTitle || "Untitled Course"}</h2>
-              <p>
-                {enrollment.course?.instructorName ||
-                  (enrollment.course?.instructor && enrollment.course.instructor.firstName) ||
-                  "Ocktiv Instructor"}
-              </p>
-            </div>
-          ))
+            ))}
+          </div>
+        ) : (
+          <NoEnrollmentCenter />
         )}
-      </main>
-      <footer className="footer">@ocktiv 2025</footer>
+
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div className="pagination-row">
+            <button
+              className="pagination-btn"
+              disabled={page === 1}
+              onClick={() => setPage(page - 1)}
+            >{'<'}</button>
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                className={`pagination-btn${page === i + 1 ? " active-page" : ""}`}
+                onClick={() => setPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              className="pagination-btn"
+              disabled={page === totalPages}
+              onClick={() => setPage(page + 1)}
+            >{'>'}</button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

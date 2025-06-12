@@ -1,0 +1,185 @@
+/* src/style/dashboardNavbar.css */
+
+.dashboard-navbar {
+  background-color: #6c9c30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  min-height: 60px;
+}
+
+.dashboard-navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.dashboard-navbar-logo {
+  height: 48px;
+  width: 48px;
+  object-fit: contain;
+}
+
+.dashboard-navbar-title {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-left: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* Dashboard right */
+.dashboard-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.dashboard-icon {
+  color: #fff;
+  vertical-align: middle;
+  height: 30px;
+  width: auto;
+}
+
+.dashboard-icon-btn {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 0 6px;
+}
+
+.dashboard-user-initials {
+  background: #fff;
+  color: #1a1a1a;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1.3rem;
+  height: 38px;
+  width: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: -15px;
+  margin-left: 5px;
+}
+
+.dashboard-user-fullname {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.dashboard-navbar-login-btn {
+  background: #fff;
+  color: #446d26;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 28px;
+  padding: 10px 34px;
+  margin-left: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dashboard-navbar-login-btn:hover {
+  background: #eaf1ea;
+}
+
+/* Apple Hamburger */
+.dashboard-apple-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  margin-left: 20px;
+  cursor: pointer;
+  z-index: 5000;
+}
+
+.dashboard-apple-hamburger span {
+  display: block;
+  height: 3.5px;
+  width: 32px;
+  background: #2d2d2d;
+  border-radius: 2px;
+}
+
+/* Apple Mobile Menu */
+.dashboard-apple-mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 4000;
+  width: 100vw;
+  height: 100vh;
+  background: #81b673;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px;
+  animation: fadeIn 0.16s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+.dashboard-apple-menu-close {
+  align-self: flex-end;
+  background: none;
+  color: #fff;
+  border: none;
+  font-size: 2.5rem;
+  cursor: pointer;
+}
+
+.dashboard-apple-mobile-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 36px 0 0 0;
+  width: 100%;
+}
+
+.dashboard-apple-mobile-menu li {
+  margin-bottom: 24px;
+}
+
+.dashboard-apple-menu-link {
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dashboard-apple-menu-link.bold {
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .dashboard-navbar-title { font-size: 1.1rem; }
+  .dashboard-user-fullname { font-size: 1rem; }
+} 
+
+@media (max-width: 768px) {
+  .dashboard-navbar {
+    padding: 10px 12px;
+    flex-wrap: wrap;
+  }
+  .dashboard-navbar-right.desktop-nav {
+    display: none;
+  }
+  .dashboard-apple-hamburger {
+    display: flex;
+  }
+}

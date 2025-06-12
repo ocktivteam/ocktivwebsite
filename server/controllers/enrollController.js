@@ -52,9 +52,28 @@ export const enrollUser = async (req, res) => {
 
 export const getUserEnrollments = async (req, res) => {
   try {
+    // Nested populate: course → instructorId
     const enrollments = await Enrollment.find({ user: req.params.userId })
-      .populate("course");
-    res.json({ status: true, enrollments });
+      .populate({
+        path: "course",
+        populate: {
+          path: "instructorId",
+          select: "firstName lastName email"
+        }
+      });
+
+    // Add instructorName to each course object for frontend
+    const result = enrollments.map(enr => {
+      const enrollmentObj = enr.toObject();
+      if (enrollmentObj.course && enrollmentObj.course.instructorId) {
+        enrollmentObj.course.instructorName = `${enrollmentObj.course.instructorId.firstName} ${enrollmentObj.course.instructorId.lastName}`.trim();
+      } else {
+        enrollmentObj.course.instructorName = "Ocktiv Instructor";
+      }
+      return enrollmentObj;
+    });
+
+    res.json({ status: true, enrollments: result });
   } catch (err) {
     res.status(500).json({ status: false, message: err.message });
   }

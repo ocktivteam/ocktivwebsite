@@ -167,8 +167,7 @@ const Login = () => {
         if (response.data.user) {
             localStorage.setItem("user", JSON.stringify(response.data.user));
         }
-
-        navigate("/home");
+        navigate("/course-shell");
       } else {
         setErrors({ general: "Incorrect email or password" });
       }

@@ -30,7 +30,7 @@ router.post("/signup", async (req, res) => {
             lastName,
             email,
             password: hashed,
-            role: userRole,
+            role: userRole
         });
         await newUser.save();
 
@@ -169,6 +169,25 @@ router.post("/reset-password", async (req, res) => {
     } catch (err) {
         console.error("Reset password error:", err);
         res.status(500).json({ status: false, message: "Server error. Please try again later." });
+    }
+});
+
+
+// ================== UPDATE LEGAL NAME & COUNTRY AFTER PAYMENT ==================
+router.patch("/:id/legal-country", async (req, res) => {
+    const { legalName, country } = req.body;
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { legalName, country },
+            { new: true }
+        );
+        if (!user) {
+            return res.status(404).json({ status: false, message: "User not found" });
+        }
+        res.json({ status: true, message: "Legal name and country updated", user });
+    } catch (err) {
+        res.status(500).json({ status: false, message: "Error updating info" });
     }
 });
 

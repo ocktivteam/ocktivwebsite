@@ -225,7 +225,7 @@ const Signup = () => {
                 if (courseId) {
                     navigate(`/payment?courseId=${courseId}`);
                 } else {
-                    navigate("/payment");
+                    navigate("/courses");
                 }
             }
         })

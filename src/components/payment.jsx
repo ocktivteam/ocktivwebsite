@@ -11,7 +11,13 @@ const ENROLL_API =
         ? "http://localhost:5050/api/enrollment/enroll"
         : "https://ocktivwebsite-3.onrender.com/api/enrollment/enroll";
 
-const Payment = () => {
+        const getUserUpdateApi = (userId) =>
+            window.location.hostname === "localhost"
+                ? `http://localhost:5050/auth/${userId}/legal-country`
+                : `https://ocktivwebsite-3.onrender.com/auth/${userId}/legal-country`;
+        
+
+    const Payment = () => {
     const [fullName, setFullName] = useState("");
     const [country, setCountry] = useState("");
     const [error, setError] = useState("");
@@ -51,6 +57,18 @@ const Payment = () => {
             });
     }, [location.search]);
 
+    const updateUserLegalCountry = async (userId, fullName, country, token) => {
+        try {
+            await axios.patch(
+                getUserUpdateApi(userId),
+                { legalName: fullName, country },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } catch (err) {
+            // Optionally handle error (you can show a warning, but it's not fatal)
+            console.warn("Could not update user legal name/country.", err);
+        }
+    };
 
     const handleEnroll = async () => {
         setError("");
@@ -87,7 +105,9 @@ const Payment = () => {
                 }
             );
             if (res.data.status) {
-                // Enrollment success: Redirect to enrolled courses
+                
+                await updateUserLegalCountry(user._id, fullName, country, token);
+                
                 navigate("/course-shell");
             } else {
                 setError(res.data.message || "Enrollment failed.");

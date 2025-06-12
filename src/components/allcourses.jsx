@@ -286,7 +286,9 @@ function AllCourses() {
               >
                 <img src="/img/ocktivLogo.png" alt="Course" className="card-logo" />
                 <div className="card-title">{course.courseTitle}</div>
-                <div className="card-instructor">By {course.instructorName || "Ocktiv Instructor"}</div>
+                <div className="card-instructor">
+  By {course.instructorName || "Ocktiv Instructor"}
+</div>
                 <div className="card-duration">Course Duration: {course.duration || "N/A"}</div>
               </div>
             ))

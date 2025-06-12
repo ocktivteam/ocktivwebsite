@@ -1,9 +1,9 @@
-
+ 
 .navbar {
   background-color: #81b673;
   padding: 4px 8px;
 }
-
+ 
 .navbar-container {
   display: flex;
   justify-content: space-between;
@@ -11,28 +11,32 @@
   max-width: 600px;
   margin: 0 auto;
 }
-
+ 
 .nav-links {
   display: flex;
   gap: 50px;
 }
-
+ 
 .nav-link {
   color: rgb(52, 51, 51);
   text-decoration: none;
   font-size: 1rem;
   transition: color 0.3s;
 }
-
+ 
 .nav-link:hover {
   color: white;
 }
-
-
+ 
+ 
 @media (max-width: 768px) {
-  .nav-links {
-      display: flex; 
-      flex-direction: column; 
-      gap: 20px; 
+  .ocktiv-navbar {
+    padding-top: 12px !important;
+    padding-bottom: 8px;
+  }
+  .navbar-left {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 }
+ 

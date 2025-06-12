@@ -6,55 +6,91 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../style/EnrolledProgram.css";
 
-const API_URL =
+const ENROLL_API =
   window.location.hostname === "localhost"
     ? "http://localhost:5050/api/enrollment"
     : "https://ocktivwebsite-3.onrender.com/api/enrollment";
 
+const COURSE_API =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5050/api/courses"
+    : "https://ocktivwebsite-3.onrender.com/api/courses";
+
 const EnrolledProgram = () => {
   const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState([]);
+  const [instructorCourses, setInstructorCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
+  const [user, setUser] = useState(null);
 
   const perPage = 9;
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    let user = null;
+    let userObj = null;
     try {
-      user = JSON.parse(localStorage.getItem("user"));
+      userObj = JSON.parse(localStorage.getItem("user"));
     } catch {
-      user = null;
+      userObj = null;
     }
+    setUser(userObj);
 
-    if (!token || !user || !user._id) {
+    if (!token || !userObj || !userObj._id) {
       setError("You must be logged in to see enrolled courses.");
       setLoading(false);
       return;
     }
 
-    setLoading(true);
-    axios
-      .get(`${API_URL}/user/${user._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        setEnrollments(res.data.enrollments || []);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Unable to fetch enrolled courses.");
-        setEnrollments([]);
-        setLoading(false);
-      });
+    // If instructor, fetch courses they teach
+    if (userObj.role === "instructor") {
+      setLoading(true);
+      axios
+        .get(COURSE_API, { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => {
+          const assigned = (res.data.courses || res.data || []).filter(
+            c => c.instructorId === userObj._id || c.instructorId?._id === userObj._id
+          );
+          setInstructorCourses(assigned);
+          setLoading(false);
+        })
+        .catch(() => {
+          setError("Unable to fetch courses.");
+          setInstructorCourses([]);
+          setLoading(false);
+        });
+    } else {
+      // Otherwise, fetch enrollments (for students)
+      setLoading(true);
+      axios
+        .get(`${ENROLL_API}/user/${userObj._id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          setEnrollments(res.data.enrollments || []);
+          setLoading(false);
+        })
+        .catch(() => {
+          setError("Unable to fetch enrolled courses.");
+          setEnrollments([]);
+          setLoading(false);
+        });
+    }
   }, []);
 
-  // Filter by search
-  const filtered = enrollments.filter(e =>
-    (e.course?.courseTitle || "").toLowerCase().includes(searchTerm.toLowerCase())
+  // Determine courses to show based on role
+  let displayCourses = [];
+  if (user?.role === "instructor") {
+    displayCourses = instructorCourses;
+  } else if (user?.role === "student") {
+    displayCourses = enrollments.map(e => e.course); // keep same shape as instructorCourses for rendering
+  }
+
+  // Filter by search (works for both roles)
+  const filtered = displayCourses.filter(c =>
+    (c?.courseTitle || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination
@@ -66,20 +102,42 @@ const EnrolledProgram = () => {
   }, [searchTerm]);
 
   // --- INDEPENDENT CENTERED BLOCK ---
-  function NoEnrollmentCenter() {
-    return (
-      <div className="no-enrollment-center">
-        <div className="no-results">
-          No enrolled courses found<br />
+  function NoEnrollmentCenter({ role }) {
+    if (role === "student") {
+      return (
+        <div className="no-enrollment-center">
+          <div className="no-results">
+            No enrolled courses found<br />
+          </div>
+          <button
+            className="enroll-now-btn"
+            onClick={() => navigate("/courses")}
+          >
+            Enroll in a course
+          </button>
         </div>
-        <button
-          className="enroll-now-btn"
-          onClick={() => navigate("/courses")}
-        >
-          Enroll in a course
-        </button>
-      </div>
-    );
+      );
+    } else if (role === "instructor") {
+      return (
+        <div className="no-enrollment-center">
+          <div className="no-results">
+            No enrolled courses found<br />
+            <span style={{ color: "#888", fontSize: "1rem" }}>
+              Please wait to be enrolled in a course.
+            </span>
+          </div>
+        </div>
+      );
+    } else {
+      // Admin, guest, or others – just the base message
+      return (
+        <div className="no-enrollment-center">
+          <div className="no-results">
+            No enrolled courses found
+          </div>
+        </div>
+      );
+    }
   }
 
   return (
@@ -88,7 +146,7 @@ const EnrolledProgram = () => {
       <div className="allcourses-container">
         <div className="courses-header-row">
           <h2 className="courses-title">
-            Enrolled Course(s) <span className="courses-count">({enrollments.length})</span>
+            Enrolled Course(s) <span className="courses-count">({filtered.length})</span>
           </h2>
         </div>
 
@@ -98,29 +156,29 @@ const EnrolledProgram = () => {
           <div className="no-results">{error}</div>
         ) : paginated.length > 0 ? (
           <div className="courses-grid">
-            {paginated.map((enrollment) => (
+            {paginated.map((course) => (
               <div
                 className="course-card"
-                key={enrollment._id}
-                onClick={() => navigate(`/course-content/${enrollment.course?._id || ""}`)}
+                key={course._id}
+                onClick={() => navigate(`/course-content/${course._id || ""}`)}
               >
                 <img
                   src="/img/ocktivLogo.png"
-                  alt={enrollment.course?.courseTitle || "[Image]"}
+                  alt={course?.courseTitle || "[Image]"}
                   className="card-logo"
                 />
-                <div className="card-title">{enrollment.course?.courseTitle || "Untitled Course"}</div>
+                <div className="card-title">{course?.courseTitle || "Untitled Course"}</div>
                 <div className="card-instructor">
-                  By {enrollment.course?.instructorName || "Ocktiv Instructor"}
+                  By {course?.instructorName || "Ocktiv Instructor"}
                 </div>
                 <div className="card-duration">
-                  Course Duration: {enrollment.course?.duration || "N/A"}
+                  Course Duration: {course?.duration || "N/A"}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <NoEnrollmentCenter />
+          <NoEnrollmentCenter role={user?.role || "student"} />
         )}
 
         {/* PAGINATION */}

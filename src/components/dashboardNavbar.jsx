@@ -48,7 +48,7 @@ function DashboardNavbar() {
             className="dashboard-navbar-logo"
           />
         </a>
-        <span className="dashboard-navbar-title">Enrolled Course(s)</span>
+        <span className="dashboard-navbar-title">Your Course(s)</span>
       </div>
 
       {/* Desktop right section with Material Icons */}

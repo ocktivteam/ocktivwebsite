@@ -146,7 +146,7 @@ const EnrolledProgram = () => {
       <div className="allcourses-container">
         <div className="courses-header-row">
           <h2 className="courses-title">
-            Enrolled Course(s) <span className="courses-count">({filtered.length})</span>
+            Your Course(s) <span className="courses-count">({filtered.length})</span>
           </h2>
         </div>
 

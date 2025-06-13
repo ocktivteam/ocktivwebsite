@@ -23,35 +23,73 @@ import ForgotPassword from './components/ForgotPassword';
 import AllCourses from "./components/allcourses";
 import Payment from "./components/payment";
 import CourseDetails from "./components/coursedetails";
+import SessionManager from "./components/SessionManager"; 
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/courses" element={<AllCourses />} />
-        <Route path="/coursedetails/:id" element={<CourseDetails />} />
-        <Route path="/payment" element={<Payment />} />
+        {/* Public routes: do NOT wrap */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/home" element={<Homepage />} />
-        <Route path="/course-shell" element={<EnrolledProgram />} />
-        <Route path="/course-content/:courseId" element={<CourseContent />} />
-        {/* <Route path="/course-content" element={<CourseContent />} /> */}
-        <Route path="/course/:courseId" element={<Content />} />
-        <Route path="/video" element={<Video />} />
-        <Route path="/messages" element={<Messages />} />
-        <Route path="/new-message" element={<NewMessage />} />
-        <Route path="/Finance" element={<Finance />} />
-        <Route path="/view-fees" element={<ViewFees />} />
-        <Route path="/academics" element={<Academics />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/evaluation" element={<Evaluation />} />
-        <Route path="/grades" element={<Grades />} />
-        <Route path="/discussion" element={<Discussion />} />
-        <Route path="/groups" element={<Groups />} />
+        {/* Protected routes: wrap with SessionManager */}
+        <Route path="/courses" element={
+          <SessionManager><AllCourses /></SessionManager>
+        } />
+        <Route path="/coursedetails/:id" element={
+          <SessionManager><CourseDetails /></SessionManager>
+        } />
+        <Route path="/payment" element={
+          <SessionManager><Payment /></SessionManager>
+        } />
+        <Route path="/home" element={
+          <SessionManager><Homepage /></SessionManager>
+        } />
+        <Route path="/course-shell" element={
+          <SessionManager><EnrolledProgram /></SessionManager>
+        } />
+        <Route path="/course-content/:courseId" element={
+          <SessionManager><CourseContent /></SessionManager>
+        } />
+        <Route path="/course/:courseId" element={
+          <SessionManager><Content /></SessionManager>
+        } />
+        <Route path="/video" element={
+          <SessionManager><Video /></SessionManager>
+        } />
+        <Route path="/messages" element={
+          <SessionManager><Messages /></SessionManager>
+        } />
+        <Route path="/new-message" element={
+          <SessionManager><NewMessage /></SessionManager>
+        } />
+        <Route path="/Finance" element={
+          <SessionManager><Finance /></SessionManager>
+        } />
+        <Route path="/view-fees" element={
+          <SessionManager><ViewFees /></SessionManager>
+        } />
+        <Route path="/academics" element={
+          <SessionManager><Academics /></SessionManager>
+        } />
+        <Route path="/news" element={
+          <SessionManager><News /></SessionManager>
+        } />
+        <Route path="/evaluation" element={
+          <SessionManager><Evaluation /></SessionManager>
+        } />
+        <Route path="/grades" element={
+          <SessionManager><Grades /></SessionManager>
+        } />
+        <Route path="/discussion" element={
+          <SessionManager><Discussion /></SessionManager>
+        } />
+        <Route path="/groups" element={
+          <SessionManager><Groups /></SessionManager>
+        } />
       </Routes>
     </Router>
   );

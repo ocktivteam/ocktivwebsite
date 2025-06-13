@@ -38,7 +38,7 @@ router.post("/signup", async (req, res) => {
         const token = jwt.sign(
             { userId: newUser._id, username: newUser.firstName, role: newUser.role },
             process.env.JWT_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: "1m" }
         );
 
         // Respond with token & user object (without password)
@@ -80,7 +80,7 @@ router.post("/login", async (req, res) => {
         const token = jwt.sign(
             { userId: user._id, username: user.firstName, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: "1m" }
         );
 
         // Respond with token & user object (without password)
@@ -101,6 +101,34 @@ router.post("/login", async (req, res) => {
         res.status(500).json({ status: false, message: "Server error during login" });
     }
 });
+
+
+// ======================== REFRESH TOKEN ========================
+router.post("/refresh-token", async (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ message: "No token provided" });
+  
+    const token = authHeader.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "Token format error" });
+  
+    try {
+      // Allow expired tokens, just check signature and payload
+      const payload = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
+      const user = await User.findById(payload.userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+  
+      const newToken = jwt.sign(
+        { userId: user._id, username: user.firstName, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "1m" }
+      );
+  
+      res.json({ token: newToken });
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+  });
+  
 
 // ==================== FORGOT PASSWORD ===================
 router.post("/forgot-password", async (req, res) => {

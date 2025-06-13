@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Layout from "./layout";
 import "../style/Grades.css";
-import Navbar from "./Navbar";  
 
 const Grades = () => {
   const title = "Gradesbook"; //Page title
@@ -19,7 +18,6 @@ const Grades = () => {
   return (
     <div>
       <Layout title={title} />
-      <Navbar />
       <div className="grades-container">
         <table className="grades-table">
           <thead>

@@ -1,3 +1,5 @@
+//models/User.js
+
 import mongoose from "mongoose";
  
 const userSchema = new mongoose.Schema({
@@ -29,6 +31,17 @@ const userSchema = new mongoose.Schema({
     enum: ['male', 'female', 'other'],
     default: null, // This makes it optional as it'll default to null
   },
+
+//Payment / Certificate Fields
+legalName: { 
+  type: String, 
+  default: "",
+},
+country:   { 
+  type: String, 
+  default: "",
+ },
+
   resetToken: {
     type: String,
     default: null,

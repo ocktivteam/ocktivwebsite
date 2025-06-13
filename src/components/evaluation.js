@@ -2,7 +2,6 @@ import React from "react";
 import { Download } from "lucide-react"; // Import the download icon from Lucid React
 import Layout from "./layout";
 import "../style/evaluation.css";
-import Navbar from "./Navbar";
 
 const Evaluation = () => {
   const title = "Evaluation";
@@ -64,7 +63,6 @@ const Evaluation = () => {
   return (
     <div>
       <Layout title={title} />
-      <Navbar />
       <div className="evaluation-container">
         <h2 className="evaluation-title">Evaluations</h2>
 

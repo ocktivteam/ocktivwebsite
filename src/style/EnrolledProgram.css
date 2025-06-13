@@ -1,38 +1,213 @@
-.container {
-    background-color: #f5f5f5;
-    min-height: 100vh;
-    text-align: center;
+/* src/style/EnrolledProgram.css */
+
+.allcourses-bg {
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.allcourses-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 12px 40px 12px;
+}
+
+.courses-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 0 12px 0;
+}
+
+.courses-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #222;
+  letter-spacing: 0.2px;
+  margin-right: 14px;
+}
+
+.courses-count {
+  color: #7ea84a;
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+.courses-actions {
+  flex: 1;
+  text-align: right;
+}
+
+.courses-search-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.navbar-search {
+  width: 100%;
+  max-width: 390px;
+  padding: 11px 18px;
+  font-size: 1.09rem;
+  border: 1.5px solid #e4e4e4;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 26px;
+  width: 100%;
+  margin: 0 auto;
+  justify-items: center;
+}
+
+.course-card {
+  background: #fff;
+  padding: 28px 18px 20px 18px;
+  border-radius: 18px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.09);
+  min-width: 260px;
+  max-width: 350px;
+  width: 100%;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.11s, box-shadow 0.11s;
+}
+.course-card:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.12);
+}
+
+.card-logo {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+  margin: 0 auto 15px auto;
+  background: #f3f5ef;
+  border-radius: 13px;
+}
+
+.card-title {
+  font-size: 1.18rem;
+  font-weight: bold;
+  color: #345c18;
+  margin-bottom: 6px;
+}
+
+.card-instructor {
+  color: #555;
+  font-size: 1.01rem;
+  margin-bottom: 4px;
+}
+
+.card-duration {
+  font-size: 0.98rem;
+  color: #666;
+}
+
+.no-results {
+  color: #7ea84a;
+  text-align: center;
+  margin: 2rem auto;
+  font-size: 1.12rem;
+  width: 100%;
+}
+
+.no-enrollment-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;    
+  justify-content: center; 
+  min-height: 55vh;       
+  width: 100%;
+  text-align: center;      
+}
+
+
+.enroll-now-btn {
+  display: flex;
+  background-color: #6c9c30;
+  font-size: 20px;
+  font-weight: semi-bold;
+  height: 40px;
+  width: auto;
+}
+
+
+.pagination-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+  gap: 8px;
+}
+.pagination-btn {
+  border: none;
+  outline: none;
+  background: #dbeaca;
+  color: #345c18;
+  font-weight: bold;
+  padding: 7px 18px;
+  border-radius: 7px;
+  margin: 0 1px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.13s, color 0.13s;
+}
+.pagination-btn.active-page,
+.pagination-btn:hover {
+  background: #7ea84a;
+  color: #fff;
+}
+
+.footer {
+  color: gray;
+  padding: 12px;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 38px;
+}
+
+
+
+@media (max-width: 900px) {
+  .allcourses-container {
+    padding: 10px 5px 26px 5px;
   }
-  
-  .content {
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
+  .courses-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 19px;
   }
-  
-  .card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    width: 250px;
-    text-align: center;
+  .card-logo {
+    width: 55px;
+    height: 55px;
   }
-  
-  .image-placeholder {
-    background: #e0e0e0;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+  .courses-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
-  
-  .footer {
-    color: gray;
-    padding: 10px;
-    font-size: 12px;
+  .courses-title {
+    font-size: 1.23rem;
   }
-  
+  .courses-count {
+    font-size: 1rem;
+  }
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .allcourses-container {
+    padding: 3px 1px 15px 1px;
+  }
+  .navbar-search {
+    max-width: 100%;
+    font-size: 0.99rem;
+    padding: 9px 9px;
+  }
+}

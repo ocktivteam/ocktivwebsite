@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
+import compression from "compression"; 
 import { userRouter } from "./routes/user.js";
 import { enrollRouter } from "./routes/enrollRoutes.js";
 import { courseRouter } from "./routes/courseRoutes.js";
@@ -18,6 +19,8 @@ const allowedOrigins = [
   "https://ocktivwebsite.vercel.app",
   "https://ocktivwebsite-3.onrender.com"
 ];
+
+app.use(compression());
 
 app.use(cors({
   origin: function(origin, callback) {
@@ -36,7 +39,6 @@ app.use(cookieParser());
 app.get('/ping', (req, res) => res.json({ pong: true, origin: req.headers.origin }));
 
 app.use('/auth', userRouter);
-
 
 app.use("/api/enrollment", enrollRouter);
 

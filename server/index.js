@@ -9,6 +9,8 @@ import compression from "compression";
 import { userRouter } from "./routes/user.js";
 import { enrollRouter } from "./routes/enrollRoutes.js";
 import { courseRouter } from "./routes/courseRoutes.js";
+import moduleRouter from "./routes/moduleRoutes.js";
+import moduleProgressRouter from "./routes/moduleProgressRoutes.js";
 
 dotenv.config();
 
@@ -43,6 +45,10 @@ app.use('/auth', userRouter);
 app.use("/api/enrollment", enrollRouter);
 
 app.use("/api/courses", courseRouter);
+
+app.use("/api/modules", moduleRouter);
+
+app.use("/api/module-progress", moduleProgressRouter);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

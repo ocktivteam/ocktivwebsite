@@ -140,7 +140,8 @@ router.post("/forgot-password", async (req, res) => {
           return res.status(200).json({ message: "If this email is registered, a reset link has been sent. Please check inbox or spam folder." });
       }
       const token = crypto.randomBytes(32).toString("hex");
-      const expiration = Date.now() + 15 * 60 * 1000; // 15 minutes
+      // FIX: Use Date object, not a number!
+      const expiration = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
       user.resetToken = token;
       user.resetTokenExpiration = expiration;
       await user.save();

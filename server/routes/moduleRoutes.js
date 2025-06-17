@@ -1,11 +1,12 @@
 import express from "express";
 import {
-  createModule,
-  getModulesByCourse,
-  getModuleById,
-  deleteModule,
-} from "../controllers/moduleController.js";
-
+    createModule,
+    getModulesByCourse,
+    getModuleById,
+    updateModule,
+    deleteModule,
+  } from "../controllers/moduleController.js";
+  
 const router = express.Router();
 
 // POST /api/modules/
@@ -16,6 +17,9 @@ router.get("/course/:courseId", getModulesByCourse);
 
 // GET /api/modules/:id
 router.get("/:id", getModuleById);
+
+// PUT /api/modules/:id
+router.put("/:id", updateModule);
 
 // DELETE /api/modules/:id
 router.delete("/:id", deleteModule);

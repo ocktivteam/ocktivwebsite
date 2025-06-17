@@ -8,6 +8,8 @@ import cors from "cors";
 import { userRouter } from "./routes/user.js";
 import { enrollRouter } from "./routes/enrollRoutes.js";
 import { courseRouter } from "./routes/courseRoutes.js";
+import moduleRouter from "./routes/moduleRoutes.js";
+import moduleProgressRouter from "./routes/moduleProgressRoutes.js";
 
 dotenv.config();
 

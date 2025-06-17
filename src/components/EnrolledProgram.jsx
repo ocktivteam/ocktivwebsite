@@ -39,7 +39,7 @@ const EnrolledProgram = () => {
     setUser(userObj);
 
     if (!token || !userObj || !userObj._id) {
-      setError("You must be logged in to see enrolled courses.");
+      setError("You must be logged in to see your courses.");
       setLoading(false);
       return;
     }
@@ -73,7 +73,7 @@ const EnrolledProgram = () => {
           setLoading(false);
         })
         .catch(() => {
-          setError("Unable to fetch enrolled courses.");
+          setError("Unable to fetch your courses.");
           setEnrollments([]);
           setLoading(false);
         });
@@ -121,9 +121,8 @@ const EnrolledProgram = () => {
       return (
         <div className="no-enrollment-center">
           <div className="no-results">
-            No enrolled courses found<br />
+          You are not currently teaching any courses.<br />
             <span style={{ color: "#888", fontSize: "1rem" }}>
-              Please wait to be enrolled in a course.
             </span>
           </div>
         </div>

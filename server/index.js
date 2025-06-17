@@ -39,10 +39,13 @@ app.get('/ping', (req, res) => res.json({ pong: true, origin: req.headers.origin
 
 app.use('/auth', userRouter);
 
-
 app.use("/api/enrollment", enrollRouter);
 
 app.use("/api/courses", courseRouter);
+
+app.use("/api/modules", moduleRouter);
+
+app.use("/api/module-progress", moduleProgressRouter);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

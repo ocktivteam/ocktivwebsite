@@ -8,6 +8,11 @@ const fileSchema = new mongoose.Schema({
   },
   name: { type: String, required: true },
   url: { type: String, required: true },
+  source: {
+    type: String,
+    enum: ["upload", "youtube", "external"],
+    default: "upload",
+  }
 }, { _id: false });
 
 const moduleSchema = new mongoose.Schema({

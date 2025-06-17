@@ -38,7 +38,7 @@ router.post("/signup", async (req, res) => {
         const token = jwt.sign(
             { userId: newUser._id, username: newUser.firstName, role: newUser.role },
             process.env.JWT_SECRET,
-            { expiresIn: "1m" }
+            { expiresIn: "1h" }
         );
 
         // Respond with token & user object (without password)
@@ -80,7 +80,7 @@ router.post("/login", async (req, res) => {
         const token = jwt.sign(
             { userId: user._id, username: user.firstName, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: "1m" }
+            { expiresIn: "1h" }
         );
 
         // Respond with token & user object (without password)
@@ -120,7 +120,7 @@ router.post("/refresh-token", async (req, res) => {
       const newToken = jwt.sign(
         { userId: user._id, username: user.firstName, role: user.role },
         process.env.JWT_SECRET,
-        { expiresIn: "1m" }
+        { expiresIn: "1h" }
       );
   
       res.json({ token: newToken });
@@ -132,49 +132,69 @@ router.post("/refresh-token", async (req, res) => {
 
 // ==================== FORGOT PASSWORD ===================
 router.post("/forgot-password", async (req, res) => {
-    const { email } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            // Always respond positively for privacy
-            return res.status(200).json({ message: "If this email is registered, a reset link has been sent. Please check inbox or spam folder" });
-        }
-        const token = crypto.randomBytes(32).toString("hex");
-        const expiration = Date.now() + 3600000; // 1 hour
-        user.resetToken = token;
-        user.resetTokenExpiration = expiration;
-        await user.save();
+  const { email } = req.body;
+  try {
+      const user = await User.findOne({ email });
+      if (!user) {
+          // Always respond positively for privacy
+          return res.status(200).json({ message: "If this email is registered, a reset link has been sent. Please check inbox or spam folder." });
+      }
+      const token = crypto.randomBytes(32).toString("hex");
+      const expiration = Date.now() + 15 * 60 * 1000; // 15 minutes
+      user.resetToken = token;
+      user.resetTokenExpiration = expiration;
+      await user.save();
 
-        const resetLink = `https://ocktivwebsite.vercel.app/reset-password/${token}`;
+      const resetLink = `https://ocktivwebsite.vercel.app/reset-password/${token}`;
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL,
-                pass: process.env.EMAIL_PASSWORD,
-            },
-        });
+      // Use first and last name if available
+      let fullName = "User";
+      if (user.firstName && user.lastName) {
+          fullName = `${user.firstName} ${user.lastName}`;
+      } else if (user.firstName) {
+          fullName = user.firstName;
+      } else if (user.lastName) {
+          fullName = user.lastName;
+      }
 
-        const mailOptions = {
-            from: process.env.EMAIL,
-            to: email,
-            subject: "Password Reset Request",
-            html: `<p>Click here to reset your password: <a href="${resetLink}">${resetLink}</a></p>`,
-        };
+      const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+              user: process.env.EMAIL,
+              pass: process.env.EMAIL_PASSWORD,
+          },
+      });
 
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error("Error sending email:", error);
-                return res.status(500).json({ message: "Failed to send email" });
-            } else {
-                console.log("Email sent:", info.response);
-                return res.status(200).json({ message: "If this email is registered, a reset link has been sent." });
-            }
-        });
-    } catch (err) {
-        console.error("Forgot password error:", err);
-        res.status(500).json({ message: "Something went wrong" });
-    }
+      const mailOptions = {
+          from: process.env.EMAIL,
+          to: email,
+          subject: "Password Reset Request",
+          html: `
+              <p>
+                  Hello ${fullName},<br><br>
+                  You have requested to reset your password. Please click the link below to proceed.<br>
+                  <b>This link will expire in 15 minutes for your security.</b><br><br>
+                  <a href="${resetLink}">${resetLink}</a><br><br>
+                  If you did not request this change, please disregard this email.<br><br>
+                  Sincerely,<br>
+                  The Ocktiv Team
+              </p>
+          `,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+              console.error("Error sending email:", error);
+              return res.status(500).json({ message: "Failed to send email" });
+          } else {
+              console.log("Email sent:", info.response);
+              return res.status(200).json({ message: "If this email is registered, a reset link has been sent. Please check your inbox or spam folder." });
+          }
+      });
+  } catch (err) {
+      console.error("Forgot password error:", err);
+      res.status(500).json({ message: "Something went wrong" });
+  }
 });
 
 // ==================== RESET PASSWORD ====================

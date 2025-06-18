@@ -159,7 +159,14 @@ const EnrolledProgram = () => {
               <div
                 className="course-card"
                 key={course._id}
-                onClick={() => navigate(`/course-content/${course._id || ""}`)}
+                onClick={() => {
+                  if (user?.role === "instructor") {
+                    navigate(`/course/${course._id}`);
+                  } else {
+                    navigate(`/course-content/${course._id || ""}`);
+                  }
+                }}
+                
               >
                 <img
                   src="/img/ocktivLogo.png"

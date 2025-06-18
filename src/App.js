@@ -4,7 +4,6 @@ import Homepage from "./components/homepage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import EnrolledProgram from "./components/EnrolledProgram";
 import CourseContent from "./components/CourseContent";
-import Content from "./components/Content";
 import Video from './components/video';
 import News from "./components/news";
 import Evaluation from './components/evaluation';
@@ -23,7 +22,8 @@ import ForgotPassword from './components/ForgotPassword';
 import AllCourses from "./components/allcourses";
 import Payment from "./components/payment";
 import CourseDetails from "./components/coursedetails";
-import SessionManager from "./components/SessionManager"; 
+import SessionManager from "./components/SessionManager";
+import Content from "./components/content";
 
 function App() {
   return (
@@ -89,6 +89,14 @@ function App() {
         } />
         <Route path="/groups" element={
           <SessionManager><Groups /></SessionManager>
+        } />
+          {/* EDIT module (show Content page in "edit" mode) */}
+          <Route path="/course/:courseId/content/:moduleId" element={
+          <SessionManager><Content /></SessionManager>
+        } />
+           {/* CREATE module (show Content page in "create" mode) */}
+           <Route path="/course/:courseId" element={
+          <SessionManager><Content /></SessionManager>
         } />
       </Routes>
     </Router>

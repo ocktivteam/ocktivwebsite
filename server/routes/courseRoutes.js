@@ -9,7 +9,6 @@ import {
 
 const router = express.Router();
 
-
 router.post("/test", (req, res) => {
   res.json({ test: true });
 });

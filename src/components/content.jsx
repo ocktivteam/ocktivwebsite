@@ -300,7 +300,10 @@ export default function Content() {
             `<img[^>]+src=["'][^"']*["'][^>]*alt=["']${file.name}["'][^>]*>`,
             "g"
           );
-          description = description.replace(regex, `<img src="${url}" alt="${file.name}" style="width:350px; height:auto;">`);
+          description = description.replace(regex, `<img src="${url}" alt="${file.name}" style="width:350px; height:auto;" loading="lazy" contenteditable="false">`);
+
+          console.log("Final Description HTML:\n", description);
+
           uploadedFiles.push({ type, name: file.name, url, source: "upload" });
         } else {
           // Replace pill href to S3 URL (name stays, icon stays)

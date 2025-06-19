@@ -1,8 +1,8 @@
 import express from "express";
 import {
   updateProgress,
-  getProgressForUser,
-  getProgressForModule,
+ // getProgressForUser,
+  //getProgressForModule,
 } from "../controllers/moduleProgressController.js";
 
 const router = express.Router();
@@ -11,9 +11,9 @@ const router = express.Router();
 router.put("/", updateProgress);
 
 // GET /api/module-progress/user/:userId
-router.get("/user/:userId", getProgressForUser);
+//router.get("/user/:userId", getProgressForUser);
 
 // GET /api/module-progress/module/:moduleId
-router.get("/module/:moduleId", getProgressForModule);
+//router.get("/module/:moduleId", getProgressForModule);
 
 export default router;

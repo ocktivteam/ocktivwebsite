@@ -25,6 +25,11 @@ const moduleProgressSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  status: {
+    type: String,
+    enum: ["not_started", "ongoing", "completed"],
+    default: "not_started",
+  },
 }, {
   timestamps: true, // adds createdAt and updatedAt
 });

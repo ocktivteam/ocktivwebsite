@@ -111,7 +111,9 @@ export default function AllContent() {
 
   // Fetch progress
   useEffect(() => {
-    if (!user?._id) return;
+    if (!user?._id || user.role !== "student" || !modules.length) return;
+
+    // Only fetch once when both are present
     axios.get(`${PROGRESS_API}/user/${user._id}`)
       .then(res => {
         const obj = {};
@@ -121,7 +123,10 @@ export default function AllContent() {
         setProgress(obj);
       })
       .catch(() => setProgress({}));
-  }, [modules, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id, modules.length]);
+
+  console.log("Fetching module progress for user:", user?._id);
 
   // Add new module handler
   function handleAddModule() {
@@ -191,33 +196,44 @@ export default function AllContent() {
   // -- YOUTUBE PLAYER LOGIC (no skip ahead) --
   // Save progress
   const saveProgress = (currentTime, ended = false) => {
-    if (!selectedModule || !user) return;
-    axios.post(`${PROGRESS_API}/save`, {
+    if (!selectedModule || !user || user.role !== "student") return;
+  
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+  
+    axios.put(`${PROGRESS_API}`, {
+      courseId,
       moduleId: selectedModule._id,
-      userId: user._id,
       lastWatchedTime: currentTime,
       completed: ended,
-    }).catch(() => {});
-    // Optionally update local progress immediately
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).catch(() => { });
+  
+    // Optimistically update local state
     setProgress(prev => ({
       ...prev,
       [selectedModule._id]: {
         ...(prev[selectedModule._id] || {}),
         lastWatchedTime: currentTime,
-        completed: ended || (prev[selectedModule._id]?.completed),
+        completed: ended || prev[selectedModule._id]?.completed,
       }
     }));
   };
+  
 
   // YouTube player events
   function onPlayerReady(event) {
+    if (user?.role !== "student") return;
     playerRef.current = event.target;
-    // Seek to last watched time if any
     const lastWatched = progress[selectedModule._id]?.lastWatchedTime || 0;
     if (lastWatched > 0) {
       event.target.seekTo(lastWatched, true);
     }
   }
+
   function onPlayerStateChange(event) {
     // 1 = playing, 2 = paused, 0 = ended
     if (event.data === 1) { // playing
@@ -246,6 +262,7 @@ export default function AllContent() {
     }
   }
   function onPlayerPlayback(event) {
+    if (user?.role !== "student") return;
     // Prevent skipping ahead
     const allowed = progress[selectedModule._id]?.lastWatchedTime || 0;
     const attempted = playerRef.current.getCurrentTime();
@@ -271,17 +288,20 @@ export default function AllContent() {
         {/* Sidebar */}
         <aside className="allcontent-sidebar">
           <div className="allcontent-sidebar-header">Course Contents</div>
-          <div className="allcontent-progress-bar-container">
-            <div className="allcontent-progress-bar">
-              <div
-                className="allcontent-progress-bar-fill"
-                style={{ width: `${percentComplete}%` }}
-              />
+          {user?.role === "student" && (
+            <div className="allcontent-progress-bar-container">
+              <div className="allcontent-progress-bar">
+                <div
+                  className="allcontent-progress-bar-fill"
+                  style={{ width: `${percentComplete}%` }}
+                />
+              </div>
+              <span className="allcontent-progress-bar-label">
+                {percentComplete}% Completed
+              </span>
             </div>
-            <span className="allcontent-progress-bar-label">
-              {percentComplete}% Completed
-            </span>
-          </div>
+          )}
+
           <div className="allcontent-module-list">
             {modules.map((mod, idx) => {
               let duration = "--";
@@ -298,17 +318,20 @@ export default function AllContent() {
                   onClick={() => setSelectedIdx(idx)}
                 >
                   <span className="allcontent-module-title">{mod.moduleTitle}</span>
-                  <span className="allcontent-module-meta">
-                    {duration}
-                    <span className="allcontent-module-status">
-                      {isComplete
-                        ? (<><MdDone className="status-icon done" /> <span>Completed</span></>)
-                        : prog && prog.lastWatchedTime > 0
-                          ? (<><span style={{color:"#3e8ed0"}}>Ongoing</span></>)
-                          : (<span style={{color:"#bbb"}}>Not Started</span>)
-                      }
+                  {user?.role === "student" && (
+                    <span className="allcontent-module-meta">
+                      {duration}
+                      <span className="allcontent-module-status">
+                        {isComplete
+                          ? (<><MdDone className="status-icon done" /> <span>Completed</span></>)
+                          : prog && prog.lastWatchedTime > 0
+                            ? (<><span style={{ color: "#3e8ed0" }}>Ongoing</span></>)
+                            : (<span style={{ color: "#bbb" }}>Not Started</span>)
+                        }
+                      </span>
                     </span>
-                  </span>
+                  )}
+
                 </div>
               );
             })}
@@ -381,16 +404,33 @@ export default function AllContent() {
               {attachedFiles.length > 0 && (
                 <div className="allcontent-files-section">
                   <div className="allcontent-files-label">
-                    Attach Files ({attachedFiles.length.toString().padStart(2, "0")})
+                    Attached Files ({attachedFiles.length.toString().padStart(2, "0")})
                   </div>
                   <div className="allcontent-files-list">
                     {attachedFiles.map((file, i) => (
                       <div className="allcontent-file-card" key={i}>
                         <span className="allcontent-file-icon">{fileIconSvg(file.type)}</span>
                         <span className="allcontent-file-name">{file.name}</span>
-                        <a
+                        {/* <a
                           className="allcontent-file-download-btn"
                           href={file.url}
+                          download={file.name} // force download with original filename
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Download File
+                        </a> */}
+                        <a
+                          href={
+                            file.key
+                              ? `${window.location.hostname === "localhost"
+                                ? "http://localhost:5050"
+                                : "https://ocktivwebsite-3.onrender.com"
+                              }/api/download/${file.key}`
+                              : file.url // fallback to public/external file URL
+                          }
+                          className="allcontent-file-download-btn"
+                          download={file.key ? file.name : undefined} // only force download for uploaded files
                           target="_blank"
                           rel="noopener noreferrer"
                         >

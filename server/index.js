@@ -12,6 +12,7 @@ import { courseRouter } from "./routes/courseRoutes.js";
 import moduleRouter from "./routes/moduleRoutes.js";
 import moduleProgressRouter from "./routes/moduleProgressRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import downloadRouter from "./routes/download.js";
 
 
 dotenv.config();
@@ -55,6 +56,8 @@ app.use("/api/modules", moduleRouter);
 app.use("/api/module-progress", moduleProgressRouter);
 
 app.use("/api/upload", uploadRoutes);
+
+app.use("/api/download", downloadRouter);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

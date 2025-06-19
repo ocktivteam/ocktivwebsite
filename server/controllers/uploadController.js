@@ -24,7 +24,7 @@ export const uploadFileToS3 = async (req, res) => {
       Key: `${Date.now()}-${req.file.originalname}`,
       Body: req.file.buffer,
       ContentType: req.file.mimetype,
-     // ACL: "public-read",
+      //ACL: "public-read",
     };
 
     // Upload to S3

@@ -24,6 +24,7 @@ import Payment from "./components/payment";
 import CourseDetails from "./components/coursedetails";
 import SessionManager from "./components/SessionManager";
 import Content from "./components/content";
+import AllContent from "./components/allContent";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+
         {/* Protected routes: wrap with SessionManager */}
         <Route path="/courses" element={
           <SessionManager><AllCourses /></SessionManager>
@@ -51,12 +53,27 @@ function App() {
         <Route path="/course-shell" element={
           <SessionManager><EnrolledProgram /></SessionManager>
         } />
+        {/* Student view: */}
         <Route path="/course-content/:courseId" element={
-          <SessionManager><CourseContent /></SessionManager>
+          <SessionManager><AllContent readOnly={true} /></SessionManager>
         } />
+
+        {/* Instructor view (module list/sidebar/plus) */}
         <Route path="/course/:courseId" element={
+          <SessionManager><AllContent /></SessionManager>
+        } />
+
+        {/* Create NEW module */}
+        <Route path="/course/:courseId/content" element={
           <SessionManager><Content /></SessionManager>
         } />
+
+        {/* Edit module */}
+        <Route path="/course/:courseId/content/:moduleId" element={
+          <SessionManager><Content /></SessionManager>
+        } />
+
+        {/* Miscellaneous routes */}
         <Route path="/video" element={
           <SessionManager><Video /></SessionManager>
         } />
@@ -89,14 +106,6 @@ function App() {
         } />
         <Route path="/groups" element={
           <SessionManager><Groups /></SessionManager>
-        } />
-          {/* EDIT module (show Content page in "edit" mode) */}
-          <Route path="/course/:courseId/content/:moduleId" element={
-          <SessionManager><Content /></SessionManager>
-        } />
-           {/* CREATE module (show Content page in "create" mode) */}
-           <Route path="/course/:courseId" element={
-          <SessionManager><Content /></SessionManager>
         } />
       </Routes>
     </Router>

@@ -3,7 +3,10 @@ import mongoose from "mongoose";
 const fileSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ["video", "pdf", "doc", "text"],
+    enum: [
+      "pdf", "doc", "docx", "zip", "rar", "7zip",
+      "text", "image", "video", "pptx", "xlsx", "external"
+    ],
     required: true,
   },
   name: { type: String, required: true },

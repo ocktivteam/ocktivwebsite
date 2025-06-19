@@ -45,6 +45,20 @@
   font-size: 1.19rem;
   box-sizing: border-box;
   border-bottom: 1px solid #ecf1f8;
+  /* --- Responsive scroll --- */
+  overflow-x: auto;
+  overflow-y: visible;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.content-tiptap-toolbar::-webkit-scrollbar {
+  height: 7px;
+  background: #1664b6;
+}
+.content-tiptap-toolbar::-webkit-scrollbar-thumb {
+  background: #22599e;
+  border-radius: 8px;
 }
 
 .content-tiptap-toolbar .MuiIconButton-root {
@@ -116,9 +130,72 @@
 }
 
 
+.file-pill-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border: 1.7px solid #d7e3f6;
+  border-radius: 12px;
+  padding: 9px 16px;
+  margin: 8px 0 7px 0;
+  min-width: 220px;
+  max-width: 480px;
+  text-decoration: none;
+  user-select: none;
+}
+.file-pill-card div {
+  pointer-events: none;
+}
+
+.file-pill-strictcard {
+  display: inline-flex !important;
+  align-items: center;
+  background: #dadada;
+  border-radius: 3px;
+  padding: 18px 34px 18px 22px;
+  margin: 14px 0;
+  min-width: 340px;
+  max-width: 700px;
+  gap: 22px;
+  text-decoration: none;
+  user-select: none;
+  box-shadow: 0 2px 6px 0 rgba(60,60,60,0.06);
+}
+.file-pill-strictcard span {
+  pointer-events: none;
+}
+.file-pill-strictcard img {
+  display: block;
+  margin: 0 auto;
+}
+
+.content-upload-btn .MuiButton-startIcon {
+  margin-right: 8px;
+  margin-left: 0;
+  display: inline-flex;
+  align-items: center;
+}
+.content-upload-btn .MuiButton-label {
+  flex-direction: row !important; /* Make sure it stays horizontal */
+}
+
+
 @media (max-width: 700px) {
   .content-body { padding: 0 4px; }
   .content-form-card { padding: 14px 2vw 17px 2vw; }
   .content-editor-block { border-radius: 13px; }
-  .content-tiptap-toolbar { border-radius: 13px 13px 0 0; padding: 10px 10px 7px 13px; }
+  .content-tiptap-toolbar {
+    border-radius: 13px 13px 0 0;
+    padding: 10px 4px 7px 7px;
+    font-size: 1.05rem;
+    gap: 1px;
+    max-width: 100vw;
+
+    /* NEW LINES BELOW */
+    flex-wrap: wrap;      /* Allow toolbar buttons to wrap to new line */
+    height: auto;         /* Let the toolbar grow in height */
+    white-space: normal;  /* Allow wrapping */
+    overflow-x: visible;  /* No horizontal scroll */
+  }
 }

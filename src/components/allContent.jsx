@@ -1,9 +1,12 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import CourseNavbar from "./courseNavbar";
 import "../style/allContent.css";
-import { FaPlusCircle, FaPen, FaTrash } from "react-icons/fa";
+import {
+  FaFilePdf, FaFileWord, FaFilePowerpoint, FaFileExcel, FaFileImage, FaFileVideo,
+  FaFileArchive, FaFileAlt, FaLink, FaFile, FaPlusCircle, FaPen, FaTrash, FaChevronDown, FaChevronUp
+} from "react-icons/fa";
 import { MdDone } from "react-icons/md";
 import YouTube from "react-youtube";
 
@@ -67,13 +70,66 @@ function stripYoutubeEmbeds(html = "") {
   return doc.innerHTML;
 }
 
-// Get file icon for attached files (simple svg, fallback by type)
-function fileIconSvg(type) {
-  const map = {
-    pdf: "📄", doc: "📄", docx: "📄", pptx: "📊", xlsx: "📊", image: "🖼️",
-    video: "🎬", zip: "🗜️", text: "📄", external: "🔗", default: "📁"
-  };
-  return map[type] || map.default;
+// FILE ICON / IMAGE THUMBNAIL
+function fileIconComponent(file) {
+  const type = (file.type || "").toLowerCase();
+  const name = (file.name || "").toLowerCase();
+  const url = file.url || "";
+  const imageExts = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
+  const ext = name.split('.').pop();
+
+  // Show thumbnail for images with a valid url
+  if (imageExts.includes(ext) && url) {
+    return (
+      <img
+        src={url}
+        alt={file.name}
+        style={{
+          width: 40, height: 40, borderRadius: 7,
+          objectFit: "cover", background: "#eee", border: "1px solid #ddd"
+        }}
+      />
+    );
+  }
+
+  // Otherwise, use real file icons
+  switch (type) {
+    case "pdf":
+      return <FaFilePdf color="#e53935" size={38} />;
+    case "doc":
+    case "docx":
+      return <FaFileWord color="#1e88e5" size={38} />;
+    case "ppt":
+    case "pptx":
+      return <FaFilePowerpoint color="#fbc02d" size={38} />;
+    case "xls":
+    case "xlsx":
+      return <FaFileExcel color="#388e3c" size={38} />;
+    case "image":
+      return <FaFileImage color="#26c6da" size={38} />;
+    case "video":
+      return <FaFileVideo color="#8e24aa" size={38} />;
+    case "zip":
+    case "rar":
+      return <FaFileArchive color="#ff7043" size={38} />;
+    case "text":
+    case "txt":
+      return <FaFileAlt color="#616161" size={38} />;
+    case "external":
+      return <FaLink color="#6d4c41" size={38} />;
+    default:
+      // fallback by extension if possible
+      if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext)) {
+        return <FaFileImage color="#26c6da" size={38} />;
+      }
+      if (["pdf"].includes(ext)) return <FaFilePdf color="#e53935" size={38} />;
+      if (["doc", "docx"].includes(ext)) return <FaFileWord color="#1e88e5" size={38} />;
+      if (["ppt", "pptx"].includes(ext)) return <FaFilePowerpoint color="#fbc02d" size={38} />;
+      if (["xls", "xlsx"].includes(ext)) return <FaFileExcel color="#388e3c" size={38} />;
+      if (["zip", "rar"].includes(ext)) return <FaFileArchive color="#ff7043" size={38} />;
+      if (["txt"].includes(ext)) return <FaFileAlt color="#616161" size={38} />;
+      return <FaFile color="#888" size={38} />;
+  }
 }
 
 export default function AllContent() {
@@ -84,15 +140,32 @@ export default function AllContent() {
 
   // State
   const [modules, setModules] = useState([]);
-  const [progress, setProgress] = useState({}); // moduleId: { completed, lastWatchedTime }
+  const [progress, setProgress] = useState({});
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
+  const [playerReady, setPlayerReady] = useState(false);
+
+  // For collapsible sidebar on mobile
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Refs for YouTube player
   const playerRef = useRef();
   const watchTimer = useRef();
+  const seekingRef = useRef(false);
+
+  // Helper: check if we're in mobile view
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth > 768) setSidebarOpen(true);
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Fetch modules
   useEffect(() => {
@@ -117,32 +190,26 @@ export default function AllContent() {
   }, [courseId]);
 
   // Clear state after redirect
-
   useEffect(() => {
     if (location.state?.selectedModuleId) {
       navigate(location.pathname, { replace: true });
     }
   }, [location, navigate]);
 
-  
-  // Fetch progress
+  // Progress fetching
   useEffect(() => {
     if (!user?._id || user.role !== "student" || !modules.length) return;
-
-    // Only fetch once when both are present
     axios.get(`${PROGRESS_API}/user/${user._id}`)
       .then(res => {
+        const arr = Array.isArray(res.data) ? res.data : res.data.progress || [];
         const obj = {};
-        (res.data.progress || []).forEach(p => {
-          obj[p.moduleId] = p;
+        arr.forEach(p => {
+          obj[String(p.moduleId)] = p;
         });
         setProgress(obj);
       })
       .catch(() => setProgress({}));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id, modules.length]);
-
-  console.log("Fetching module progress for user:", user?._id);
 
   // Add new module handler
   function handleAddModule() {
@@ -173,29 +240,6 @@ export default function AllContent() {
     }
   }
 
-  // Show empty state if no modules
-  if (!loading && modules.length === 0) {
-    return (
-      <div>
-        <CourseNavbar />
-        <div className="allcontent-body">
-          <div className="allcontent-sidebar">
-            <div className="allcontent-sidebar-header">Course Contents</div>
-            <div className="allcontent-empty">
-              You have not created any modules yet,<br />
-              please click the plus button below to add any courses.
-            </div>
-            {user?.role === "instructor" && (
-              <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
-                <FaPlusCircle size={36} />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Progress summary
   const totalModules = modules.length;
   const completedModules = modules.filter(
@@ -209,11 +253,13 @@ export default function AllContent() {
   const selectedModule = modules[selectedIdx] || modules[0];
   const youtubeId = selectedModule ? getYoutubeId(selectedModule.description) : null;
 
-  // -- YOUTUBE PLAYER LOGIC (no skip ahead) --
-  // Save progress
+  // Save progress, but never revert to incomplete once completed
   const saveProgress = (currentTime, ended = false) => {
     if (!selectedModule || !user || user.role !== "student") return;
 
+    const previous = progress[selectedModule._id] || {};
+    const alreadyCompleted = previous.completed === true;
+    const willComplete = ended || alreadyCompleted;
     const token = localStorage.getItem("authToken");
     if (!token) return;
 
@@ -221,44 +267,64 @@ export default function AllContent() {
       courseId,
       moduleId: selectedModule._id,
       lastWatchedTime: currentTime,
-      completed: ended,
+      completed: willComplete,
     }, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     }).catch(() => { });
 
-    // Optimistically update local state
     setProgress(prev => ({
       ...prev,
       [selectedModule._id]: {
-        ...(prev[selectedModule._id] || {}),
+        ...previous,
         lastWatchedTime: currentTime,
-        completed: ended || prev[selectedModule._id]?.completed,
+        completed: willComplete,
       }
     }));
   };
 
-
-  // YouTube player events
+  // YOUTUBE PLAYER LOGIC (seekTo on ready)
   function onPlayerReady(event) {
     if (user?.role !== "student") return;
     playerRef.current = event.target;
-    const lastWatched = progress[selectedModule._id]?.lastWatchedTime || 0;
-    if (lastWatched > 0) {
-      event.target.seekTo(lastWatched, true);
+    setPlayerReady(true);
+
+    const selectedModule = modules[selectedIdx] || modules[0];
+    const prog = progress[selectedModule?._id];
+
+    // Prevent double-seeking
+    if (seekingRef.current) return;
+    seekingRef.current = true;
+
+    if (prog) {
+      // Completed: seek to end
+      if (prog.completed && playerRef.current.getDuration) {
+        const duration = playerRef.current.getDuration();
+        if (duration > 0) {
+          playerRef.current.seekTo(duration - 0.2, true);
+        }
+      }
+      // Ongoing: seek to last watched time
+      else if (typeof prog.lastWatchedTime === "number" && prog.lastWatchedTime > 0) {
+        playerRef.current.seekTo(prog.lastWatchedTime, true);
+      }
     }
+    setTimeout(() => seekingRef.current = false, 1500);
   }
 
   function onPlayerStateChange(event) {
     // 1 = playing, 2 = paused, 0 = ended
     if (event.data === 1) { // playing
-      // Start timer to autosave progress every 5s
       if (watchTimer.current) clearInterval(watchTimer.current);
       watchTimer.current = setInterval(() => {
         if (playerRef.current) {
           const t = playerRef.current.getCurrentTime();
-          saveProgress(t, false);
+          if (t && t.then) {
+            t.then(time => saveProgress(time, false));
+          } else {
+            saveProgress(t, false);
+          }
         }
       }, 5000);
     }
@@ -266,25 +332,39 @@ export default function AllContent() {
       if (watchTimer.current) clearInterval(watchTimer.current);
       if (playerRef.current) {
         const t = playerRef.current.getCurrentTime();
-        saveProgress(t, false);
+        if (t && t.then) {
+          t.then(time => saveProgress(t, false));
+        } else {
+          saveProgress(t, false);
+        }
       }
     }
     if (event.data === 0) { // ended
       if (watchTimer.current) clearInterval(watchTimer.current);
       if (playerRef.current) {
         const t = playerRef.current.getCurrentTime();
-        saveProgress(t, true);
+        if (t && t.then) {
+          t.then(time => saveProgress(time, true));
+        } else {
+          saveProgress(t, true);
+        }
       }
     }
   }
   function onPlayerPlayback(event) {
     if (user?.role !== "student") return;
-    // Prevent skipping ahead
     const allowed = progress[selectedModule._id]?.lastWatchedTime || 0;
     const attempted = playerRef.current.getCurrentTime();
-    // Allow going back, but not forward more than a couple seconds
-    if (attempted > allowed + 2) {
-      playerRef.current.seekTo(allowed, true);
+    if (attempted && attempted.then) {
+      attempted.then(current => {
+        if (current > allowed + 2) {
+          playerRef.current.seekTo(allowed, true);
+        }
+      });
+    } else {
+      if (attempted > allowed + 2) {
+        playerRef.current.seekTo(allowed, true);
+      }
     }
   }
 
@@ -297,67 +377,103 @@ export default function AllContent() {
     ? stripYoutubeEmbeds(selectedModule.description)
     : "";
 
+  // Show empty state if no modules
+  if (!loading && modules.length === 0) {
+    return (
+      <div>
+        <CourseNavbar />
+        <div className="allcontent-body">
+          <div className="allcontent-sidebar">
+            <div className="allcontent-sidebar-header">Course Contents</div>
+            <div className="allcontent-empty">
+              You have not created any modules yet,<br />
+              please click the plus button below to add any courses.
+            </div>
+            {user?.role === "instructor" && (
+              <div className="allcontent-add-btn-wrapper">
+                <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
+                  <FaPlusCircle size={36} />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <CourseNavbar />
       <div className="allcontent-body">
         {/* Sidebar */}
         <aside className="allcontent-sidebar">
-          <div className="allcontent-sidebar-header">Course Contents</div>
-          {user?.role === "student" && (
-            <div className="allcontent-progress-bar-container">
-              <div className="allcontent-progress-bar">
-                <div
-                  className="allcontent-progress-bar-fill"
-                  style={{ width: `${percentComplete}%` }}
-                />
-              </div>
-              <span className="allcontent-progress-bar-label">
-                {percentComplete}% Completed
-              </span>
-            </div>
-          )}
-
-          <div className="allcontent-module-list">
-            {modules.map((mod, idx) => {
-              let duration = "--";
-              if (mod.description) {
-                const ytId = getYoutubeId(mod.description);
-                duration = ytId ? "20m" : "--";
-              }
-              const prog = progress[mod._id];
-              const isComplete = !!prog?.completed;
-              return (
-                <div
-                  className={`allcontent-module-item${selectedIdx === idx ? " selected" : ""}`}
-                  key={mod._id}
-                  onClick={() => setSelectedIdx(idx)}
-                >
-                  <span className="allcontent-module-title">{mod.moduleTitle}</span>
-                  {user?.role === "student" && (
-                    <span className="allcontent-module-meta">
-                      {duration}
-                      <span className="allcontent-module-status">
-                        {isComplete
-                          ? (<><MdDone className="status-icon done" /> <span>Completed</span></>)
-                          : prog && prog.lastWatchedTime > 0
-                            ? (<><span style={{ color: "#3e8ed0" }}>Ongoing</span></>)
-                            : (<span style={{ color: "#bbb" }}>Not Started</span>)
-                        }
-                      </span>
-                    </span>
-                  )}
-
-                </div>
-              );
-            })}
-            {/* Plus (+) button */}
-            {user?.role === "instructor" && (
-              <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
-                <FaPlusCircle size={36} />
-              </button>
+          {/* Collapsible header on mobile */}
+          <div
+            className={`allcontent-sidebar-header${isMobile ? " centered" : ""}`}
+            onClick={() => isMobile && setSidebarOpen((v) => !v)}
+            style={{
+              cursor: isMobile ? "pointer" : "default",
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: isMobile ? "center" : "flex-start",
+              gap: "8px",
+              userSelect: "none"
+            }}
+          >
+            Course Contents
+            {isMobile && (
+              sidebarOpen
+                ? <FaChevronUp style={{ marginLeft: 8, fontSize: 16 }} />
+                : <FaChevronDown style={{ marginLeft: 8, fontSize: 16 }} />
             )}
           </div>
+
+          {/* Collapse modules/cards on mobile */}
+          {(!isMobile || sidebarOpen) && (
+            <div className="allcontent-module-list">
+              {modules.map((mod, idx) => {
+                let duration = "--";
+                if (mod.description) {
+                  const ytId = getYoutubeId(mod.description);
+                  duration = ytId ? "20m" : "--";
+                }
+                const prog = progress[String(mod._id)];
+                const isComplete = !!prog?.completed;
+                return (
+                  <div
+                    className={`allcontent-module-item${selectedIdx === idx ? " selected" : ""}`}
+                    key={mod._id}
+                    onClick={() => setSelectedIdx(idx)}
+                  >
+                    <span className="allcontent-module-title">{mod.moduleTitle}</span>
+                    {user?.role === "student" && (
+                      <span className="allcontent-module-meta">
+                        {duration}
+                        <span className="allcontent-module-status">
+                          {isComplete
+                            ? (<><MdDone className="status-icon done" /> <span>Completed</span></>)
+                            : prog && prog.lastWatchedTime > 0
+                              ? (<><span style={{ color: "#3e8ed0" }}>Ongoing</span></>)
+                              : (<span style={{ color: "#bbb" }}>Not Started</span>)
+                          }
+                        </span>
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+              {/* Center the add button */}
+              {user?.role === "instructor" && (
+                <div className="allcontent-add-btn-wrapper">
+                  <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
+                    <FaPlusCircle size={36} />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </aside>
         {/* Main content */}
         <main className="allcontent-main">
@@ -409,7 +525,6 @@ export default function AllContent() {
                 </div>
               </div>
 
-
               {/* Tabs */}
               <div className="allcontent-tabs-row">
                 <span className="allcontent-tab active">Contents</span>
@@ -429,17 +544,8 @@ export default function AllContent() {
                   <div className="allcontent-files-list">
                     {attachedFiles.map((file, i) => (
                       <div className="allcontent-file-card" key={i}>
-                        <span className="allcontent-file-icon">{fileIconSvg(file.type)}</span>
+                        <span className="allcontent-file-icon">{fileIconComponent(file)}</span>
                         <span className="allcontent-file-name">{file.name}</span>
-                        {/* <a
-                          className="allcontent-file-download-btn"
-                          href={file.url}
-                          download={file.name} // force download with original filename
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Download File
-                        </a> */}
                         <a
                           href={
                             file.key
@@ -450,7 +556,7 @@ export default function AllContent() {
                               : file.url // fallback to public/external file URL
                           }
                           className="allcontent-file-download-btn"
-                          download={file.key ? file.name : undefined} // only force download for uploaded files
+                          download={file.key ? file.name : undefined}
                           target="_blank"
                           rel="noopener noreferrer"
                         >

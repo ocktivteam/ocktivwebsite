@@ -174,7 +174,7 @@
   
   
   
-  .allcontent-title-row {
+  /* .allcontent-title-row {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -187,9 +187,9 @@
     color: #1e293b;
     letter-spacing: 0.01em;
     flex: 1;
-  }
+  } */
   
-  .allcontent-module-actions {
+  /* .allcontent-module-actions {
     display: flex;
     align-items: center;
     gap: 18px;
@@ -207,6 +207,43 @@
   .allcontent-action-icon:hover {
     color: #fff;
     background: #6c9c30;
+  } */
+
+  .allcontent-title-row {
+    display: block; /* change from flex to block to allow vertical layout */
+    margin-bottom: 14px;
+  }
+  
+  .allcontent-title-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* align everything to the left */
+  }
+  
+  .allcontent-module-title-main {
+    font-size: 1.52rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: 0.01em;
+    margin-bottom: 6px;
+  }
+
+  .allcontent-module-actions {
+    display: flex;
+    gap: 24px;
+  }
+  
+  .allcontent-edit-icon {
+    font-size: 1.3rem;
+    color: black;
+    cursor: pointer;
+  }
+  
+  .allcontent-delete-icon {
+    font-size: 1.3rem;
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
   }
   
   .allcontent-tabs-row {

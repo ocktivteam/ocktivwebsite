@@ -197,10 +197,10 @@ export default function AllContent() {
   // Save progress
   const saveProgress = (currentTime, ended = false) => {
     if (!selectedModule || !user || user.role !== "student") return;
-  
+
     const token = localStorage.getItem("authToken");
     if (!token) return;
-  
+
     axios.put(`${PROGRESS_API}`, {
       courseId,
       moduleId: selectedModule._id,
@@ -211,7 +211,7 @@ export default function AllContent() {
         Authorization: `Bearer ${token}`
       }
     }).catch(() => { });
-  
+
     // Optimistically update local state
     setProgress(prev => ({
       ...prev,
@@ -222,7 +222,7 @@ export default function AllContent() {
       }
     }));
   };
-  
+
 
   // YouTube player events
   function onPlayerReady(event) {
@@ -372,24 +372,28 @@ export default function AllContent() {
               )}
               {/* Module title, edit/delete */}
               <div className="allcontent-title-row">
-                <span className="allcontent-module-title-main">
-                  {selectedModule.moduleTitle}
-                </span>
-                {user?.role === "instructor" && (
-                  <span className="allcontent-module-actions">
-                    <FaPen
-                      className="allcontent-action-icon"
-                      title="Edit Module"
-                      onClick={() => handleEditModule(selectedModule._id)}
-                    />
-                    <FaTrash
-                      className="allcontent-action-icon"
-                      title="Delete Module"
-                      onClick={() => handleDeleteModule(selectedModule._id)}
-                    />
+                <div className="allcontent-title-column">
+                  <span className="allcontent-module-title-main">
+                    {selectedModule.moduleTitle}
                   </span>
-                )}
+                  {user?.role === "instructor" && (
+                    <div className="allcontent-module-actions">
+                      <FaPen
+                        className="allcontent-edit-icon"
+                        title="Edit Module"
+                        onClick={() => handleEditModule(selectedModule._id)}
+                      />
+                      <FaTrash
+                        className="allcontent-delete-icon"
+                        title="Delete Module"
+                        onClick={() => handleDeleteModule(selectedModule._id)}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
+
+
               {/* Tabs */}
               <div className="allcontent-tabs-row">
                 <span className="allcontent-tab active">Contents</span>

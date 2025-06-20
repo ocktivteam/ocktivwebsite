@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import CourseNavbar from "./courseNavbar";
 import "../style/allContent.css";
@@ -80,6 +80,7 @@ export default function AllContent() {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const user = getCurrentUser();
+  const location = useLocation();
 
   // State
   const [modules, setModules] = useState([]);
@@ -99,8 +100,14 @@ export default function AllContent() {
     setLoading(true);
     axios.get(`${MODULE_API}/course/${courseId}`)
       .then(res => {
-        setModules(res.data.modules || []);
-        setSelectedIdx(0);
+        const loadedModules = res.data.modules || [];
+        setModules(loadedModules);
+
+        const selectedId = location.state?.selectedModuleId;
+        const indexToSelect = selectedId
+          ? loadedModules.findIndex(m => m._id === selectedId)
+          : 0;
+        setSelectedIdx(indexToSelect >= 0 ? indexToSelect : 0);
         setLoading(false);
       })
       .catch(() => {
@@ -109,6 +116,15 @@ export default function AllContent() {
       });
   }, [courseId]);
 
+  // Clear state after redirect
+
+  useEffect(() => {
+    if (location.state?.selectedModuleId) {
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
+
+  
   // Fetch progress
   useEffect(() => {
     if (!user?._id || user.role !== "student" || !modules.length) return;

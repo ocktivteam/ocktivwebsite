@@ -287,6 +287,14 @@
     min-height: 60px;
   }
   
+  .allcontent-desc-body img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 12px 0;
+    border-radius: 8px;
+  }
+  
   .allcontent-files-section {
     margin-top: 6px;
     margin-bottom: 18px;

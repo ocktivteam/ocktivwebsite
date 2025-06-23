@@ -5,7 +5,7 @@ import CourseNavbar from "./courseNavbar";
 import "../style/allContent.css";
 import {
   FaFilePdf, FaFileWord, FaFilePowerpoint, FaFileExcel, FaFileImage, FaFileVideo,
-  FaFileArchive, FaFileAlt, FaLink, FaFile, FaPlusCircle, FaPen, FaTrash, FaChevronDown, FaChevronUp
+  FaFileArchive, FaFileAlt, FaLink, FaFile, FaChevronDown, FaChevronUp, FaLock
 } from "react-icons/fa";
 import { MdDone } from "react-icons/md";
 import YouTube from "react-youtube";
@@ -33,13 +33,11 @@ function getCurrentUser() {
 function getYoutubeId(html = "") {
   const doc = document.createElement("div");
   doc.innerHTML = html;
-  // iframe src
   const iframe = doc.querySelector("iframe");
   if (iframe && iframe.src) {
     const match = iframe.src.match(/embed\/([A-Za-z0-9_-]{11})/);
     if (match) return match[1];
   }
-  // direct link
   const a = doc.querySelector("a[href*='youtu']");
   if (a) {
     let url = a.href;
@@ -59,13 +57,11 @@ function stripYoutubeEmbeds(html = "") {
   if (!html) return "";
   const doc = document.createElement("div");
   doc.innerHTML = html;
-  // Remove YouTube iframes
   doc.querySelectorAll("iframe").forEach(iframe => {
     if (iframe.src && (iframe.src.includes("youtube.com") || iframe.src.includes("youtu.be"))) {
       iframe.remove();
     }
   });
-  // Remove direct YouTube links
   doc.querySelectorAll("a[href*='youtu']").forEach(a => a.remove());
   return doc.innerHTML;
 }
@@ -78,7 +74,6 @@ function fileIconComponent(file) {
   const imageExts = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
   const ext = name.split('.').pop();
 
-  // Show thumbnail for images with a valid url
   if (imageExts.includes(ext) && url) {
     return (
       <img
@@ -92,7 +87,6 @@ function fileIconComponent(file) {
     );
   }
 
-  // Otherwise, use real file icons
   switch (type) {
     case "pdf":
       return <FaFilePdf color="#e53935" size={38} />;
@@ -118,7 +112,6 @@ function fileIconComponent(file) {
     case "external":
       return <FaLink color="#6d4c41" size={38} />;
     default:
-      // fallback by extension if possible
       if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext)) {
         return <FaFileImage color="#26c6da" size={38} />;
       }
@@ -129,6 +122,31 @@ function fileIconComponent(file) {
       if (["zip", "rar"].includes(ext)) return <FaFileArchive color="#ff7043" size={38} />;
       if (["txt"].includes(ext)) return <FaFileAlt color="#616161" size={38} />;
       return <FaFile color="#888" size={38} />;
+  }
+}
+
+// Force image download as blob
+async function forceImageDownload(url, filename) {
+  try {
+    const response = await fetch(url, {
+      mode: "cors",
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error("Failed to fetch");
+    const blob = await response.blob();
+    const objUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = objUrl;
+    a.download = filename || "image";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(objUrl);
+    }, 100);
+  } catch {
+    alert("Image download failed. Try right-clicking and choosing 'Save As' instead.");
   }
 }
 
@@ -143,12 +161,12 @@ export default function AllContent() {
   const [progress, setProgress] = useState({});
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState("");
-  const [playerReady, setPlayerReady] = useState(false);
 
   // For collapsible sidebar on mobile
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // For toast on locked modules
+  const [toastIdx, setToastIdx] = useState(null);
 
   // Refs for YouTube player
   const playerRef = useRef();
@@ -211,35 +229,6 @@ export default function AllContent() {
       .catch(() => setProgress({}));
   }, [user?._id, modules.length]);
 
-  // Add new module handler
-  function handleAddModule() {
-    navigate(`/course/${courseId}/content`);
-  }
-  // Edit module handler
-  function handleEditModule(moduleId) {
-    navigate(`/course/${courseId}/content/${moduleId}`);
-  }
-  // Delete module handler
-  async function handleDeleteModule(moduleId) {
-    if (!window.confirm("Are you sure you want to delete this module?")) return;
-    setDeleting(true);
-    const token = localStorage.getItem("authToken");
-    try {
-      await axios.delete(`${MODULE_API}/${moduleId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      const idx = modules.findIndex(m => m._id === moduleId);
-      let newIdx = Math.max(0, idx - 1);
-      const newModules = modules.filter(m => m._id !== moduleId);
-      setModules(newModules);
-      setSelectedIdx(newIdx);
-      setDeleting(false);
-    } catch (err) {
-      setError("Delete failed. Try again.");
-      setDeleting(false);
-    }
-  }
-
   // Progress summary
   const totalModules = modules.length;
   const completedModules = modules.filter(
@@ -248,6 +237,14 @@ export default function AllContent() {
   const percentComplete = totalModules
     ? Math.round((completedModules / totalModules) * 100)
     : 0;
+
+  // Determine if a module is locked (student must complete previous)
+  function isModuleLocked(idx) {
+    if (idx === 0) return false;
+    // Previous module must be completed
+    const prevModule = modules[idx - 1];
+    return !progress[prevModule?._id]?.completed;
+  }
 
   // Show selected module (default: first)
   const selectedModule = modules[selectedIdx] || modules[0];
@@ -288,25 +285,20 @@ export default function AllContent() {
   function onPlayerReady(event) {
     if (user?.role !== "student") return;
     playerRef.current = event.target;
-    setPlayerReady(true);
 
     const selectedModule = modules[selectedIdx] || modules[0];
     const prog = progress[selectedModule?._id];
 
-    // Prevent double-seeking
     if (seekingRef.current) return;
     seekingRef.current = true;
 
     if (prog) {
-      // Completed: seek to end
       if (prog.completed && playerRef.current.getDuration) {
         const duration = playerRef.current.getDuration();
         if (duration > 0) {
           playerRef.current.seekTo(duration - 0.2, true);
         }
-      }
-      // Ongoing: seek to last watched time
-      else if (typeof prog.lastWatchedTime === "number" && prog.lastWatchedTime > 0) {
+      } else if (typeof prog.lastWatchedTime === "number" && prog.lastWatchedTime > 0) {
         playerRef.current.seekTo(prog.lastWatchedTime, true);
       }
     }
@@ -314,8 +306,7 @@ export default function AllContent() {
   }
 
   function onPlayerStateChange(event) {
-    // 1 = playing, 2 = paused, 0 = ended
-    if (event.data === 1) { // playing
+    if (event.data === 1) {
       if (watchTimer.current) clearInterval(watchTimer.current);
       watchTimer.current = setInterval(() => {
         if (playerRef.current) {
@@ -328,7 +319,7 @@ export default function AllContent() {
         }
       }, 5000);
     }
-    if (event.data === 2) { // paused
+    if (event.data === 2) {
       if (watchTimer.current) clearInterval(watchTimer.current);
       if (playerRef.current) {
         const t = playerRef.current.getCurrentTime();
@@ -339,7 +330,7 @@ export default function AllContent() {
         }
       }
     }
-    if (event.data === 0) { // ended
+    if (event.data === 0) {
       if (watchTimer.current) clearInterval(watchTimer.current);
       if (playerRef.current) {
         const t = playerRef.current.getCurrentTime();
@@ -349,8 +340,14 @@ export default function AllContent() {
           saveProgress(t, true);
         }
       }
+      if (selectedIdx < modules.length - 1) {
+        setTimeout(() => {
+          setSelectedIdx(idx => idx + 1);
+        }, 700);
+      }
     }
   }
+
   function onPlayerPlayback(event) {
     if (user?.role !== "student") return;
     const allowed = progress[selectedModule._id]?.lastWatchedTime || 0;
@@ -386,16 +383,9 @@ export default function AllContent() {
           <div className="allcontent-sidebar">
             <div className="allcontent-sidebar-header">Course Contents</div>
             <div className="allcontent-empty">
-              You have not created any modules yet,<br />
-              please click the plus button below to add any courses.
+              No modules yet.<br />
+              (Ask your instructor to add content.)
             </div>
-            {user?.role === "instructor" && (
-              <div className="allcontent-add-btn-wrapper">
-                <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
-                  <FaPlusCircle size={36} />
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -430,48 +420,70 @@ export default function AllContent() {
             )}
           </div>
 
-          {/* Collapse modules/cards on mobile */}
+          {/*Progress Bar */}
+          <div className="allcontent-progress-row">
+            <div className="allcontent-progress-label">
+              Progress: <span>{percentComplete}% ({completedModules}/{totalModules})</span>
+            </div>
+            <div className="allcontent-progress-bar-modern">
+              <div
+                className="allcontent-progress-bar-gradient"
+                style={{
+                  width: `${percentComplete}%`
+                }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Module List */}
           {(!isMobile || sidebarOpen) && (
             <div className="allcontent-module-list">
               {modules.map((mod, idx) => {
-                let duration = "--";
-                if (mod.description) {
-                  const ytId = getYoutubeId(mod.description);
-                  duration = ytId ? "20m" : "--";
-                }
                 const prog = progress[String(mod._id)];
                 const isComplete = !!prog?.completed;
+                const isOngoing = !isComplete && prog && prog.lastWatchedTime > 0;
+                const isLocked = isModuleLocked(idx);
+
                 return (
                   <div
-                    className={`allcontent-module-item${selectedIdx === idx ? " selected" : ""}`}
+                    className={
+                      "allcontent-module-item" +
+                      (selectedIdx === idx && !isLocked ? " selected" : "") +
+                      (isLocked ? " locked" : "")
+                    }
                     key={mod._id}
-                    onClick={() => setSelectedIdx(idx)}
+                    tabIndex={isLocked ? -1 : 0}
+                    onClick={() => {
+                      if (!isLocked) setSelectedIdx(idx);
+                    }}
+                    onMouseEnter={() => isLocked && setToastIdx(idx)}
+                    onMouseLeave={() => isLocked && setToastIdx(null)}
                   >
                     <span className="allcontent-module-title">{mod.moduleTitle}</span>
-                    {user?.role === "student" && (
-                      <span className="allcontent-module-meta">
-                        {duration}
-                        <span className="allcontent-module-status">
-                          {isComplete
-                            ? (<><MdDone className="status-icon done" /> <span>Completed</span></>)
-                            : prog && prog.lastWatchedTime > 0
-                              ? (<><span style={{ color: "#3e8ed0" }}>Ongoing</span></>)
-                              : (<span style={{ color: "#bbb" }}>Not Started</span>)
-                          }
-                        </span>
-                      </span>
-                    )}
+                    <span className="allcontent-module-meta">
+                      {/* Status */}
+                      {isComplete ? (
+                        <>
+                          <MdDone className="status-icon done" />
+                          <span className="allcontent-module-status done">Completed</span>
+                        </>
+                      ) : isOngoing ? (
+                        <span className="allcontent-module-status ongoing">Ongoing</span>
+                      ) : isLocked ? (
+                        <>
+                          <span className="allcontent-module-status locked">Not Started</span>
+                          <FaLock className="lock-icon" />
+                          {toastIdx === idx && (
+                            <span className="locked-toast">Complete previous <br />module to unlock</span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="allcontent-module-status notstarted">Not Started</span>
+                      )}
+                    </span>
                   </div>
                 );
               })}
-              {/* Center the add button */}
-              {user?.role === "instructor" && (
-                <div className="allcontent-add-btn-wrapper">
-                  <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
-                    <FaPlusCircle size={36} />
-                  </button>
-                </div>
-              )}
             </div>
           )}
         </aside>
@@ -502,26 +514,12 @@ export default function AllContent() {
                   />
                 </div>
               )}
-              {/* Module title, edit/delete */}
+              {/* Module title */}
               <div className="allcontent-title-row">
                 <div className="allcontent-title-column">
                   <span className="allcontent-module-title-main">
                     {selectedModule.moduleTitle}
                   </span>
-                  {user?.role === "instructor" && (
-                    <div className="allcontent-module-actions">
-                      <FaPen
-                        className="allcontent-edit-icon"
-                        title="Edit Module"
-                        onClick={() => handleEditModule(selectedModule._id)}
-                      />
-                      <FaTrash
-                        className="allcontent-delete-icon"
-                        title="Delete Module"
-                        onClick={() => handleDeleteModule(selectedModule._id)}
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -542,28 +540,53 @@ export default function AllContent() {
                     Attached Files ({attachedFiles.length.toString().padStart(2, "0")})
                   </div>
                   <div className="allcontent-files-list">
-                    {attachedFiles.map((file, i) => (
-                      <div className="allcontent-file-card" key={i}>
-                        <span className="allcontent-file-icon">{fileIconComponent(file)}</span>
-                        <span className="allcontent-file-name">{file.name}</span>
-                        <a
-                          href={
-                            file.key
-                              ? `${window.location.hostname === "localhost"
-                                ? "http://localhost:5050"
-                                : "https://ocktivwebsite-3.onrender.com"
-                              }/api/download/${file.key}`
-                              : file.url // fallback to public/external file URL
-                          }
-                          className="allcontent-file-download-btn"
-                          download={file.key ? file.name : undefined}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Download File
-                        </a>
-                      </div>
-                    ))}
+                    {attachedFiles.map((file, i) => {
+                      const isImage = /\.(jpe?g|png|gif|bmp|webp)$/i.test(file.name);
+                      const hasKey = !!file.key;
+                      const downloadUrl = hasKey
+                        ? `${window.location.hostname === "localhost"
+                            ? "http://localhost:5050"
+                            : "https://ocktivwebsite-3.onrender.com"
+                          }/api/download/${file.key}`
+                        : file.url;
+                      return (
+                        <div className="allcontent-file-card" key={i}>
+                          <span className="allcontent-file-icon">{fileIconComponent(file)}</span>
+                          <span className="allcontent-file-name">{file.name}</span>
+                          {isImage ? (
+                            hasKey ? (
+                              <button
+                                className="allcontent-file-download-btn"
+                                type="button"
+                                onClick={() => forceImageDownload(downloadUrl, file.name)}
+                              >
+                                Download File
+                              </button>
+                            ) : (
+                              <span style={{ color: "#a22", fontSize: 13 }}>
+                                No download available
+                              </span>
+                            )
+                          ) : (
+                            hasKey ? (
+                              <a
+                                href={downloadUrl}
+                                className="allcontent-file-download-btn"
+                                download={file.name}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Download File
+                              </a>
+                            ) : (
+                              <span style={{ color: "#a22", fontSize: 13 }}>
+                                No download available
+                              </span>
+                            )
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

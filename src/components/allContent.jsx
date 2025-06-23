@@ -172,6 +172,7 @@ export default function AllContent() {
   const playerRef = useRef();
   const watchTimer = useRef();
   const seekingRef = useRef(false);
+  const [readyToSeek, setReadyToSeek] = useState(false);
 
   // Helper: check if we're in mobile view
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -229,6 +230,7 @@ export default function AllContent() {
       .catch(() => setProgress({}));
   }, [user?._id, modules.length]);
 
+  
   // Progress summary
   const totalModules = modules.length;
   const completedModules = modules.filter(
@@ -281,65 +283,103 @@ export default function AllContent() {
     }));
   };
 
-  // YOUTUBE PLAYER LOGIC (seekTo on ready)
-  function onPlayerReady(event) {
-    if (user?.role !== "student") return;
-    playerRef.current = event.target;
-
-    const selectedModule = modules[selectedIdx] || modules[0];
-    const prog = progress[selectedModule?._id];
-
-    if (seekingRef.current) return;
-    seekingRef.current = true;
-
-    if (prog) {
-      if (prog.completed && playerRef.current.getDuration) {
-        const duration = playerRef.current.getDuration();
-        if (duration > 0) {
-          playerRef.current.seekTo(duration - 0.2, true);
+  useEffect(() => {
+    if (
+      readyToSeek &&
+      playerRef.current &&
+      selectedModule &&
+      progress[selectedModule._id]
+    ) {
+      const player = playerRef.current;
+      const prog = progress[selectedModule._id];
+  
+      const seekTime =
+        prog.completed && typeof player.getDuration === "function"
+          ? Math.max(player.getDuration() - 0.2, 0)
+          : prog.lastWatchedTime || 0;
+  
+      const trySeek = (attempt = 0) => {
+        try {
+          const duration = player.getDuration?.();
+          if (!duration || duration === 0) {
+            if (attempt < 10) {
+              setTimeout(() => trySeek(attempt + 1), 300);
+            } else {
+              console.warn("Seek failed after 10 attempts: duration never became available.");
+            }
+            return;
+          }
+  
+          const time = player.getCurrentTime?.();
+          if (time && typeof time.then === "function") {
+            time.then(() => {
+              player.seekTo(seekTime, true);
+              setReadyToSeek(false);
+            }).catch(err => {
+              console.error("Error inside getCurrentTime().then:", err);
+            });
+          } else if (typeof time === "number") {
+            player.seekTo(seekTime, true);
+            setReadyToSeek(false);
+          }
+        } catch (err) {
+          console.error("Exception during seekTo retry:", err);
         }
-      } else if (typeof prog.lastWatchedTime === "number" && prog.lastWatchedTime > 0) {
-        playerRef.current.seekTo(prog.lastWatchedTime, true);
-      }
+      };
+  
+      trySeek(); // start retry loop
     }
-    setTimeout(() => seekingRef.current = false, 1500);
+  }, [readyToSeek, selectedModule, progress]);
+  
+  function onPlayerReady(event) {
+    try {
+      if (user?.role !== "student") return;
+      playerRef.current = event.target;
+      setReadyToSeek(true);
+    } catch (err) {
+      console.error("onPlayerReady error:", err);
+    }
   }
-
+  
   function onPlayerStateChange(event) {
-    if (event.data === 1) {
+    const player = playerRef.current;
+    const isStudent = user?.role === "student";
+  
+    // Playing
+    if (event.data === 1 && isStudent) {
       if (watchTimer.current) clearInterval(watchTimer.current);
       watchTimer.current = setInterval(() => {
-        if (playerRef.current) {
-          const t = playerRef.current.getCurrentTime();
-          if (t && t.then) {
-            t.then(time => saveProgress(time, false));
-          } else {
-            saveProgress(t, false);
-          }
-        }
-      }, 5000);
-    }
-    if (event.data === 2) {
-      if (watchTimer.current) clearInterval(watchTimer.current);
-      if (playerRef.current) {
-        const t = playerRef.current.getCurrentTime();
+        const t = player.getCurrentTime();
         if (t && t.then) {
-          t.then(time => saveProgress(t, false));
+          t.then(time => saveProgress(time, false));
         } else {
           saveProgress(t, false);
         }
+      }, 5000);
+    }
+  
+    // Paused
+    if (event.data === 2 && isStudent) {
+      if (watchTimer.current) clearInterval(watchTimer.current);
+      const t = player.getCurrentTime();
+      if (t && t.then) {
+        t.then(time => saveProgress(time, false));
+      } else {
+        saveProgress(t, false);
       }
     }
-    if (event.data === 0) {
+  
+    // Ended
+    if (event.data === 0 && isStudent) {
       if (watchTimer.current) clearInterval(watchTimer.current);
-      if (playerRef.current) {
-        const t = playerRef.current.getCurrentTime();
-        if (t && t.then) {
-          t.then(time => saveProgress(time, true));
-        } else {
-          saveProgress(t, true);
-        }
+      const t = player.getCurrentTime();
+      if (t && t.then) {
+        t.then(time => saveProgress(time, true));
+      } else {
+        saveProgress(t, true);
       }
+  
+      // Auto-advance to next module
       if (selectedIdx < modules.length - 1) {
         setTimeout(() => {
           setSelectedIdx(idx => idx + 1);
@@ -347,7 +387,7 @@ export default function AllContent() {
       }
     }
   }
-
+  
   function onPlayerPlayback(event) {
     if (user?.role !== "student") return;
     const allowed = progress[selectedModule._id]?.lastWatchedTime || 0;

@@ -370,6 +370,11 @@
 }
 
 @media (max-width: 900px) {
+
+  .allcontent-main {
+    padding: 0 !important;
+  }
+  
   .allcontent-body {
     flex-direction: column;
   }

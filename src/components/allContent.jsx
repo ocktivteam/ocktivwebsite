@@ -5,7 +5,7 @@ import CourseNavbar from "./courseNavbar";
 import "../style/allContent.css";
 import {
   FaFilePdf, FaFileWord, FaFilePowerpoint, FaFileExcel, FaFileImage, FaFileVideo,
-  FaFileArchive, FaFileAlt, FaLink, FaFile, FaChevronDown, FaChevronUp, FaLock
+  FaFileArchive, FaFileAlt, FaLink, FaFile, FaPlusCircle, FaPen, FaTrash, FaChevronDown, FaChevronUp, FaLock
 } from "react-icons/fa";
 import { MdDone } from "react-icons/md";
 import YouTube from "react-youtube";
@@ -80,7 +80,7 @@ function fileIconComponent(file) {
         src={url}
         alt={file.name}
         style={{
-          width: 40, height: 40, borderRadius: 7,
+          width: 28, height: 28, borderRadius: 6,
           objectFit: "cover", background: "#eee", border: "1px solid #ddd"
         }}
       />
@@ -161,6 +161,8 @@ export default function AllContent() {
   const [progress, setProgress] = useState({});
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
 
   // For collapsible sidebar on mobile
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -230,8 +232,37 @@ export default function AllContent() {
       .catch(() => setProgress({}));
   }, [user?._id, modules.length]);
 
-  
-  // Progress summary
+  // Add new module handler
+  function handleAddModule() {
+    navigate(`/course/${courseId}/content`);
+  }
+  // Edit module handler
+  function handleEditModule(moduleId) {
+    navigate(`/course/${courseId}/content/${moduleId}`);
+  }
+  // Delete module handler
+  async function handleDeleteModule(moduleId) {
+    if (!window.confirm("Are you sure you want to delete this module?")) return;
+    setDeleting(true);
+    setError("");
+    const token = localStorage.getItem("authToken");
+    try {
+      await axios.delete(`${MODULE_API}/${moduleId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const idx = modules.findIndex(m => m._id === moduleId);
+      let newIdx = Math.max(0, idx - 1);
+      const newModules = modules.filter(m => m._id !== moduleId);
+      setModules(newModules);
+      setSelectedIdx(newIdx);
+      setDeleting(false);
+    } catch (err) {
+      setError("Delete failed. Try again.");
+      setDeleting(false);
+    }
+  }
+
+  // Progress summary (only for students)
   const totalModules = modules.length;
   const completedModules = modules.filter(
     m => progress[m._id]?.completed
@@ -240,8 +271,9 @@ export default function AllContent() {
     ? Math.round((completedModules / totalModules) * 100)
     : 0;
 
-  // Determine if a module is locked (student must complete previous)
+  // Determine if a module is locked (student only)
   function isModuleLocked(idx) {
+    if (user?.role !== "student") return false;
     if (idx === 0) return false;
     // Previous module must be completed
     const prevModule = modules[idx - 1];
@@ -292,12 +324,12 @@ export default function AllContent() {
     ) {
       const player = playerRef.current;
       const prog = progress[selectedModule._id];
-  
+
       const seekTime =
         prog.completed && typeof player.getDuration === "function"
           ? Math.max(player.getDuration() - 0.2, 0)
           : prog.lastWatchedTime || 0;
-  
+
       const trySeek = (attempt = 0) => {
         try {
           const duration = player.getDuration?.();
@@ -309,7 +341,7 @@ export default function AllContent() {
             }
             return;
           }
-  
+
           const time = player.getCurrentTime?.();
           if (time && typeof time.then === "function") {
             time.then(() => {
@@ -326,11 +358,11 @@ export default function AllContent() {
           console.error("Exception during seekTo retry:", err);
         }
       };
-  
+
       trySeek(); // start retry loop
     }
   }, [readyToSeek, selectedModule, progress]);
-  
+
   function onPlayerReady(event) {
     try {
       if (user?.role !== "student") return;
@@ -340,11 +372,11 @@ export default function AllContent() {
       console.error("onPlayerReady error:", err);
     }
   }
-  
+
   function onPlayerStateChange(event) {
     const player = playerRef.current;
     const isStudent = user?.role === "student";
-  
+
     // Playing
     if (event.data === 1 && isStudent) {
       if (watchTimer.current) clearInterval(watchTimer.current);
@@ -357,7 +389,7 @@ export default function AllContent() {
         }
       }, 5000);
     }
-  
+
     // Paused
     if (event.data === 2 && isStudent) {
       if (watchTimer.current) clearInterval(watchTimer.current);
@@ -368,7 +400,7 @@ export default function AllContent() {
         saveProgress(t, false);
       }
     }
-  
+
     // Ended
     if (event.data === 0 && isStudent) {
       if (watchTimer.current) clearInterval(watchTimer.current);
@@ -378,7 +410,7 @@ export default function AllContent() {
       } else {
         saveProgress(t, true);
       }
-  
+
       // Auto-advance to next module
       if (selectedIdx < modules.length - 1) {
         setTimeout(() => {
@@ -387,7 +419,7 @@ export default function AllContent() {
       }
     }
   }
-  
+
   function onPlayerPlayback(event) {
     if (user?.role !== "student") return;
     const allowed = progress[selectedModule._id]?.lastWatchedTime || 0;
@@ -426,6 +458,13 @@ export default function AllContent() {
               No modules yet.<br />
               (Ask your instructor to add content.)
             </div>
+            {user?.role === "instructor" && (
+              <div className="allcontent-add-btn-wrapper">
+                <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
+                  <FaPlusCircle size={36} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -460,20 +499,22 @@ export default function AllContent() {
             )}
           </div>
 
-          {/*Progress Bar */}
-          <div className="allcontent-progress-row">
-            <div className="allcontent-progress-label">
-              Progress: <span>{percentComplete}% ({completedModules}/{totalModules})</span>
+          {/*Progress Bar - only for students */}
+          {user?.role === "student" && (
+            <div className="allcontent-progress-row">
+              <div className="allcontent-progress-label">
+                Progress: <span>{percentComplete}% ({completedModules}/{totalModules})</span>
+              </div>
+              <div className="allcontent-progress-bar-modern">
+                <div
+                  className="allcontent-progress-bar-gradient"
+                  style={{
+                    width: `${percentComplete}%`
+                  }}
+                ></div>
+              </div>
             </div>
-            <div className="allcontent-progress-bar-modern">
-              <div
-                className="allcontent-progress-bar-gradient"
-                style={{
-                  width: `${percentComplete}%`
-                }}
-              ></div>
-            </div>
-          </div>
+          )}
 
           {/* Module List */}
           {(!isMobile || sidebarOpen) && (
@@ -488,42 +529,52 @@ export default function AllContent() {
                   <div
                     className={
                       "allcontent-module-item" +
-                      (selectedIdx === idx && !isLocked ? " selected" : "") +
-                      (isLocked ? " locked" : "")
+                      (selectedIdx === idx && (!isLocked || user?.role !== "student") ? " selected" : "") +
+                      (isLocked && user?.role === "student" ? " locked" : "")
                     }
                     key={mod._id}
-                    tabIndex={isLocked ? -1 : 0}
+                    tabIndex={isLocked && user?.role === "student" ? -1 : 0}
                     onClick={() => {
-                      if (!isLocked) setSelectedIdx(idx);
+                      if (!isLocked || user?.role !== "student") setSelectedIdx(idx);
                     }}
-                    onMouseEnter={() => isLocked && setToastIdx(idx)}
-                    onMouseLeave={() => isLocked && setToastIdx(null)}
+                    onMouseEnter={() => isLocked && user?.role === "student" && setToastIdx(idx)}
+                    onMouseLeave={() => isLocked && user?.role === "student" && setToastIdx(null)}
                   >
                     <span className="allcontent-module-title">{mod.moduleTitle}</span>
                     <span className="allcontent-module-meta">
-                      {/* Status */}
-                      {isComplete ? (
-                        <>
-                          <MdDone className="status-icon done" />
-                          <span className="allcontent-module-status done">Completed</span>
-                        </>
-                      ) : isOngoing ? (
-                        <span className="allcontent-module-status ongoing">Ongoing</span>
-                      ) : isLocked ? (
-                        <>
-                          <span className="allcontent-module-status locked">Not Started</span>
-                          <FaLock className="lock-icon" />
-                          {toastIdx === idx && (
-                            <span className="locked-toast">Complete previous <br />module to unlock</span>
-                          )}
-                        </>
-                      ) : (
-                        <span className="allcontent-module-status notstarted">Not Started</span>
+                      {/* Status - Only for Students */}
+                      {user?.role === "student" && (
+                        isComplete ? (
+                          <>
+                            <MdDone className="status-icon done" />
+                            <span className="allcontent-module-status done">Completed</span>
+                          </>
+                        ) : isOngoing ? (
+                          <span className="allcontent-module-status ongoing">Ongoing</span>
+                        ) : isLocked ? (
+                          <>
+                            <span className="allcontent-module-status locked">Not Started</span>
+                            <FaLock className="lock-icon" />
+                            {toastIdx === idx && (
+                              <span className="locked-toast">Complete previous <br />module to unlock</span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="allcontent-module-status notstarted">Not Started</span>
+                        )
                       )}
                     </span>
                   </div>
                 );
               })}
+              {/* Center the add button for instructors */}
+              {user?.role === "instructor" && (
+                <div className="allcontent-add-btn-wrapper">
+                  <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
+                    <FaPlusCircle size={36} />
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </aside>
@@ -554,14 +605,37 @@ export default function AllContent() {
                   />
                 </div>
               )}
-              {/* Module title */}
+              {/* Module title and edit/delete for instructor */}
               <div className="allcontent-title-row">
                 <div className="allcontent-title-column">
                   <span className="allcontent-module-title-main">
                     {selectedModule.moduleTitle}
                   </span>
+                  {user?.role === "instructor" && (
+                    <div className="allcontent-module-actions">
+                      <FaPen
+                        className="allcontent-edit-icon"
+                        title="Edit Module"
+                        style={{ marginLeft: 12, cursor: "pointer" }}
+                        onClick={() => handleEditModule(selectedModule._id)}
+                      />
+                      <FaTrash
+                        className="allcontent-delete-icon"
+                        title="Delete Module"
+                        style={{ marginLeft: 10, cursor: "pointer" }}
+                        onClick={() => handleDeleteModule(selectedModule._id)}
+                        disabled={deleting}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
+              {/* Error message on delete fail */}
+              {error && (
+                <div style={{ color: "#c00", fontSize: 15, margin: "7px 0 2px 3px" }}>
+                  {error}
+                </div>
+              )}
 
               {/* Tabs */}
               <div className="allcontent-tabs-row">

@@ -175,7 +175,10 @@ export default function AllContent() {
   const watchTimer = useRef();
   const seekingRef = useRef(false);
   const [readyToSeek, setReadyToSeek] = useState(false);
-
+  const hasSeekedRef = useRef(false);
+  const autoAdvanceRef = useRef(false);
+  const manualClickRef = useRef(false);
+  
   // Helper: check if we're in mobile view
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -319,47 +322,9 @@ export default function AllContent() {
     if (
       readyToSeek &&
       playerRef.current &&
-      selectedModule &&
-      progress[selectedModule._id]
+      selectedModule
+      //progress[selectedModule._id]
     ) {
-      const player = playerRef.current;
-      const prog = progress[selectedModule._id];
-
-      const seekTime =
-        prog.completed && typeof player.getDuration === "function"
-          ? Math.max(player.getDuration() - 0.2, 0)
-          : prog.lastWatchedTime || 0;
-
-      const trySeek = (attempt = 0) => {
-        try {
-          const duration = player.getDuration?.();
-          if (!duration || duration === 0) {
-            if (attempt < 10) {
-              setTimeout(() => trySeek(attempt + 1), 300);
-            } else {
-              console.warn("Seek failed after 10 attempts: duration never became available.");
-            }
-            return;
-          }
-
-          const time = player.getCurrentTime?.();
-          if (time && typeof time.then === "function") {
-            time.then(() => {
-              player.seekTo(seekTime, true);
-              setReadyToSeek(false);
-            }).catch(err => {
-              console.error("Error inside getCurrentTime().then:", err);
-            });
-          } else if (typeof time === "number") {
-            player.seekTo(seekTime, true);
-            setReadyToSeek(false);
-          }
-        } catch (err) {
-          console.error("Exception during seekTo retry:", err);
-        }
-      };
-
-      trySeek(); // start retry loop
     }
   }, [readyToSeek, selectedModule, progress]);
 
@@ -367,17 +332,41 @@ export default function AllContent() {
     try {
       if (user?.role !== "student") return;
       playerRef.current = event.target;
-      setReadyToSeek(true);
     } catch (err) {
       console.error("onPlayerReady error:", err);
     }
   }
-
+  
   function onPlayerStateChange(event) {
     const player = playerRef.current;
     const isStudent = user?.role === "student";
+  
+    // Seek only once, when playback starts
+    if (event.data === 1 && isStudent && !hasSeekedRef.current) {
+      const prog = progress[selectedModule._id] || {};
 
-    // Playing
+    let seekTime = 0;
+
+    if (autoAdvanceRef.current || (!manualClickRef.current && !hasSeekedRef.current)) {
+      // Auto-advance or page load (resume logic)
+      if (prog.completed) {
+        // 👇 NEW LOGIC: only seek to near end if auto-advanced
+        seekTime = autoAdvanceRef.current
+          ? Math.max(player.getDuration() - 0.2, 0)
+          : 0;
+      } else {
+        seekTime = prog.lastWatchedTime || 0;
+      }
+    } else if (!prog.completed) {
+      // Manual click on ongoing module
+      seekTime = prog.lastWatchedTime || 0;
+    }
+  
+    player.seekTo(seekTime, true);
+    hasSeekedRef.current = true;
+  }
+  
+    // Start watch timer
     if (event.data === 1 && isStudent) {
       if (watchTimer.current) clearInterval(watchTimer.current);
       watchTimer.current = setInterval(() => {
@@ -389,8 +378,8 @@ export default function AllContent() {
         }
       }, 5000);
     }
-
-    // Paused
+  
+    // Pause = save current progress
     if (event.data === 2 && isStudent) {
       if (watchTimer.current) clearInterval(watchTimer.current);
       const t = player.getCurrentTime();
@@ -400,8 +389,8 @@ export default function AllContent() {
         saveProgress(t, false);
       }
     }
-
-    // Ended
+  
+    // Ended = mark complete + auto-advance
     if (event.data === 0 && isStudent) {
       if (watchTimer.current) clearInterval(watchTimer.current);
       const t = player.getCurrentTime();
@@ -410,15 +399,22 @@ export default function AllContent() {
       } else {
         saveProgress(t, true);
       }
-
-      // Auto-advance to next module
+  
       if (selectedIdx < modules.length - 1) {
         setTimeout(() => {
+          autoAdvanceRef.current = true;
           setSelectedIdx(idx => idx + 1);
+          hasSeekedRef.current = false; // reset for next module
         }, 700);
       }
     }
   }
+  
+  useEffect(() => {
+  hasSeekedRef.current = false;
+  autoAdvanceRef.current = false;
+  manualClickRef.current = false;
+}, [selectedModule]);
 
   function onPlayerPlayback(event) {
     if (user?.role !== "student") return;
@@ -535,7 +531,10 @@ export default function AllContent() {
                     key={mod._id}
                     tabIndex={isLocked && user?.role === "student" ? -1 : 0}
                     onClick={() => {
-                      if (!isLocked || user?.role !== "student") setSelectedIdx(idx);
+                      if (!isLocked || user?.role !== "student") {
+                        manualClickRef.current = true;
+                        setSelectedIdx(idx);
+                      }
                     }}
                     onMouseEnter={() => isLocked && user?.role === "student" && setToastIdx(idx)}
                     onMouseLeave={() => isLocked && user?.role === "student" && setToastIdx(null)}

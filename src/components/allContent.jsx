@@ -200,11 +200,19 @@ export default function AllContent() {
         const loadedModules = res.data.modules || [];
         setModules(loadedModules);
 
-        const selectedId = location.state?.selectedModuleId;
-        const indexToSelect = selectedId
-          ? loadedModules.findIndex(m => m._id === selectedId)
-          : 0;
-        setSelectedIdx(indexToSelect >= 0 ? indexToSelect : 0);
+        // === PATCH START: Restore last selected module from localStorage if available ===
+        const lastModuleId = localStorage.getItem(`lastSelectedModule_${courseId}`);
+        let indexToSelect = 0;
+        if (lastModuleId) {
+          const idx = loadedModules.findIndex(m => m._id === lastModuleId);
+          if (idx !== -1) indexToSelect = idx;
+        } else if (location.state?.selectedModuleId) {
+          const idx = loadedModules.findIndex(m => m._id === location.state.selectedModuleId);
+          if (idx !== -1) indexToSelect = idx;
+        }
+        setSelectedIdx(indexToSelect);
+        // === PATCH END ===
+
         setLoading(false);
       })
       .catch(() => {
@@ -258,7 +266,7 @@ export default function AllContent() {
       const newModules = modules.filter(m => m._id !== moduleId);
       setModules(newModules);
       setSelectedIdx(newIdx);
-      setDeleting(false);
+    setDeleting(false);
     } catch (err) {
       setError("Delete failed. Try again.");
       setDeleting(false);
@@ -467,6 +475,15 @@ export default function AllContent() {
     );
   }
 
+  // === PATCH START: persist selection in localStorage on click ===
+  function handleModuleSelect(idx) {
+    setSelectedIdx(idx);
+    if (modules[idx]?._id && courseId) {
+      localStorage.setItem(`lastSelectedModule_${courseId}`, modules[idx]._id);
+    }
+  }
+  // === PATCH END ===
+
   return (
     <div>
       <CourseNavbar />
@@ -533,7 +550,7 @@ export default function AllContent() {
                     onClick={() => {
                       if (!isLocked || user?.role !== "student") {
                         manualClickRef.current = true;
-                        setSelectedIdx(idx);
+                        handleModuleSelect(idx); // PATCH: use handleModuleSelect instead of setSelectedIdx
                       }
                     }}
                     onMouseEnter={() => isLocked && user?.role === "student" && setToastIdx(idx)}
@@ -710,3 +727,8 @@ export default function AllContent() {
     </div>
   );
 }
+
+
+
+
+

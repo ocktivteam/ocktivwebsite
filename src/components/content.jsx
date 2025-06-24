@@ -279,11 +279,11 @@ export default function Content() {
     setUploading(true); setError(""); setSuccess("");
     let description = editor.getHTML();
     let uploadedFiles = [];
-
+  
     for (const file of pendingFiles) {
       const formData = new FormData();
       formData.append("file", file);
-
+  
       try {
         const res = await axios.post(
           window.location.hostname === "localhost"
@@ -294,19 +294,15 @@ export default function Content() {
         );
         const { url } = res.data;
         let type = getFileType(url, file.name);
-
+  
         if (file.type.startsWith("image/")) {
           const regex = new RegExp(
             `<img[^>]+src=["'][^"']*["'][^>]*alt=["']${file.name}["'][^>]*>`,
             "g"
           );
           description = description.replace(regex, `<img src="${url}" alt="${file.name}" style="width:350px; height:auto;" loading="lazy" contenteditable="false">`);
-
-          console.log("Final Description HTML:\n", description);
-
           uploadedFiles.push({ type, name: file.name, url, source: "upload" });
         } else {
-          // Replace pill href to S3 URL (name stays, icon stays)
           const regex = new RegExp(
             `<a[^>]*class=["']file-pill-strictcard["'][^>]*href=["'][^"']*["'][^>]*>([\\s\\S]*?)${file.name}([\\s\\S]*?)<\\/a>`,
             "g"
@@ -331,13 +327,13 @@ export default function Content() {
         return;
       }
     }
-
+  
     const filesFromEditor = extractFilesFromHTML(description);
     const files = [
       ...uploadedFiles,
       ...filesFromEditor.filter(f => !uploadedFiles.find(up => up.url === f.url))
     ];
-
+  
     const formDataObj = {
       moduleTitle,
       description,
@@ -345,27 +341,56 @@ export default function Content() {
       courseId,
       createdBy: JSON.parse(localStorage.getItem("user"))?._id || "",
     };
+  
     try {
       const token = localStorage.getItem("authToken");
       if (mode === "create") {
-        await axios.post(MODULE_API, formDataObj, {
+        // === PATCH: store response, then redirect with module id ===
+        const res = await axios.post(MODULE_API, formDataObj, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         setSuccess("Module created!");
+  
+        // Only instructors: redirect and select new module
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (user?.role === "instructor" && res.data && res.data.module?._id) {
+          setTimeout(() => {
+            setModuleTitle("");
+            editor.commands.clearContent();
+            setUploading(false);
+            setSuccess("");
+            setPendingFiles([]);
+            navigate(`/course/${courseId}`, {
+              state: { selectedModuleId: res.data.module._id }
+            });
+          }, 1000);
+          return;
+        }
+  
+        // (Fallback: old behavior for non-instructors, e.g., admin)
+        setTimeout(() => {
+          setModuleTitle("");
+          editor.commands.clearContent();
+          setUploading(false);
+          setSuccess("");
+          setPendingFiles([]);
+          navigate(`/course/${courseId}`);
+        }, 1000);
+  
       } else {
         await axios.put(`${MODULE_API}/${moduleId}`, formDataObj, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         setSuccess("Module updated!");
+        setTimeout(() => {
+          setModuleTitle("");
+          editor.commands.clearContent();
+          setUploading(false);
+          setSuccess("");
+          setPendingFiles([]);
+          navigate(`/course/${courseId}`);
+        }, 1000);
       }
-      setTimeout(() => {
-        setModuleTitle("");
-        editor.commands.clearContent();
-        setUploading(false);
-        setSuccess("");
-        setPendingFiles([]);
-        navigate(`/course/${courseId}`);
-      }, 1000);
     } catch {
       setError("Upload failed. Check your inputs and try again."); setUploading(false);
     }

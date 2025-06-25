@@ -41,12 +41,12 @@ function SessionManager({ children }) {
     const expiry = decoded.exp * 1000;
     const now = Date.now();
     const msUntilExpire = expiry - now;
-    const msUntilWarning = msUntilExpire - 30000; // 30s before expiry
+    const msUntilWarning = msUntilExpire - 60000; // 1min before expiry
 
     if (msUntilWarning > 0) {
       warningTimeout.current = setTimeout(() => setShowWarning(true), msUntilWarning);
     } else {
-      setShowWarning(true); // If already within 30s
+      setShowWarning(true); // If already within 1min
     }
     if (msUntilExpire > 0) {
       logoutTimeout.current = setTimeout(() => handleLogout(true), msUntilExpire);

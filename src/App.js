@@ -4,7 +4,6 @@ import Homepage from "./components/homepage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import EnrolledProgram from "./components/EnrolledProgram";
 import CourseContent from "./components/CourseContent";
-import Content from "./components/Content";
 import Video from './components/video';
 import News from "./components/news";
 import Evaluation from './components/evaluation';
@@ -23,7 +22,9 @@ import ForgotPassword from './components/ForgotPassword';
 import AllCourses from "./components/allcourses";
 import Payment from "./components/payment";
 import CourseDetails from "./components/coursedetails";
-import SessionManager from "./components/SessionManager"; 
+import SessionManager from "./components/SessionManager";
+import Content from "./components/content";
+import AllContent from "./components/allContent";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+
         {/* Protected routes: wrap with SessionManager */}
         <Route path="/courses" element={
           <SessionManager><AllCourses /></SessionManager>
@@ -51,12 +53,27 @@ function App() {
         <Route path="/course-shell" element={
           <SessionManager><EnrolledProgram /></SessionManager>
         } />
+        {/* Student view: */}
         <Route path="/course-content/:courseId" element={
-          <SessionManager><CourseContent /></SessionManager>
+          <SessionManager><AllContent readOnly={true} /></SessionManager>
         } />
+
+        {/* Instructor view (module list/sidebar/plus) */}
         <Route path="/course/:courseId" element={
+          <SessionManager><AllContent /></SessionManager>
+        } />
+
+        {/* Create NEW module */}
+        <Route path="/course/:courseId/content" element={
           <SessionManager><Content /></SessionManager>
         } />
+
+        {/* Edit module */}
+        <Route path="/course/:courseId/content/:moduleId" element={
+          <SessionManager><Content /></SessionManager>
+        } />
+
+        {/* Miscellaneous routes */}
         <Route path="/video" element={
           <SessionManager><Video /></SessionManager>
         } />

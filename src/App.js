@@ -23,7 +23,7 @@ import AllCourses from "./components/allcourses";
 import Payment from "./components/payment";
 import CourseDetails from "./components/coursedetails";
 import SessionManager from "./components/SessionManager";
-import Content from "./components/Content";
+import Content from "./components/content";
 import AllContent from "./components/allContent";
 
 function App() {

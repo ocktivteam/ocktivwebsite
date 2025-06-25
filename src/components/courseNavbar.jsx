@@ -4,12 +4,17 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "../style/courseNavbar.css";
-import { MdOutlineMail, MdNotificationsNone } from "react-icons/md";
+import { MdOutlineMail, MdNotificationsNone, MdHome } from "react-icons/md"; // <-- Add MdHome
 
 const COURSE_API =
   window.location.hostname === "localhost"
     ? "http://localhost:5050/api/courses"
     : "https://ocktivwebsite-3.onrender.com/api/courses";
+
+const COURSE_SHELL_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000/course-shell"
+    : "https://ocktivwebsite.vercel.app/course-shell";
 
 const TABS = [
   { label: "Content", path: "content" },
@@ -107,6 +112,11 @@ function CourseNavbar() {
     return () => { document.body.style.overflow = ""; }
   }, [menuOpen, tabOpen]);
 
+  // Home icon click handler
+  const handleHomeClick = () => {
+    window.location.href = COURSE_SHELL_URL;
+  };
+
   return (
     <>
       {/* Top Navbar */}
@@ -123,6 +133,17 @@ function CourseNavbar() {
         </div>
         {/* Desktop Right */}
         <div className="course-navbar-right desktop-nav">
+          {/* HOME ICON */}
+          <button
+            className="course-icon-btn"
+            title="Home"
+            aria-label="Home"
+            type="button"
+            onClick={handleHomeClick}
+          >
+            <MdHome className="course-icon" size={36} />
+          </button>
+          {/* EMAIL ICON */}
           <button
             className="course-icon-btn"
             title="Email"
@@ -132,6 +153,7 @@ function CourseNavbar() {
           >
             <MdOutlineMail className="course-icon" size={36} />
           </button>
+          {/* NOTIFICATION ICON */}
           <button
             className="course-icon-btn"
             title="Notifications"
@@ -170,6 +192,19 @@ function CourseNavbar() {
               &times;
             </button>
             <ul>
+              <li>
+                {/* HOME ICON in mobile */}
+                <span
+                  className="course-menu-link"
+                  style={{ display: "flex", alignItems: "center" }}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleHomeClick();
+                  }}
+                >
+                  <MdHome className="course-icon" style={{ marginRight: 8 }} size={16} /> Home
+                </span>
+              </li>
               <li>
                 <span
                   className="course-menu-link"

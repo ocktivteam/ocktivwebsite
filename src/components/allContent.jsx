@@ -480,16 +480,22 @@ export default function AllContent() {
           <div className="allcontent-sidebar">
             <div className="allcontent-sidebar-header">Course Contents</div>
             <div className="allcontent-empty">
-              No modules yet.<br />
-              (Ask your instructor to add content.)
+              {user?.role === "instructor" || user?.role === "professor" ? (
+                <>You have not created any modules yet.</>
+              ) : (
+                <>
+                  No modules yet.<br />
+                  (Ask your instructor to add content.)
+                </>
+              )}
             </div>
-            {user?.role === "instructor" && (
+            {user?.role === "instructor" || user?.role === "professor" ? (
               <div className="allcontent-add-btn-wrapper">
                 <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
                   <FaPlusCircle size={36} />
                 </button>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

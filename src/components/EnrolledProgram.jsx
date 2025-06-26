@@ -51,8 +51,11 @@ const EnrolledProgram = () => {
         .get(COURSE_API, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => {
           const assigned = (res.data.courses || res.data || []).filter(
-            c => c.instructorId === userObj._id || c.instructorId?._id === userObj._id
+            c => Array.isArray(c.instructors) && c.instructors.some(i =>
+              i === userObj._id || i?._id === userObj._id
+            )
           );
+          
           setInstructorCourses(assigned);
           setLoading(false);
         })
@@ -175,11 +178,12 @@ const EnrolledProgram = () => {
                 />
                 <div className="card-title">{course?.courseTitle || "Untitled Course"}</div>
                 <div className="card-instructor">
-                  By {course?.instructorName || "Ocktiv Instructor"}
-                </div>
-                <div className="card-duration">
-                  Course Duration: {course?.duration || "N/A"}
-                </div>
+    By {course.instructorNames}
+  </div>
+  <div className="card-duration">
+  Course Modules: {Array.isArray(course?.modules) ? course.modules.length : 0}
+</div>
+
               </div>
             ))}
           </div>

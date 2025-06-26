@@ -52,24 +52,30 @@ export const enrollUser = async (req, res) => {
 
 export const getUserEnrollments = async (req, res) => {
   try {
-    // Nested populate: course → instructorId
+    // Nested populate: course → instructors + modules
     const enrollments = await Enrollment.find({ user: req.params.userId })
       .populate({
         path: "course",
-        populate: {
-          path: "instructorId",
-          select: "firstName lastName email"
-        }
+        populate: [
+          { path: "instructors", select: "firstName lastName email" },
+          { path: "modules", select: "_id" },
+        ]
       });
 
-    // Add instructorName to each course object for frontend
+    // Add instructorNames (supports multiple instructors)
     const result = enrollments.map(enr => {
       const enrollmentObj = enr.toObject();
-      if (enrollmentObj.course && enrollmentObj.course.instructorId) {
-        enrollmentObj.course.instructorName = `${enrollmentObj.course.instructorId.firstName} ${enrollmentObj.course.instructorId.lastName}`.trim();
+      if (enrollmentObj.course && enrollmentObj.course.instructors && enrollmentObj.course.instructors.length > 0) {
+        const names = enrollmentObj.course.instructors.map(i =>
+          `${i.firstName} ${i.lastName}`.trim()
+        );
+        if (names.length === 1) enrollmentObj.course.instructorNames = names[0];
+        else if (names.length === 2) enrollmentObj.course.instructorNames = names.join(" & ");
+        else enrollmentObj.course.instructorNames = names.slice(0, -1).join(", ") + " & " + names[names.length - 1];
       } else {
-        enrollmentObj.course.instructorName = "Ocktiv Instructor";
+        enrollmentObj.course.instructorNames = "Ocktiv Instructor";
       }
+      // modules array will now be populated, so length will work!
       return enrollmentObj;
     });
 

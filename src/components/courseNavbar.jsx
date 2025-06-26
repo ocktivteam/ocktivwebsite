@@ -122,13 +122,17 @@ function CourseNavbar() {
       {/* Top Navbar */}
       <nav className="course-navbar">
         <div className="course-navbar-left">
-          <a href="/home">
-            <img
-              src="/img/GreenLogoOnly.png"
-              alt="Course Logo"
-              className="course-navbar-logo"
-            />
-          </a>
+        <a
+  href="https://ocktiv.com/"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <img
+    src="/img/GreenLogoOnly.png"
+    alt="Course Logo"
+    className="course-navbar-logo"
+  />
+</a>
           <span className="course-navbar-title">{courseTitle}</span>
         </div>
         {/* Desktop Right */}

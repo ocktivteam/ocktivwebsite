@@ -361,6 +361,18 @@
   justify-content: flex-start; 
 }
 
+/* Quiz Sidebar */
+.quiz-sidebar-item.selected {
+  background: #c2e59c !important;
+  color: #25581c !important;
+  font-weight: 700;
+}
+.quiz-sidebar-item.locked {
+  opacity: 0.63;
+  pointer-events: none;
+}
+
+
 /* Sidebar */
 @media (max-width: 1024px) {
   .allcontent-sidebar {

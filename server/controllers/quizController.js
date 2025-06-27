@@ -1,6 +1,18 @@
 import { Quiz } from "../models/Quiz.js";
 import mongoose from "mongoose";
 
+// === ADD THIS: CREATE QUIZ ===
+export const createQuiz = async (req, res) => {
+  try {
+    const quiz = new Quiz(req.body);
+    await quiz.save();
+    res.status(201).json({ message: "Quiz created", quiz });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+// === END CREATE QUIZ ===
+
 // GET /api/quiz/course/:courseId
 export const getQuizzesByCourse = async (req, res) => {
   try {

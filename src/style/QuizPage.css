@@ -65,8 +65,9 @@
   } */
   
   .option {
-    display: flexbox;
+    display: block;
     align-items: flex-start;
+    gap: 8px;
     margin-bottom: 12px;
     font-size: 14px;
     color: #000;
@@ -75,8 +76,8 @@
   }
   
   .option input[type="radio"] {
-    margin-right: 8px;
-    margin-top: 6px; /* aligns with top of text */
+   /* margin-right: 8px;*/
+    margin-top: 10px; /* aligns with top of text */
     transform: scale(1.15);
   }
   

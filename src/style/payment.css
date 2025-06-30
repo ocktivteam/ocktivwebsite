@@ -116,7 +116,8 @@
   }
   
   .enroll-btn {
-    background-color: #000;
+    /*background-color: #000;*/
+    background-color: #69982F;
     color: #fff;
     border: none;
     padding: 0.8rem 1.2rem;
@@ -124,6 +125,10 @@
     font-size: 1rem;
     cursor: pointer;
     width: 100%;
+  }
+  
+  .enroll-btn:hover {
+    background-color: #3b6211;
   }
   
   @media (max-width: 768px) {

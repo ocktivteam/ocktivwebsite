@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./../style/quizList.css";
 import { FaFileAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 // Helper: Score/PASS
 function getQuizStatus(quiz, studentAttempts) {
@@ -29,6 +30,7 @@ export default function QuizList({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [studentQuizData, setStudentQuizData] = useState({}); // quizId => studentAttempts[]
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!courseId) return;
@@ -134,11 +136,13 @@ export default function QuizList({
                   role="button"
                   onClick={() => {
                     // Clickable: just log for now, can add navigation/action later
-                    console.log("Quiz card clicked:", quiz.quizTitle);
+                    //console.log("Quiz card clicked:", quiz.quizTitle);
+                    navigate(`/course-content/${courseId}/quiz/${quiz._id}`);
                   }}
                   onKeyPress={e => {
                     if (e.key === "Enter" || e.key === " ") {
-                      console.log("Quiz card clicked (keyboard):", quiz.quizTitle);
+                     // console.log("Quiz card clicked (keyboard):", quiz.quizTitle);
+                     navigate(`/course-content/${courseId}/quiz/${quiz._id}`);
                     }
                   }}
                   aria-label={`Quiz card: ${quiz.quizTitle || quizTitle}`}

@@ -25,6 +25,8 @@ import CourseDetails from "./components/coursedetails";
 import SessionManager from "./components/SessionManager";
 import Content from "./components/content";
 import AllContent from "./components/allContent";
+import QuizPage from './components/QuizPage';
+
 
 function App() {
   return (
@@ -106,6 +108,9 @@ function App() {
         } />
         <Route path="/groups" element={
           <SessionManager><Groups /></SessionManager>
+        } />
+ <Route path="/course-content/:courseId/quiz/:quizId" element={
+          <SessionManager><QuizPage /></SessionManager>
         } />
       </Routes>
     </Router>

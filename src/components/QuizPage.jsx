@@ -100,9 +100,12 @@ const QuizPage = () => {
                     </div>
                 </div>
             ))}
-
             {!submitted && (
-                <button className="submit-btn" onClick={handleSubmit}>
+                <button
+                    className="submit-btn"
+                    onClick={handleSubmit}
+                    disabled={Object.keys(selectedAnswers).length !== quiz.questions.length}
+                >
                     Submit Quiz
                 </button>
             )}

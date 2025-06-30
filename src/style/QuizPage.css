@@ -99,6 +99,11 @@
     background-color: #0056b3;
   }
 
+  .submit-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
   /* Mobile Responsiveness */
   @media (max-width: 600px) {
     .quiz-container {

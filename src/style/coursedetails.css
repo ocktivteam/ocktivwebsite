@@ -120,7 +120,7 @@
     font-size: 1rem;
   }
   
-  .sidecard-enroll {
+  /* .sidecard-enroll {
     width: 100%;
     padding: 11px 0;
     background: #fff;
@@ -136,8 +136,25 @@
   .sidecard-enroll:hover {
     background: #3b6211;
     color: #fff;
-  }
+  } */
   
+  .sidecard-enroll {
+    width: 100%;
+    padding: 11px 0;
+    background-color: #69982f;
+    border: 1px solid #3b6211;
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: background 0.13s, color 0.13s;
+  }
+  .sidecard-enroll:hover {
+    background: #3b6211;
+    color: #fff;
+  }
+
   .sidecard-share {
     width: 100%;
     text-align: left;

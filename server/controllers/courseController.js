@@ -156,7 +156,7 @@ export const updateCourse = async (req, res) => {
   }
 };
 
-// DELETE a course (unchanged)
+// DELETE a course
 export const deleteCourse = async (req, res) => {
   try {
     const course = await Course.findByIdAndDelete(req.params.id);

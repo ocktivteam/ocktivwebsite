@@ -70,13 +70,14 @@ const QuizPage = () => {
 
             {quiz.questions?.map((q, idx) => (
                 <div key={idx} className="question-card">
-                    <div className="question-header" style={{ flexDirection: "column", alignItems: "flex-start" }}>
-                        <div className="question-label">Q{idx + 1}</div>
-                        <div className="question-text">{q.questionText}</div>
-                        <div className="question-points" style={{ alignSelf: "flex-end", marginTop: 5 }}>
-                            {quiz.quizGrade || 5} points
+                    <div className="question-header">
+                        <div className="question-meta">
+                            <div className="question-label">Question {idx + 1}</div>
+                            <div className="question-points">{quiz.quizGrade || 5} points</div>
                         </div>
+                        <div className="question-text">{q.questionText}</div>
                     </div>
+
                     <div className="options">
                         <div className="options-label">Answer options:</div>
 
@@ -91,9 +92,10 @@ const QuizPage = () => {
                                     checked={selectedAnswers[idx] === i}
                                     disabled={submitted}
                                 />
-                                <span>{String.fromCharCode(97 + i)}. {opt}</span>
+                                <div className="option-text">
+                                    {String.fromCharCode(97 + i)}. {opt}
+                                </div>
                             </label>
-
                         ))}
                     </div>
                 </div>

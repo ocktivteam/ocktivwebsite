@@ -137,3 +137,76 @@
   font-size: 1.05rem;
   text-align: left;
 }
+
+
+.quizlist-card.passed-locked {
+  background: #e9ecef !important;
+  color: #222 !important; /* Sets ALL text to dark */
+  pointer-events: none;
+  filter: grayscale(70%);
+}
+
+/* Make title and description black (override inherited color) */
+.quizlist-card.passed-locked .quizlist-title,
+.quizlist-card.passed-locked .quizlist-description {
+  color: #222 !important;
+}
+
+.quizlist-card.passed-locked .quizlist-status-passed {
+  color: #222 !important;      /* Black */
+  text-shadow: none !important;
+}
+
+/* Tooltip styles */
+.quizlist-card.passed-locked .passed-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 6px 15px;
+  border-radius: 7px;
+  font-size: 1rem;
+  white-space: nowrap;
+  z-index: 100;
+  transition: opacity 0.19s;
+}
+
+.quizlist-card.passed-locked:hover .passed-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.quizlist-card.passed-locked .quizlist-title,
+.quizlist-card.passed-locked .quizlist-description,
+.quizlist-card.passed-locked .quizlist-status-passed {
+  color: #222 !important;
+  text-shadow: none !important;
+}
+
+.passed-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 6px 15px;
+  border-radius: 7px;
+  font-size: 1rem;
+  white-space: nowrap;
+  z-index: 100;
+  transition: opacity 0.19s;
+}
+
+.quizlist-card.passed-locked:hover .passed-tooltip {
+  visibility: visible;
+  opacity: 1;
+}

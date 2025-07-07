@@ -1,0 +1,91 @@
+/* Main container for the courses */
+.course-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Adjusts based on screen width */
+  gap: 20px;
+  padding: 20px;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Styling for each course card */
+.course-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 8px solid #81b673;
+  padding: 20px;
+  text-decoration: none;
+  color: black;
+  background: white;
+  border-radius: 15px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
+}
+
+
+.course-card:hover {
+  transform: translateY(-5px); 
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); 
+}
+
+/* Image inside the card */
+.course-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover; 
+  border-radius: 10px;
+  margin-bottom: 15px; 
+}
+
+/* Footer*/
+.footer {
+  text-align: center; 
+  padding: 15px;
+  font-size: 14px;
+  background-color: #f8f8f8; 
+  margin-top: 30px; 
+  border-top: 1px solid #ddd; 
+}
+
+
+@media (max-width: 768px) {
+  .course-container {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+  }
+}
+/* Container for the course view toggle */
+.view-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px;
+}
+
+
+.view-toggle button {
+  background-color: #81b673; 
+  color: #0e0d0d; 
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 50px; 
+  cursor: pointer;
+  transition: all 0.3s ease; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.view-toggle button:hover {
+  background-color: #f4f2f0; 
+  color: #81b673; 
+  transform: translateY(-4px); 
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); 
+}
+
+.view-toggle button:focus {
+  outline: none; 
+}
+
+.view-toggle button:active {
+  transform: translateY(2px); 
+  box-shadow: none; 
+}

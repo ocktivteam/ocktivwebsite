@@ -1,0 +1,280 @@
+ 
+.course-details-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 20px;
+    font-family: 'Inter', Arial, sans-serif;
+  }
+  
+  .course-breadcrumbs {
+    color: #868686;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .course-details-content {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+  }
+  
+  .course-details-main {
+    flex: 2;
+  }
+  
+  .course-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #232323;
+    margin-bottom: 8px;
+  }
+  
+  .course-meta {
+    color: #838383;
+    font-size: 1rem;
+    margin-bottom: 24px;
+  }
+  
+  .course-section {
+    margin-bottom: 24px;
+  }
+  
+  .course-section h3 {
+    margin-top: 40px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
+  
+  .syllabus-list {
+    margin-top: 30px;
+    background: #fafbfc;
+    border-radius: 12px;
+    border: 1px solid #e5e7ec;
+    padding: 18px 0;
+  }
+  
+  
+  .syllabus-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid #e5e7ec;
+    font-size: 1rem;
+  }
+  
+  .syllabus-item:last-child {
+    border-bottom: none;
+  }
+  
+  .syllabus-title {
+    font-weight: 500;
+  }
+  
+  .syllabus-meta {
+    color: #878787;
+    font-size: 0.98rem;
+  }
+  
+  /* --- Right card --- */
+  .course-details-sidecard {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #ebebeb;
+    border-radius: 14px;
+    box-shadow: 0 2px 16px #0001;
+    padding: 24px 18px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .sidecard-logo {
+    width: 200px;
+    margin-bottom: 20px;
+  }
+  
+  .sidecard-price {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;         
+    text-align: left;
+  }
+  
+  
+  
+  .free {
+    font-weight: bold;
+    color: #39982c;
+    margin-right: 6px;
+  }
+  
+  .old-price {
+    text-decoration: line-through;
+    color: #ccc;
+    font-size: 1rem;
+  }
+  
+  .sidecard-enroll {
+    width: 100%;
+    padding: 11px 0;
+    background-color: #69982f;
+    border: 1px solid #3b6211;
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: background 0.13s, color 0.13s;
+  }
+  .sidecard-enroll:hover {
+    background: #3b6211;
+    color: #fff;
+  }
+
+  .sidecard-share {
+    width: 100%;
+    text-align: left;
+  }
+  .sidecard-share span {
+    display: block;
+    color: #818181;
+    font-size: 0.93rem;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .share-icons {
+    display: flex;
+    gap: 10px;
+  }
+  .share-icons a img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+  }
+  
+  
+  /* --- MOBILE STYLES --- */
+  @media (max-width: 950px) {
+    .course-details-content {
+      flex-direction: column;
+      gap: 0;
+    }
+    .course-details-sidecard {
+      margin: 32px 0 0 0;
+      width: 100%;
+      min-width: unset;
+      box-shadow: 0 2px 16px #0001;
+    }
+    .course-details-main {
+      width: 100%;
+      min-width: unset;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .course-details-wrapper {
+      padding: 18px 5px;
+    }
+    .course-title {
+      font-size: 1.35rem;
+    }
+    .course-section h3 {
+      font-size: 1.07rem;
+      margin-top: 24px;
+    }
+    .syllabus-item {
+      font-size: 0.98rem;
+      padding: 10px 10px;
+    }
+    .sidecard-logo {
+      width: 62px;
+      margin-bottom: 10px;
+    }
+  }
+ 
+/* NAVBAR */
+.ocktiv-navbar {
+    width: 100%;
+    height: 65px;
+    background: #69982f;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 32px;                   
+    padding: 0 36px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1000;
+  }
+  
+  .navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  
+  .navbar-logo {
+    height: 38px;
+    width: auto;
+    cursor: pointer;
+  }
+  
+  /* NAV LINKS */
+  .navbar-links {
+    list-style: none;
+    display: flex;
+    gap: 24px;               
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    margin-left: auto;     
+  }
+  
+  .navbar-links li a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 17px;
+    padding: 7px 13px;
+    border-radius: 6px;
+    transition: background 0.1s;
+  }
+  
+  .navbar-links li .active-link {
+    background: #62972e;
+    color: #fff;
+    pointer-events: none;
+  }
+  
+  .navbar-links li a:not(.active-link):hover {
+    background: #f1f7ed;
+    color: #7bb044;
+  }
+  
+  /* LOGIN BUTTON */
+  .navbar-login-wrap {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-login-btn {
+    background: #fff;
+    color: #37610b;
+    border-radius: 27px;
+    padding: 8px 30px;
+    border: none;
+    font-size: 17px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.1s, color 0.1s;
+  }
+  
+  .navbar-login-btn:hover {
+    background: #0e0861;
+    color: #fff;
+  }

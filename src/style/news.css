@@ -1,0 +1,39 @@
+.news-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .news-item {
+    margin-bottom: 30px;
+  }
+  
+  .news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .news-title {
+    color: #145da0;  /* News title color */
+    font-size: 2em;
+    margin: 0;
+  }
+  
+  .news-date {
+    color: #666666;  /* Dark gray color for the posted date */
+    font-size: 1em;
+  }
+  
+  .news-content {
+    background-color: #f4f2f0;  /* Background color for the news content */
+    padding: 15px;
+    border-radius: 5px;
+  }
+  
+  .news-body {
+    color: black;  /* Body text color */
+    font-size: 1.2em;
+    line-height: 1.6em;
+  }
+  

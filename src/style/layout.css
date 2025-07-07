@@ -1,0 +1,36 @@
+.header {
+  background-color: #1e5aa0;
+  color: white;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 50px;
+  margin-right: 10px;
+}
+
+/* Center the title */
+.header-title {
+  flex: 1; /* Makes this div take up available space */
+  text-align: center; /* Centers the text inside */
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+  
+
+

@@ -1,0 +1,29 @@
+.video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .video-wrapper {
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  iframe {
+    max-width: 100%;
+  }
+  /* Styling the current video title */
+.current-video-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #145da0; /* Change this to the desired color */
+  }
+  
+  
+  

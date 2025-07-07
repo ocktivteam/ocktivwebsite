@@ -1,0 +1,212 @@
+.quizlist-container {
+  padding: 32px 24px;
+}
+
+.quizlist-heading {
+  display: flex;
+  align-items: center;
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  gap: 10px;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.quizlist-heading-icon {
+  font-size: 2rem;
+  margin-right: 7px;
+  color: #222;
+}
+
+.quizlist-locked-message {
+  color: #b70a2a;
+  background: #fff4f4;
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+
+.quizlist-cards-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.quizlist-card {
+  background: #75af00;
+  border-radius: 16px;
+  color: #fff;
+  padding: 22px 30px 18px 30px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 8px 0 rgba(120,170,90,0.08);
+  transition: box-shadow 0.17s, background 0.13s;
+  border: none;
+  width: 100%;
+  max-width: 1100px;
+  cursor: pointer;
+  outline: none;
+}
+
+.quizlist-card:focus,
+.quizlist-card:hover {
+  background: #2a9300;
+  box-shadow: 0 4px 18px 0 rgba(120,170,90,0.14);
+}
+
+.quizlist-card:active {
+  background: #75af00;
+  box-shadow: 0 2px 6px 0 rgba(120,170,90,0.14);
+}
+
+.quizlist-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+}
+
+.quizlist-title-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.quizlist-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 2px;
+  color: #fff;
+}
+.quizlist-description {
+  font-size: 1rem;
+  color: #e8ffe1;
+}
+
+.quizlist-score-group {
+  text-align: right;
+}
+.quizlist-score-label {
+  font-size: 1.03rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.quizlist-score-points {
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.quizlist-score-notstarted {
+  color: #fff8c6;
+  font-weight: 500;
+}
+.quizlist-status-passed {
+  color: #fff;
+  font-weight: 600;
+  margin-left: 2px;
+  text-shadow: 0 0 2px #437113;
+}
+.quizlist-status-failed {
+  color: #ffe1e1;
+  font-weight: 600;
+  margin-left: 2px;
+  text-shadow: 0 0 2px #910606;
+}
+
+.quizlist-progress-info {
+  font-size: 1.06rem;
+  margin-bottom: 12px;
+  font-weight: 500;
+  color: #234711;
+  text-align: left;
+}
+
+.quizlist-loading, .quizlist-error, .quizlist-empty {
+  color: #aa2e1b;
+  background: #fff0ea;
+  border-radius: 7px;
+  padding: 10px 20px;
+  margin: 10px 0;
+  font-size: 1.05rem;
+  text-align: left;
+}
+
+
+.quizlist-card.passed-locked {
+  background: #e9ecef !important;
+  color: #222 !important; /* Sets ALL text to dark */
+  pointer-events: none;
+  filter: grayscale(70%);
+}
+
+/* Make title and description black (override inherited color) */
+.quizlist-card.passed-locked .quizlist-title,
+.quizlist-card.passed-locked .quizlist-description {
+  color: #222 !important;
+}
+
+.quizlist-card.passed-locked .quizlist-status-passed {
+  color: #222 !important;      /* Black */
+  text-shadow: none !important;
+}
+
+/* Tooltip styles */
+.quizlist-card.passed-locked .passed-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 6px 15px;
+  border-radius: 7px;
+  font-size: 1rem;
+  white-space: nowrap;
+  z-index: 100;
+  transition: opacity 0.19s;
+}
+
+.quizlist-card.passed-locked:hover .passed-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.quizlist-card.passed-locked .quizlist-title,
+.quizlist-card.passed-locked .quizlist-description,
+.quizlist-card.passed-locked .quizlist-status-passed {
+  color: #222 !important;
+  text-shadow: none !important;
+}
+
+.passed-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 6px 15px;
+  border-radius: 7px;
+  font-size: 1rem;
+  white-space: nowrap;
+  z-index: 100;
+  transition: opacity 0.19s;
+}
+
+.quizlist-card.passed-locked:hover .passed-tooltip {
+  visibility: visible;
+  opacity: 1;
+}

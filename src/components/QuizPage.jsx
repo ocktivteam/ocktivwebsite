@@ -34,6 +34,7 @@ const QuizPage = () => {
 
   // --- Get current user/studentId
   const user = getCurrentUser();
+  const isInstructor = user?.role !== "student";
   const studentId = user?._id;
 
   // --- Load quiz and attempts info
@@ -175,7 +176,7 @@ const QuizPage = () => {
     } catch (err) {
       alert(
         err?.response?.data?.error ||
-          "There was an error submitting your quiz. Please try again."
+        "There was an error submitting your quiz. Please try again."
       );
     }
   };
@@ -184,14 +185,15 @@ const QuizPage = () => {
   if (!quiz) return <div>Quiz not found.</div>;
 
   // Disable form if passed or can't attempt
-  const isDisabled = submitted || !canAttempt;
+  //const isDisabled = submitted || !canAttempt;
+  const isDisabled = submitted || !canAttempt || isInstructor;
 
   return (
     <div className="quiz-container">
       <h2 className="quiz-title">{quiz.quizTitle}</h2>
       <p className="quiz-description">{quiz.description}</p>
 
-      {isDisabled && (
+      {isDisabled && !isInstructor && (
         <div
           style={{
             background: "#f3f3f3",
@@ -238,16 +240,29 @@ const QuizPage = () => {
               </label>
             ))}
           </div>
+          {isInstructor && (
+            <div style={{ padding: "10px 20px", fontStyle: "italic", color: "#444" }}>
+              <strong>Correct answer:</strong> {q.options[q.correctAnswer]}
+            </div>
+          )}
         </div>
       ))}
-
-      {!isDisabled && (
+      {!isInstructor ? (
+        !isDisabled && (
+          <button
+            className="submit-btn"
+            onClick={handleSubmit}
+            disabled={selectedAnswers.length !== quiz.questions.length || selectedAnswers.includes(undefined)}
+          >
+            Submit Quiz
+          </button>
+        )
+      ) : (
         <button
           className="submit-btn"
-          onClick={handleSubmit}
-          disabled={selectedAnswers.length !== quiz.questions.length || selectedAnswers.includes(undefined)}
+          onClick={() => navigate(`/course-content/${courseId}`)}
         >
-          Submit Quiz
+          Go Back to Quiz List
         </button>
       )}
     </div>

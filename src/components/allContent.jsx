@@ -11,6 +11,8 @@ import {
 import { MdDone } from "react-icons/md";
 import YouTube from "react-youtube";
 import QuizList from "./quizList";
+import CertificateTab from "./CertificateTab";
+
 
 // API endpoints
 const MODULE_API =
@@ -298,7 +300,7 @@ export default function AllContent() {
     const score = latest?.score || 0;
     return score >= passingScore;
   }
-  
+
   useEffect(() => {
     if (location.state?.selectedModuleId) {
       navigate(location.pathname, { replace: true });
@@ -389,7 +391,7 @@ export default function AllContent() {
       readyToSeek &&
       playerRef.current &&
       selectedModule
-    ) {}
+    ) { }
   }, [readyToSeek, selectedModule, progress]);
 
   function onPlayerReady(event) {
@@ -666,15 +668,49 @@ export default function AllContent() {
                             <>
                               <span className="allcontent-module-status locked">Not Started</span>
                               {(completedModules !== totalModules) && <FaLock className="lock-icon" />}
-                              </>
-        );
-      })()
-    )
-  )}
-</span>
+                            </>
+                          );
+                        })()
+                      )
+                    )}
+                  </span>
                 </div>
               )}
               {/* === END QUIZ SIDEBAR ITEM === */}
+              {user?.role === "student" && (
+                <div
+                  className={
+                    "allcontent-module-item" +
+                    (selectedSidebar === "certificate" ? " selected" : "") +
+                    ((completedModules !== totalModules || !allQuizzesPassed) ? " locked" : "")
+                  }
+                  tabIndex={(completedModules !== totalModules || !allQuizzesPassed) ? -1 : 0}
+                  onClick={() => {
+                    if (completedModules === totalModules && allQuizzesPassed) {
+                      setSelectedSidebar("certificate");
+                      if (user?._id) {
+                        localStorage.setItem(`lastSelectedSidebar_${user._id}_${courseId}`, "certificate");
+                      }
+                    }
+                  }}
+                >
+                  <span className="allcontent-module-title">Certificate</span>
+                  <span className="allcontent-module-meta">
+                    {(completedModules === totalModules && allQuizzesPassed) ? (
+                      <>
+                        <MdDone className="status-icon done" />
+                        <span className="allcontent-module-status done">Unlocked</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="allcontent-module-status locked">Locked</span>
+                        <FaLock className="lock-icon" />
+                      </>
+                    )}
+                  </span>
+                </div>
+              )}
+
             </div>
           )}
         </aside>
@@ -687,6 +723,8 @@ export default function AllContent() {
               locked={user?.role === "student" && completedModules !== totalModules}
               quizTitle="Quiz"
             />
+          ) : selectedSidebar === "certificate" ? (
+            <CertificateTab user={user} courseId={courseId} />
           ) : (
             selectedModule && (
               <>
@@ -761,9 +799,9 @@ export default function AllContent() {
                         const hasKey = !!file.key;
                         const downloadUrl = hasKey
                           ? `${window.location.hostname === "localhost"
-                              ? "http://localhost:5050"
-                              : "https://ocktivwebsite-3.onrender.com"
-                            }/api/download/${file.key}`
+                            ? "http://localhost:5050"
+                            : "https://ocktivwebsite-3.onrender.com"
+                          }/api/download/${file.key}`
                           : file.url;
                         return (
                           <div className="allcontent-file-card" key={i}>
@@ -807,37 +845,37 @@ export default function AllContent() {
                   </div>
                 )}
                 {user?.role === "student" &&
-      !hasYoutubeVideo(selectedModule) &&
-      selectedIdx < modules.length - 1 &&
-      !progress[selectedModule._id]?.completed && (
-        <div
-          style={{
-            margin: "42px 0 0 0",
-            display: "flex",
-            justifyContent: "flex-end",
-            minHeight: 80,
-          }}
-        >
-          <button
-            className="allcontent-next-btn"
-            style={{
-              padding: "12px 30px",
-              fontSize: "1.07rem",
-              borderRadius: "7px",
-              fontWeight: 600,
-              color: "#fff",
-              background: "#1664b6",
-              border: "none",
-              cursor: "pointer",
-              boxShadow: "0 2px 10px 0 rgba(60, 105, 190, 0.13)",
-              marginBottom: 30,
-            }}
-            onClick={handleManualCompleteAndNext}
-          >
-            Mark as Complete & Next Module
-          </button>
-        </div>
-    )}
+                  !hasYoutubeVideo(selectedModule) &&
+                  selectedIdx < modules.length - 1 &&
+                  !progress[selectedModule._id]?.completed && (
+                    <div
+                      style={{
+                        margin: "42px 0 0 0",
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        minHeight: 80,
+                      }}
+                    >
+                      <button
+                        className="allcontent-next-btn"
+                        style={{
+                          padding: "12px 30px",
+                          fontSize: "1.07rem",
+                          borderRadius: "7px",
+                          fontWeight: 600,
+                          color: "#fff",
+                          background: "#1664b6",
+                          border: "none",
+                          cursor: "pointer",
+                          boxShadow: "0 2px 10px 0 rgba(60, 105, 190, 0.13)",
+                          marginBottom: 30,
+                        }}
+                        onClick={handleManualCompleteAndNext}
+                      >
+                        Mark as Complete & Next Module
+                      </button>
+                    </div>
+                  )}
 
               </>
             )

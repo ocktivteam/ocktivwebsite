@@ -1,0 +1,62 @@
+.certificate-wrapper {
+    padding: 40px;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .certificate-wrapper h2 {
+    font-size: 24px;
+    color: #2e7d32;
+    margin-bottom: 10px;
+  }
+  
+  .certificate-wrapper p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 25px;
+  }
+  
+  .certificate-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  
+  .certificate-btn {
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    text-decoration: none;
+  }
+  
+  .download-btn {
+    background-color: #1976d2;
+  }
+  
+  .download-btn:hover {
+    background-color: #1565c0;
+  }
+  
+  .share-btn {
+    background-color: #4caf50;
+  }
+  
+  .share-btn:hover {
+    background-color: #388e3c;
+  }
+  
+  iframe {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+  }
+  

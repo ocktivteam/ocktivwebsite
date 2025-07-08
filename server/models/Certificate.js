@@ -8,4 +8,5 @@ const certificateSchema = new mongoose.Schema({
   }, { timestamps: true });
   
   const Certificate = mongoose.model("Certificate", certificateSchema);
-  
+  export { Certificate };
+    

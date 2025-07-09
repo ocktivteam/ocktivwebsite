@@ -345,7 +345,7 @@ export default function Content() {
     try {
       const token = localStorage.getItem("authToken");
       if (mode === "create") {
-        // === PATCH: store response, then redirect with module id ===
+        // PATCH: store response, then redirect with module id
         const res = await axios.post(MODULE_API, formDataObj, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });

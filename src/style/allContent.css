@@ -198,6 +198,7 @@
   min-width: 0;
 }
 .allcontent-video-container {
+  position: relative;
   width: 100%;
   max-width: 100%;
   aspect-ratio: 16 / 9;
@@ -205,14 +206,17 @@
   border-radius: 22px;
   overflow: hidden;
   background: #000;
-  display: flex;
 }
-.youtube-responsive-player {
-  width: 100% !important;
-  height: 100% !important;
+.youtube-responsive-player iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   border: none;
   display: block;
+  background: #000;
 }
+
 .allcontent-video-iframe {
   width: 100%;
   aspect-ratio: 16/9;

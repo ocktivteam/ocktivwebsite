@@ -225,7 +225,7 @@ export default function AllContent() {
     }
   }
 
-  // [QUIZ-LOGIC-FIX] Only set selectedIdx if on "module" tab
+  // [QUIZ-LOGIC] Only set selectedIdx if on "module" tab
   useEffect(() => {
     if (!courseId) return;
     setLoading(true);

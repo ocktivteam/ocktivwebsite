@@ -11,7 +11,7 @@ const fileSchema = new mongoose.Schema({
   },
   name: { type: String, required: true },
   url: { type: String, required: true },
-  key: { type: String }, //NEW field (optional)
+  key: { type: String },
   source: {
     type: String,
     enum: ["upload", "youtube", "external"],

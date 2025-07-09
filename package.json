@@ -24,6 +24,7 @@
     "aws-sdk": "^2.1692.0",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
+    "canvas": "^2.11.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -41,6 +42,7 @@
     "react-router-dom": "^7.3.0",
     "react-scripts": "5.0.1",
     "react-youtube": "^10.1.0",
+    "sharp": "^0.34.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

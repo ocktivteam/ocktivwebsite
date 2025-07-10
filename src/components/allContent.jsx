@@ -267,6 +267,12 @@ export default function AllContent() {
 
   useEffect(() => {
     if (!user || user.role !== "student" || !quizList.length) return;
+    
+      // Prevent refetching if already fetched
+  const alreadyFetchedAll = quizList.every(q => studentQuizData[q._id]);
+  if (alreadyFetchedAll) return;
+
+  
     const fetchAll = async () => {
       let result = {};
       await Promise.all(

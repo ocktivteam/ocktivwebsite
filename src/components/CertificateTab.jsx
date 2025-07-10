@@ -70,26 +70,55 @@
 //==July9--
 
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import "../style/certificate.css"; // Keep your styles
 
 export default function CertificateTab({ user, courseId }) {
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(true);
+  const calledRef = useRef(false); // <=== Add this
 
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5050"
       : "https://ocktivwebsite-3.onrender.com";
 
+  // useEffect(() => {
+  //   console.log("Triggering certificate generation...");
+
+  //   if (!user || !user._id || !courseId) {
+  //     setLoading(true);
+  //     return;
+  //   }
+  //   const fetchCertificate = async () => {
+  //     try {
+  //       console.log("Sending POST to /api/certificate/generate");
+
+  //       const { data } = await axios.post(`${backendURL}/api/certificate/generate`, {
+  //         userId: user._id,
+  //         courseId,
+  //       });
+  //       setCertificate(data);
+  //     } catch (err) {
+  //       console.error("Error generating cert:", err);
+  //       setCertificate(null);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchCertificate();
+  // }, [user, courseId, backendURL]);
+
   useEffect(() => {
-    if (!user || !user._id || !courseId) {
-      setLoading(true);
-      return;
-    }
+    if (calledRef.current || !user || !user._id || !courseId) return;
+
+    console.log("Triggering certificate generation...");
+    calledRef.current = true;
+
     const fetchCertificate = async () => {
       try {
+        console.log("Sending POST to /api/certificate/generate");
         const { data } = await axios.post(`${backendURL}/api/certificate/generate`, {
           userId: user._id,
           courseId,
@@ -101,9 +130,10 @@ export default function CertificateTab({ user, courseId }) {
         setLoading(false);
       }
     };
+
     fetchCertificate();
   }, [user, courseId, backendURL]);
-
+  
   if (!user || !user._id || !courseId || loading)
     return <p>Loading certificate info...</p>;
 
@@ -181,3 +211,4 @@ export default function CertificateTab({ user, courseId }) {
     </div>
   );
 }
+

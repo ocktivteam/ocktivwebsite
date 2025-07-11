@@ -78,6 +78,7 @@ export default function CertificateTab({ user, courseId }) {
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(true);
   const calledRef = useRef(false); // <=== Add this
+  const [copied, setCopied] = useState(false);
 
   const backendURL =
     window.location.hostname === "localhost"
@@ -133,7 +134,7 @@ export default function CertificateTab({ user, courseId }) {
 
     fetchCertificate();
   }, [user, courseId, backendURL]);
-  
+
   if (!user || !user._id || !courseId || loading)
     return <p>Loading certificate info...</p>;
 
@@ -144,22 +145,28 @@ export default function CertificateTab({ user, courseId }) {
   const {
     studentName = "Student Name",
     courseName = "Course Name",
-    instructorName = "Instructor Name",
-    dateOfCompletion,
+    instructor = "Instructor Name",
+    completionDate,
     certId = "CertID",
     certificateUrl = "#",
   } = certificate;
 
   // Format date to readable (e.g. July 9, 2025)
   let formattedDate = "Date of Completion";
-  if (dateOfCompletion) {
-    const date = new Date(dateOfCompletion);
-    formattedDate = date.toLocaleDateString("en-US", {
-      year: "numeric",
+  if (completionDate) {
+    const date = new Date(completionDate);
+    formattedDate = date.toLocaleDateString("en-GB", {
+      day: "2-digit",
       month: "long",
-      day: "numeric"
+      year: "numeric",
     });
   }
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(certificateUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000); // hide after 2 seconds
+  };
 
   return (
     <div className="certificate-outer-container">
@@ -167,24 +174,25 @@ export default function CertificateTab({ user, courseId }) {
       <div className="certificate-header-row">
         <div>
           <h1 className="certificate-main-header">Congratulations for completing this course!</h1>
-          <p className="certificate-subtext">
+          {/* <p className="certificate-subtext">
             You may now download your certificate below
-          </p>
+          </p> */}
         </div>
         {/* BUTTONS */}
         <div className="certificate-action-buttons">
-          <button
-            className="certificate-btn share-btn"
-            onClick={() => navigator.clipboard.writeText(certificateUrl)}
-          >
-            Share Certificate
-          </button>
+          {/* Share button + toast */}
+          <div className="certificate-share-container">
+            <button className="certificate-btn share-btn" onClick={handleCopy}>
+              Share Certificate
+            </button>
+            {copied && <div className="copy-toast">Link copied!</div>}
+          </div>
+
+          {/* Download button */}
           <a
             href={certificateUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            download={`${studentName}-${courseName}-certificate.png`}
             className="certificate-btn download-btn"
-            download
           >
             Download Certificate
           </a>
@@ -202,10 +210,22 @@ export default function CertificateTab({ user, courseId }) {
 
       {/* DESCRIPTION */}
       <div className="certificate-description">
-        <p>
-          This certificate confirms that <b>{studentName}</b> completed all requirements for the <b>{courseName}</b> course on <b>{formattedDate}</b>, under the instruction of <b>{instructorName}</b> through Ocktiv.
+        {/* <p>
+          This certificate confirms that <b>{studentName}</b> completed all requirements for the <b>{courseName}</b> course on <b>{formattedDate}</b>, under the instruction of <b>{instructorName}</b> through ocktiv.
           <br />
           Course completion has been validated within our platform. To confirm the authenticity of this certificate, please visit <b>ocktiv.com/certificates/{certId}</b> and enter the provided Cert ID in the URL.
+        </p> */}
+        <p>
+          This certificate confirms that <b>{studentName}</b> has successfully completed the <b>{courseName}</b> course on <b>{formattedDate}</b>, under the instruction of <b>{instructor}</b> through ocktiv.
+          <br /><br />
+          You can view or share your certificate using the following link:{" "}
+          <a
+            href={certificateUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <b>ocktiv.com/certificates/{certId}</b>
+          </a>
         </p>
       </div>
     </div>

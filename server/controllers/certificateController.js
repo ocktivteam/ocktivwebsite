@@ -273,33 +273,33 @@ export const generateCertificate = async (req, res) => {
     console.log("Canvas height:", height);
     
     // Course Name (above first line)
-    ctx.font = "bold 40px Arial";
+    ctx.font = "bold 90px Arial";
     ctx.fillStyle = "#000";
     ctx.textAlign = "center";
-    ctx.fillText(courseName, width / 2, 1050);
+    ctx.fillText(courseName, width / 2, 1045);
     
     // Instructors (left-aligned under line)
-    ctx.font = "32px Arial";
+    ctx.font = "60px Arial";
     ctx.fillStyle = "#000";
     ctx.textAlign = "left";
-    ctx.fillText(`${instructor}`, 1700, 1210);
+    ctx.fillText(`${instructor}`, 1630, 1235);
     
     // Student Name (on second underline)
-    ctx.font = "bold 40px Arial";
+    ctx.font = "bold 90px Arial";
     ctx.fillStyle = "#1d4f91";
     ctx.textAlign = "center";
-    ctx.fillText(studentName, width / 2, 1700);
+    ctx.fillText(studentName, width / 2, 1680);
     
-    ctx.font = "26px Arial";
-    ctx.fillStyle = "#444";
-    ctx.fillText(completionDate, 2200, 1920);
-
-    ctx.fillStyle = "#1d4f91";
-    ctx.fillText(`ocktiv.com/certificates/${certId}`, 760, 540);
-    
-    ctx.font = "bold 16px Arial";
+    ctx.font = "50px Arial";
     ctx.fillStyle = "#000";
-    ctx.fillText(`${certId}`, 2100, 2280);
+    ctx.fillText(completionDate, 2240, 1930);
+
+    // ctx.fillStyle = "#1d4f91";
+    // ctx.fillText(`ocktiv.com/certificates/${certId}`, 760, 540);
+    
+    ctx.font = "bold 40px Arial";
+    ctx.fillStyle = "#000";
+    ctx.fillText(`${certId}`, 2680, 2315);
     
     // // 5. Draw background + text
     // ctx.drawImage(certImage, 0, 0, width, height);
@@ -341,12 +341,18 @@ export const generateCertificate = async (req, res) => {
     const buffer = canvas.toBuffer("image/png");
     const s3Key = `certificates/${userId}-${courseId}-${Date.now()}.png`;
 
+    const safeFileName = `${studentName}-${courseName}`
+  .replace(/\s+/g, "_")        // Replace spaces with underscores
+  .replace(/[^a-zA-Z0-9_-]/g, ""); // Remove special characters
+
+
     // 7. Upload to S3
     const uploadParams = {
       Bucket: process.env.AWS_S3_BUCKET,
       Key: s3Key,
       Body: buffer,
       ContentType: "image/png",
+      //ContentDisposition: `attachment; filename="${safeFileName}.png"`, // this triggers download - but it downloads eveytime even when user just tries to visit the link
     };
 
     const s3Result = await s3.upload(uploadParams).promise();

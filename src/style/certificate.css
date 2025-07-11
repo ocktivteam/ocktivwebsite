@@ -146,11 +146,38 @@
     background: #f7fff0;
     padding: 16px 22px;
     border-radius: 8px;
-    font-size: 1.08rem;
+    font-size: 1 rem;
     line-height: 1.55;
     max-width: 900px;
     margin-left: auto;
     margin-right: auto;
     border: 1px solid #e5efce;
+  }
+  
+  .certificate-share-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .copy-toast {
+    position: absolute;
+    top: 100%; /* Directly below the button */
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 6px;
+    background-color: #e0f7e9;
+    color: #2e7d32;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    animation: fadeOut 2s forwards;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  @keyframes fadeOut {
+    0%, 70% { opacity: 1; }
+    100% { opacity: 0; }
   }
   

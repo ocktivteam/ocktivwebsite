@@ -1,9 +1,9 @@
 // index.js
-
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 import cors from "cors";
 import compression from "compression"; 
 import { userRouter } from "./routes/user.js";
@@ -16,7 +16,6 @@ import downloadRouter from "./routes/download.js";
 import quizRouter from "./routes/quizRoutes.js";
 import certificateRouter from "./routes/certificate.js";
 
-dotenv.config();
 
 const app = express();
 

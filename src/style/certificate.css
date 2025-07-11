@@ -78,7 +78,7 @@
   }
   
   .certificate-main-header {
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #212121;
     margin: 0;
@@ -161,7 +161,7 @@
   
   .copy-toast {
     position: absolute;
-    top: 100%; /* Directly below the button */
+    top: 90%; /* Directly below the button */
     left: 50%;
     transform: translateX(-50%);
     margin-top: 6px;
@@ -179,5 +179,88 @@
   @keyframes fadeOut {
     0%, 70% { opacity: 1; }
     100% { opacity: 0; }
+  }
+  
+
+  /* ====Pop Up==== */
+  .certificate-share-popup {
+    position: absolute;
+    z-index: 10;
+    top: 110%; /* Directly below the share button */
+    left: 0;
+    min-width: 360px;
+    background: #181818;
+    color: #fff;
+    border-radius: 28px;
+    padding: 28px 22px 22px 22px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.17);
+    border: 1.5px solid #f3f3f3;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .share-popup-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .share-popup-icons {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 14px;
+  }
+  .share-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #0091ff;
+    transition: box-shadow 0.2s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  }
+  .share-icon:hover {
+    box-shadow: 0 0 0 4px #e7f7d4;
+  }
+  .share-popup-label {
+    font-size: 1.17rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    margin-top: 6px;
+    color: #fff;
+  }
+  .share-popup-url-row {
+    display: flex;
+    align-items: center;
+    background: #252525;
+    border-radius: 20px;
+    padding: 7px 11px;
+    gap: 8px;
+  }
+  .share-popup-url {
+    flex: 1;
+    font-size: 1.03rem;
+    border: none;
+    background: transparent;
+    color: #fff;
+    outline: none;
+  }
+  .copy-btn {
+    border: none;
+    background: #2f7c38;
+    color: #fff;
+    border-radius: 9px;
+    padding: 5px 11px;
+    font-size: 1.15rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.17s;
+  }
+  .copy-btn:hover {
+    background: #67c965;
   }
   

@@ -26,6 +26,8 @@ import SessionManager from "./components/SessionManager";
 import Content from "./components/content";
 import AllContent from "./components/allContent";
 import QuizPage from './components/QuizPage';
+import CertificateTab from "./components/CertificateTab";
+import CertificateViewer from "./components/CertificateViewer";
 
 
 function App() {
@@ -109,6 +111,7 @@ function App() {
         <Route path="/groups" element={
           <SessionManager><Groups /></SessionManager>
         } />
+         <Route path="/certificates/:certId" element={<CertificateViewer />} />
  <Route path="/course-content/:courseId/quiz/:quizId" element={
           <SessionManager><QuizPage /></SessionManager>
         } />

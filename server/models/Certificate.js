@@ -28,16 +28,35 @@
 
   // July 10
 
-  import mongoose from "mongoose";
+//   import mongoose from "mongoose";
+
+// const certificateSchema = new mongoose.Schema({
+//   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+//   course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
+//   issuedDate: { type: Date, default: Date.now, immutable: true },
+//   certificateUrl: String
+// }, { timestamps: true });
+
+// certificateSchema.index({ user: 1, course: 1 }, { unique: true }); // <-- Ensures one cert per user-course
+
+// const Certificate = mongoose.model("Certificate", certificateSchema);
+// export { Certificate };
+
+
+//=== July 11===
+
+import mongoose from "mongoose";
 
 const certificateSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
   issuedDate: { type: Date, default: Date.now, immutable: true },
-  certificateUrl: String
+  certificateUrl: String,
+  certId: { type: String, required: true, unique: true } // <-- UUID string
 }, { timestamps: true });
 
-certificateSchema.index({ user: 1, course: 1 }, { unique: true }); // <-- Ensures one cert per user-course
+certificateSchema.index({ user: 1, course: 1 }, { unique: true });
 
 const Certificate = mongoose.model("Certificate", certificateSchema);
 export { Certificate };
+

@@ -72,54 +72,31 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import "../style/certificate.css"; // Keep your styles
+import "../style/certificate.css";
 
 export default function CertificateTab({ user, courseId }) {
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(true);
-  const calledRef = useRef(false); // <=== Add this
+  const calledRef = useRef(false);
   const [copied, setCopied] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+
+  // Change this to match your frontend deploy domain!
+  const frontendDomain =
+    window.location.hostname === "localhost"
+      ? "http://localhost:3000"
+      : "https://ocktivwebsite.vercel.app";
 
   const backendURL =
     window.location.hostname === "localhost"
       ? "http://localhost:5050"
       : "https://ocktivwebsite-3.onrender.com";
 
-  // useEffect(() => {
-  //   console.log("Triggering certificate generation...");
-
-  //   if (!user || !user._id || !courseId) {
-  //     setLoading(true);
-  //     return;
-  //   }
-  //   const fetchCertificate = async () => {
-  //     try {
-  //       console.log("Sending POST to /api/certificate/generate");
-
-  //       const { data } = await axios.post(`${backendURL}/api/certificate/generate`, {
-  //         userId: user._id,
-  //         courseId,
-  //       });
-  //       setCertificate(data);
-  //     } catch (err) {
-  //       console.error("Error generating cert:", err);
-  //       setCertificate(null);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchCertificate();
-  // }, [user, courseId, backendURL]);
-
   useEffect(() => {
     if (calledRef.current || !user || !user._id || !courseId) return;
-
-    console.log("Triggering certificate generation...");
     calledRef.current = true;
-
     const fetchCertificate = async () => {
       try {
-        console.log("Sending POST to /api/certificate/generate");
         const { data } = await axios.post(`${backendURL}/api/certificate/generate`, {
           userId: user._id,
           courseId,
@@ -131,9 +108,18 @@ export default function CertificateTab({ user, courseId }) {
         setLoading(false);
       }
     };
-
     fetchCertificate();
   }, [user, courseId, backendURL]);
+
+  useEffect(() => {
+    function handler(e) {
+      if (!e.target.closest(".certificate-share-popup") && !e.target.closest(".share-btn")) {
+        setShowShare(false);
+      }
+    }
+    if (showShare) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showShare]);
 
   if (!user || !user._id || !courseId || loading)
     return <p>Loading certificate info...</p>;
@@ -141,7 +127,6 @@ export default function CertificateTab({ user, courseId }) {
   if (!certificate)
     return <p>Something went wrong. Please try again later.</p>;
 
-  // Fallbacks if any field is missing
   const {
     studentName = "Student Name",
     courseName = "Course Name",
@@ -151,7 +136,6 @@ export default function CertificateTab({ user, courseId }) {
     certificateUrl = "#",
   } = certificate;
 
-  // Format date to readable (e.g. July 9, 2025)
   let formattedDate = "Date of Completion";
   if (completionDate) {
     const date = new Date(completionDate);
@@ -162,10 +146,33 @@ export default function CertificateTab({ user, courseId }) {
     });
   }
 
+  // The pretty, shareable link
+  const shareLink = `${frontendDomain}/certificates/${certId}`;
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(certificateUrl);
+    navigator.clipboard.writeText(shareLink);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000); // hide after 2 seconds
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // ------- DOWNLOAD HANDLER --------
+  const handleDownload = async () => {
+    try {
+      const res = await axios.get(
+        `${backendURL}/api/certificate/download/${certId}`
+      );
+      const presignedUrl = res.data.url;
+
+      // Trigger download via hidden anchor
+      const a = document.createElement("a");
+      a.href = presignedUrl;
+      a.download = `${studentName}-${courseName}-certificate.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (err) {
+      alert("Failed to download certificate. Please try again.");
+    }
   };
 
   return (
@@ -174,31 +181,76 @@ export default function CertificateTab({ user, courseId }) {
       <div className="certificate-header-row">
         <div>
           <h1 className="certificate-main-header">Congratulations for completing this course!</h1>
-          {/* <p className="certificate-subtext">
-            You may now download your certificate below
-          </p> */}
         </div>
         {/* BUTTONS */}
         <div className="certificate-action-buttons">
-          {/* Share button + toast */}
+          {/* Share button + popup */}
           <div className="certificate-share-container">
-            <button className="certificate-btn share-btn" onClick={handleCopy}>
+            <button
+              className="certificate-btn share-btn"
+              onClick={() => setShowShare((v) => !v)}
+              type="button"
+            >
               Share Certificate
             </button>
-            {copied && <div className="copy-toast">Link copied!</div>}
-          </div>
+            {showShare && (
+              <div className="certificate-share-popup">
+                <div className="share-popup-title">Share</div>
+                <div className="share-popup-icons">
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Share on Facebook"
+                  >
+                    <img src="/img/facebook.png" alt="Facebook" className="share-icon" />
+                  </a>
+                  <a
+                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareLink)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Share on LinkedIn"
+                  >
+                    <img src="/img/linkedin.png" alt="LinkedIn" className="share-icon" />
+                  </a>
+                  <a
+                    href={`https://www.instagram.com/`} // Instagram doesn't support direct link sharing
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Share on Instagram"
+                  >
+                    <img src="/img/instagram.png" alt="Instagram" className="share-icon" />
+                  </a>
+                </div>
+                <div className="share-popup-label">Manually copy the URL for sharing</div>
+                <div className="share-popup-url-row">
+                  <input
+                    className="share-popup-url"
+                    value={shareLink}
+                    readOnly
+                    onClick={handleCopy}
+                  />
+                  <button className="copy-btn" onClick={handleCopy} type="button" tabIndex={-1}>
+                    <span role="img" aria-label="Copy">📋</span>
+                  </button>
+                  </div>
+    {copied && (
+      <div className="copy-toast">Link copied!</div>
+    )}
+  </div>
 
+            )}
+          </div>
           {/* Download button */}
-          <a
-            href={certificateUrl}
-            download={`${studentName}-${courseName}-certificate.png`}
+          <button
             className="certificate-btn download-btn"
+            onClick={handleDownload}
+            type="button"
           >
             Download Certificate
-          </a>
+          </button>
         </div>
       </div>
-
       {/* CERTIFICATE IMAGE */}
       <div className="certificate-image-wrapper">
         <img
@@ -207,28 +259,21 @@ export default function CertificateTab({ user, courseId }) {
           className="certificate-image"
         />
       </div>
-
       {/* DESCRIPTION */}
       <div className="certificate-description">
-        {/* <p>
-          This certificate confirms that <b>{studentName}</b> completed all requirements for the <b>{courseName}</b> course on <b>{formattedDate}</b>, under the instruction of <b>{instructorName}</b> through ocktiv.
-          <br />
-          Course completion has been validated within our platform. To confirm the authenticity of this certificate, please visit <b>ocktiv.com/certificates/{certId}</b> and enter the provided Cert ID in the URL.
-        </p> */}
         <p>
           This certificate confirms that <b>{studentName}</b> has successfully completed the <b>{courseName}</b> course on <b>{formattedDate}</b>, under the instruction of <b>{instructor}</b> through ocktiv.
           <br /><br />
           You can view or share your certificate using the following link:{" "}
           <a
-            href={certificateUrl}
+            href={shareLink}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <b>ocktiv.com/certificates/{certId}</b>
+            <b>{shareLink}</b>
           </a>
         </p>
       </div>
     </div>
   );
 }
-

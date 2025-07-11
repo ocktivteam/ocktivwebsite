@@ -200,6 +200,205 @@
 
 // July 10
 
+// import { createCanvas, loadImage } from "canvas";
+// import path from "path";
+// import { fileURLToPath } from "url";
+// import { User } from "../models/User.js";
+// import { Course } from "../models/Course.js";
+// import { Certificate } from "../models/Certificate.js";
+// import { v4 as uuidv4 } from "uuid";
+// import AWS from "aws-sdk";
+
+// // AWS Setup
+// const s3 = new AWS.S3({
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   region: process.env.AWS_REGION,
+// });
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// export const generateCertificate = async (req, res) => {
+//   try {
+//     const { userId, courseId } = req.body;
+
+//     if (!userId || !courseId) {
+//       return res.status(400).json({ message: "Missing userId or courseId" });
+//     }
+
+//     // 1. Fetch user and course
+//     const user = await User.findById(userId);
+//     const course = await Course.findById(courseId).populate("instructors");
+//     if (!user || !course) {
+//       return res.status(404).json({ message: "User or Course not found" });
+//     }
+
+//     // 2. Check if certificate already exists
+//     const existingCert = await Certificate.findOne({ user: userId, course: courseId });
+//     if (existingCert) {
+//       console.log("Returning existing certificate:", existingCert._id);
+//       return res.status(200).json({
+//         certificateUrl: existingCert.certificateUrl,
+//         certId: existingCert._id,
+//         studentName: user.legalName || `${user.firstName} ${user.lastName}`,
+//         courseName: course.courseTitle,
+//         instructor: course.instructors.map(i => `${i.firstName} ${i.lastName}`).join(", "),
+//         completionDate: existingCert.issuedDate.toLocaleDateString("en-GB", {
+//           day: "2-digit",
+//           month: "long",
+//           year: "numeric"
+//         }),
+//       });
+//     }
+//     console.log("No existing cert found — creating new one...");
+//     console.log("userId:", userId);
+//     console.log("courseId:", courseId);
+    
+
+// // 3. Prepare certificate data
+// const studentName = user.legalName || `${user.firstName} ${user.lastName}`;
+// const courseName = course.courseTitle;
+// const instructor = course.instructors.map(i => `${i.firstName} ${i.lastName}`).join(", ");
+// const completionDate = new Date().toLocaleDateString("en-GB", {
+//   day: "2-digit",
+//   month: "long",
+//   year: "numeric"
+// });
+// const certId = uuidv4();
+
+//     // 4. Create canvas
+//     const templatePath = path.join(__dirname, "..", "templates", "ocktiv-cert-template.png");
+//     const certImage = await loadImage(templatePath);
+//     const width = certImage.width;
+//     const height = certImage.height;
+//     const canvas = createCanvas(width, height);
+//     const ctx = canvas.getContext("2d");
+
+//     // Draw template
+//     ctx.drawImage(certImage, 0, 0, width, height);
+//     console.log("Canvas width:", width);
+//     console.log("Canvas height:", height);
+    
+//     // Course Name (above first line)
+//     ctx.font = "bold 110px Arial";
+//     ctx.fillStyle = "#000";
+//     ctx.textAlign = "center";
+//     ctx.fillText(courseName, width / 2, 1045);
+    
+//     // Instructors (left-aligned under line)
+//     ctx.font = "90px Arial";
+//     ctx.fillStyle = "#000";
+//     ctx.textAlign = "left";
+//     ctx.fillText(`${instructor}`, 1630, 1235);
+    
+//     // Student Name (on second underline)
+//     ctx.font = "bold 110px Arial";
+//     ctx.fillStyle = "#1d4f91";
+//     ctx.textAlign = "center";
+//     ctx.fillText(studentName, width / 2, 1680);
+    
+//     ctx.font = "50px Arial";
+//     ctx.fillStyle = "#000";
+//     ctx.fillText(completionDate, 2240, 1930);
+
+//     // ctx.fillStyle = "#1d4f91";
+//     // ctx.fillText(`ocktiv.com/certificates/${certId}`, 760, 540);
+    
+//     ctx.font = "bold 40px Arial";
+//     ctx.fillStyle = "#000";
+//     ctx.fillText(`${certId}`, 2680, 2315);
+
+//     ctx.font = "36px Arial";
+// ctx.fillStyle = "#1d4f91"; // Or any color you want for the link
+// ctx.textAlign = "left"; // Set the alignment as you need (can use "center" if you want)
+// ctx.fillText(`ocktiv.com/certificates/${certId}`, 200, 2315);
+
+    
+//     // // 5. Draw background + text
+//     // ctx.drawImage(certImage, 0, 0, width, height);
+
+//     // ctx.font = "bold 36px Arial";
+//     // ctx.fillStyle = "#263D5A";
+//     // ctx.textAlign = "center";
+//     // ctx.textBaseline = "middle";
+//     // ctx.fillText("CERTIFICATE OF COMPLETION", width / 2, 160);
+
+//     // ctx.font = "24px Arial";
+//     // ctx.fillStyle = "#222";
+//     // ctx.fillText(courseName, width / 2, 240);
+
+//     // ctx.font = "20px Arial";
+//     // ctx.fillStyle = "#222";
+//     // ctx.textAlign = "left";
+//     // ctx.fillText(`${instructor}`, 150, 305);
+
+//     // ctx.textAlign = "center";
+//     // ctx.font = "bold 26px Arial";
+//     // ctx.fillStyle = "#263D5A";
+//     // ctx.fillText(studentName, width / 2, 390);
+
+//     // ctx.font = "18px Arial";
+//     // ctx.fillStyle = "#444";
+//     // ctx.textAlign = "left";
+//     // ctx.fillText(completionDate, 75, 480);
+
+//     // ctx.font = "16px Arial";
+//     // ctx.fillStyle = "#263D5A";
+//     // ctx.fillText("Verify at:", 900, 540);
+//     // ctx.fillStyle = "#2980b9";
+//     // ctx.fillText(`https://ocktiv.com/certificates/${certId}`, 900, 570);
+//     // ctx.fillStyle = "#263D5A";
+//     // ctx.fillText(`Cert ID: ${certId}`, 900, 600);
+
+//     // 6. Convert to PNG buffer
+//     const buffer = canvas.toBuffer("image/png");
+//     const s3Key = `certificates/${userId}-${courseId}-${Date.now()}.png`;
+
+//     const safeFileName = `${studentName}-${courseName}`
+//   .replace(/\s+/g, "_")        // Replace spaces with underscores
+//   .replace(/[^a-zA-Z0-9_-]/g, ""); // Remove special characters
+
+
+//     // 7. Upload to S3
+//     const uploadParams = {
+//       Bucket: process.env.AWS_S3_BUCKET,
+//       Key: s3Key,
+//       Body: buffer,
+//       ContentType: "image/png",
+//       //ContentDisposition: `attachment; filename="${safeFileName}.png"`, // this triggers download - but it downloads eveytime even when user just tries to visit the link
+//     };
+
+//     const s3Result = await s3.upload(uploadParams).promise();
+//     const certUrl = s3Result.Location;
+
+//     // 8. Save to DB
+//     const newCert = await Certificate.create({
+//       user: userId,
+//       course: courseId,
+//       certificateUrl: certUrl,
+//       issuedDate: new Date(), // will be fixed/immutable
+//     });
+
+//     // 9. Respond
+//     res.status(201).json({
+//       certificateUrl: certUrl,
+//       certId: newCert._id,
+//       studentName,
+//       courseName,
+//       instructor,
+//       completionDate,
+//     });
+//   } catch (err) {
+//     console.error("Certificate generation failed:", err);
+//     res.status(500).json({ message: "Certificate generation failed" });
+//   }
+// };
+
+
+// === July 11 ===
+
+
 import { createCanvas, loadImage } from "canvas";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -209,20 +408,23 @@ import { Certificate } from "../models/Certificate.js";
 import { v4 as uuidv4 } from "uuid";
 import AWS from "aws-sdk";
 
-// AWS Setup
+console.log('Loaded AWS_REGION:', process.env.AWS_REGION);
+
+// AWS S3 v4 Setup (fixes "Please use AWS4-HMAC-SHA256" error)
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
+  region: process.env.AWS_REGION || "ca-central-1",
+  signatureVersion: "v4", // <--- important!
 });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// CERTIFICATE GENERATION (existing)
 export const generateCertificate = async (req, res) => {
   try {
     const { userId, courseId } = req.body;
-
     if (!userId || !courseId) {
       return res.status(400).json({ message: "Missing userId or courseId" });
     }
@@ -237,26 +439,29 @@ export const generateCertificate = async (req, res) => {
     // 2. Check if certificate already exists
     const existingCert = await Certificate.findOne({ user: userId, course: courseId });
     if (existingCert) {
-      console.log("Returning existing certificate:", existingCert._id);
       return res.status(200).json({
         certificateUrl: existingCert.certificateUrl,
-        certId: existingCert._id,
+        certId: existingCert.certId,
         studentName: user.legalName || `${user.firstName} ${user.lastName}`,
         courseName: course.courseTitle,
         instructor: course.instructors.map(i => `${i.firstName} ${i.lastName}`).join(", "),
-        completionDate: existingCert.issuedDate.toLocaleDateString("en-US"),
+        completionDate: existingCert.issuedDate.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        }),
       });
     }
-    console.log("No existing cert found — creating new one...");
-    console.log("userId:", userId);
-    console.log("courseId:", courseId);
-    
 
     // 3. Prepare certificate data
     const studentName = user.legalName || `${user.firstName} ${user.lastName}`;
     const courseName = course.courseTitle;
     const instructor = course.instructors.map(i => `${i.firstName} ${i.lastName}`).join(", ");
-    const completionDate = new Date().toLocaleDateString("en-US");
+    const completionDate = new Date().toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    });
     const certId = uuidv4();
 
     // 4. Create canvas
@@ -269,107 +474,65 @@ export const generateCertificate = async (req, res) => {
 
     // Draw template
     ctx.drawImage(certImage, 0, 0, width, height);
-    console.log("Canvas width:", width);
-    console.log("Canvas height:", height);
-    
-    // Course Name (above first line)
-    ctx.font = "bold 90px Arial";
+    ctx.font = "bold 110px Arial";
     ctx.fillStyle = "#000";
     ctx.textAlign = "center";
     ctx.fillText(courseName, width / 2, 1045);
-    
-    // Instructors (left-aligned under line)
-    ctx.font = "60px Arial";
+
+    ctx.font = "85px Arial";
     ctx.fillStyle = "#000";
     ctx.textAlign = "left";
     ctx.fillText(`${instructor}`, 1630, 1235);
-    
-    // Student Name (on second underline)
-    ctx.font = "bold 90px Arial";
+
+    ctx.font = "bold 110px Arial";
     ctx.fillStyle = "#1d4f91";
     ctx.textAlign = "center";
-    ctx.fillText(studentName, width / 2, 1680);
-    
-    ctx.font = "50px Arial";
-    ctx.fillStyle = "#000";
-    ctx.fillText(completionDate, 2240, 1930);
+    ctx.fillText(studentName, width / 2, 1700);
 
-    // ctx.fillStyle = "#1d4f91";
-    // ctx.fillText(`ocktiv.com/certificates/${certId}`, 760, 540);
-    
+    ctx.font = "54px Roboto";
+    ctx.fillStyle = "#000";
+    ctx.fillText(completionDate, 2273, 1941);
+
     ctx.font = "bold 40px Arial";
     ctx.fillStyle = "#000";
-    ctx.fillText(`${certId}`, 2680, 2315);
-    
-    // // 5. Draw background + text
-    // ctx.drawImage(certImage, 0, 0, width, height);
+    ctx.textAlign = "left";
+    ctx.fillText(`${certId}`, 2340, 2300);
 
-    // ctx.font = "bold 36px Arial";
-    // ctx.fillStyle = "#263D5A";
-    // ctx.textAlign = "center";
-    // ctx.textBaseline = "middle";
-    // ctx.fillText("CERTIFICATE OF COMPLETION", width / 2, 160);
+    ctx.font = "36px Arial";
+    ctx.fillStyle = "#1d4f91";
+    ctx.textAlign = "left";
+// Before you draw text on canvas
+const viewerLink = process.env.FRONTEND_DOMAIN || "ocktiv.com";
+// ...when drawing the link
+ctx.fillText(`${viewerLink}/certificates/${certId}`, 200, 2295);
 
-    // ctx.font = "24px Arial";
-    // ctx.fillStyle = "#222";
-    // ctx.fillText(courseName, width / 2, 240);
 
-    // ctx.font = "20px Arial";
-    // ctx.fillStyle = "#222";
-    // ctx.textAlign = "left";
-    // ctx.fillText(`${instructor}`, 150, 305);
-
-    // ctx.textAlign = "center";
-    // ctx.font = "bold 26px Arial";
-    // ctx.fillStyle = "#263D5A";
-    // ctx.fillText(studentName, width / 2, 390);
-
-    // ctx.font = "18px Arial";
-    // ctx.fillStyle = "#444";
-    // ctx.textAlign = "left";
-    // ctx.fillText(completionDate, 75, 480);
-
-    // ctx.font = "16px Arial";
-    // ctx.fillStyle = "#263D5A";
-    // ctx.fillText("Verify at:", 900, 540);
-    // ctx.fillStyle = "#2980b9";
-    // ctx.fillText(`https://ocktiv.com/certificates/${certId}`, 900, 570);
-    // ctx.fillStyle = "#263D5A";
-    // ctx.fillText(`Cert ID: ${certId}`, 900, 600);
-
-    // 6. Convert to PNG buffer
+    // Convert to PNG buffer
     const buffer = canvas.toBuffer("image/png");
     const s3Key = `certificates/${userId}-${courseId}-${Date.now()}.png`;
 
-    const safeFileName = `${studentName}-${courseName}`
-  .replace(/\s+/g, "_")        // Replace spaces with underscores
-  .replace(/[^a-zA-Z0-9_-]/g, ""); // Remove special characters
-
-
-    // 7. Upload to S3
+    // Upload to S3
     const uploadParams = {
       Bucket: process.env.AWS_S3_BUCKET,
       Key: s3Key,
       Body: buffer,
       ContentType: "image/png",
-      //ContentDisposition: `attachment; filename="${safeFileName}.png"`, // this triggers download - but it downloads eveytime even when user just tries to visit the link
     };
-
     const s3Result = await s3.upload(uploadParams).promise();
     const certUrl = s3Result.Location;
 
-    // 8. Save to DB
+    // Save to DB (including certId)
     const newCert = await Certificate.create({
       user: userId,
       course: courseId,
       certificateUrl: certUrl,
-      issuedDate: new Date(), // will be fixed/immutable
+      issuedDate: new Date(),
+      certId
     });
 
-    // 9. Respond
     res.status(201).json({
       certificateUrl: certUrl,
-      certId: newCert._id,
+      certId,
       studentName,
       courseName,
       instructor,
@@ -381,3 +544,63 @@ export const generateCertificate = async (req, res) => {
   }
 };
 
+// REDIRECT CONTROLLER (for sharing)
+export const redirectToCertificate = async (req, res) => {
+  try {
+    const { certId } = req.params;
+    const cert = await Certificate.findOne({ certId });
+    if (!cert) {
+      return res.status(404).send("Certificate not found.");
+    }
+    res.redirect(cert.certificateUrl);
+  } catch (err) {
+    console.error("Redirect failed:", err);
+    res.status(500).send("Error redirecting to certificate.");
+  }
+};
+
+export const getCertificateByCertId = async (req, res) => {
+  try {
+    const { certId } = req.params;
+    // Populate course if you want to get the course title, etc.
+    const cert = await Certificate.findOne({ certId }).populate('course');
+    if (!cert) return res.status(404).json({ message: "Certificate not found" });
+
+    res.json({
+      certificateUrl: cert.certificateUrl,
+      course: cert.course._id || cert.course, // Always send the course _id
+      // Optionally include course name/title, etc.
+      courseTitle: cert.course.courseTitle || undefined
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch certificate" });
+  }
+};
+
+
+// PRESIGNED URL CONTROLLER (download)
+export const getPresignedCertificateUrl = async (req, res) => {
+  try {
+    const { certId } = req.params;
+    const cert = await Certificate.findOne({ certId });
+    if (!cert) return res.status(404).json({ message: "Certificate not found." });
+
+    // Extract S3 key from certificateUrl
+    const url = new URL(cert.certificateUrl);
+    const key = decodeURIComponent(url.pathname.substring(1));
+    const filename = `${certId}.png`; // You can use any filename
+
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: key,
+      Expires: 60, // 1 minute
+      ResponseContentType: "image/png",
+      ResponseContentDisposition: `attachment; filename="${filename}"`,
+    };
+    const signedUrl = s3.getSignedUrl("getObject", params);
+    return res.json({ url: signedUrl });
+  } catch (err) {
+    console.error("Failed to get presigned URL", err);
+    res.status(500).json({ message: "Failed to get download link" });
+  }
+};

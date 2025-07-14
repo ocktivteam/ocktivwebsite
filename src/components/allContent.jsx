@@ -272,7 +272,7 @@ export default function AllContent() {
   const alreadyFetchedAll = quizList.every(q => studentQuizData[q._id]);
   if (alreadyFetchedAll) return;
 
-  
+
     const fetchAll = async () => {
       let result = {};
       await Promise.all(
@@ -719,6 +719,9 @@ export default function AllContent() {
 
             </div>
           )}
+          <div className="allcontent-sidebar-footer">
+  Customer Support: <a href="mailto:support@ocktiv.com">support@ocktiv.com</a>
+</div>
         </aside>
         {/* Main content */}
         <main className="allcontent-main">

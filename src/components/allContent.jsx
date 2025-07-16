@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -267,10 +266,10 @@ export default function AllContent() {
 
   useEffect(() => {
     if (!user || user.role !== "student" || !quizList.length) return;
-    
-      // Prevent refetching if already fetched
-  const alreadyFetchedAll = quizList.every(q => studentQuizData[q._id]);
-  if (alreadyFetchedAll) return;
+
+    // Prevent refetching if already fetched
+    const alreadyFetchedAll = quizList.every(q => studentQuizData[q._id]);
+    if (alreadyFetchedAll) return;
 
 
     const fetchAll = async () => {
@@ -398,6 +397,7 @@ export default function AllContent() {
       playerRef.current &&
       selectedModule
     ) { }
+
   }, [readyToSeek, selectedModule, progress]);
 
   function onPlayerReady(event) {
@@ -720,8 +720,8 @@ export default function AllContent() {
             </div>
           )}
           <div className="allcontent-sidebar-footer">
-  Customer Support: <a href="mailto:support@ocktiv.com">support@ocktiv.com</a>
-</div>
+            Customer Support: <a href="mailto:support@ocktiv.com">support@ocktiv.com</a>
+          </div>
         </aside>
         {/* Main content */}
         <main className="allcontent-main">
@@ -855,7 +855,6 @@ export default function AllContent() {
                 )}
                 {user?.role === "student" &&
                   !hasYoutubeVideo(selectedModule) &&
-                  selectedIdx < modules.length - 1 &&
                   !progress[selectedModule._id]?.completed && (
                     <div
                       style={{
@@ -881,7 +880,10 @@ export default function AllContent() {
                         }}
                         onClick={handleManualCompleteAndNext}
                       >
-                        Mark as Complete & Next Module
+                        {selectedIdx < modules.length - 1
+                          ? "Mark as Complete & Next Module"
+                          : "Mark as Complete"
+                        }
                       </button>
                     </div>
                   )}
@@ -894,3 +896,4 @@ export default function AllContent() {
     </div>
   );
 }
+

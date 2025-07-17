@@ -147,7 +147,10 @@ export default function CertificateTab({ user, courseId }) {
   }
 
   // The pretty, shareable link
-  const shareLink = `${frontendDomain}/certificates/${certId}`;
+  //const shareLink = `${frontendDomain}/certificates/${certId}`;
+  //const shareLink = certificateUrl; // Use the S3 URL directly for sharing
+  const brandedLink = `${frontendDomain}/certificates/${certId}`; // for UI display
+  const shareLink = certificateUrl; // raw AWS S3 link for sharing
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareLink);
@@ -233,12 +236,11 @@ export default function CertificateTab({ user, courseId }) {
                   <button className="copy-btn" onClick={handleCopy} type="button" tabIndex={-1}>
                     <span role="img" aria-label="Copy">📋</span>
                   </button>
-                  </div>
-    {copied && (
-      <div className="copy-toast">Link copied!</div>
-    )}
-  </div>
-
+                </div>
+                {copied && (
+                  <div className="copy-toast">Link copied!</div>
+                )}
+              </div>
             )}
           </div>
           {/* Download button */}
@@ -266,11 +268,11 @@ export default function CertificateTab({ user, courseId }) {
           <br /><br />
           You can view or share your certificate using the following link:{" "}
           <a
-            href={shareLink}
+            href={brandedLink}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <b>{shareLink}</b>
+            <b>{brandedLink}</b>
           </a>
         </p>
       </div>

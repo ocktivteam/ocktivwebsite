@@ -5,6 +5,7 @@ import "../style/payment.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./navbar";
+import { useSessionCheck } from '../hooks/useSessionCheck';
 
 const ENROLL_API =
     window.location.hostname === "localhost"
@@ -18,6 +19,8 @@ const ENROLL_API =
         
 
     const Payment = () => {
+    useSessionCheck();
+    
     const [fullName, setFullName] = useState("");
     const [country, setCountry] = useState("");
     const [error, setError] = useState("");

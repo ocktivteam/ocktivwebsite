@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../style/QuizPage.css";
+import { useSessionCheck } from '../hooks/useSessionCheck';
 
 // --- UTILITY: Get current logged-in user ---
 function getCurrentUser() {
@@ -18,6 +19,8 @@ const API_ROOT =
     : "https://ocktivwebsite-3.onrender.com";
 
 const QuizPage = () => {
+  useSessionCheck();
+  
   const { courseId, quizId } = useParams();
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);

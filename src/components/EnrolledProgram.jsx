@@ -5,6 +5,7 @@ import DashboardNavbar from "./dashboardNavbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../style/EnrolledProgram.css";
+import { useSessionCheck } from '../hooks/useSessionCheck';
 
 const ENROLL_API =
   window.location.hostname === "localhost"
@@ -17,6 +18,8 @@ const COURSE_API =
     : "https://ocktivwebsite-3.onrender.com/api/courses";
 
 const EnrolledProgram = () => {
+  useSessionCheck();
+  
   const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState([]);
   const [instructorCourses, setInstructorCourses] = useState([]);

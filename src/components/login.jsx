@@ -127,7 +127,10 @@ const Login = () => {
             <Link to="/forgotPassword" className="forgot-link">Forgot your password?</Link>
 
             {/* Link to Signup page */}
-            <p className="signup-link">Don't have an account? <Link to="/signup">Sign Up</Link></p>
+            {/* <p className="signup-link">Don't have an account? <Link to="/signup">Sign Up</Link></p> */}
+
+            {/* Link to Courses page */}
+            <p className="signup-link">Not enrolled in any courses? <Link to="/courses">Enroll Now</Link></p>
           </form>
         </div>
       </div>

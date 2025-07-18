@@ -22,10 +22,32 @@ function Navbar() {
   }, []);
 
   const handleLogout = () => {
+    // Check if we're on course details or payment page
+    const currentPath = window.location.pathname;
+    const isSpecialPage = currentPath.includes('/coursedetails/') || currentPath.includes('/payment');
+    
+    // Clear all session data
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
-    navigate("/login");
+    
+    if (isSpecialPage) {
+      // Special redirect for course details and payment pages
+      navigate('/login', { replace: true });
+      
+      // Override back button to go to courses page
+      window.history.pushState(null, '', '/courses');
+      window.history.pushState(null, '', '/login');
+    } else {
+      // Normal logout behavior for other pages
+      navigate('/login', { replace: true });
+      
+      // Prevent back button normally
+      window.history.pushState(null, '', window.location.href);
+      window.onpopstate = function () {
+        window.history.go(1);
+      };
+    }
   };
 
   // Prevent background scroll for mobile menu

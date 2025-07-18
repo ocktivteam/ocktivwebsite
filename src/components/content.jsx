@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import CourseNavbar from "./courseNavbar";
+import { useSessionCheck } from '../hooks/useSessionCheck';
 import "../style/content.css";
 import {
   OutlinedInput, Typography, Button, Box, Tooltip, IconButton, Menu, MenuItem, Popover
@@ -183,6 +184,8 @@ function extractFilesFromHTML(html) {
 }
 
 export default function Content() {
+  useSessionCheck();
+  
   const { courseId, moduleId } = useParams();
   const navigate = useNavigate();
   const [mode] = useState(moduleId ? "edit" : "create");

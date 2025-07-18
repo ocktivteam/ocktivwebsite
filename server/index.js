@@ -15,7 +15,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import downloadRouter from "./routes/download.js";
 import quizRouter from "./routes/quizRoutes.js";
 import certificateRouter from "./routes/certificate.js";
-
+import { preventCache } from "./middleware/preventCache.js";
 
 const app = express();
 
@@ -46,21 +46,14 @@ app.get('/ping', (req, res) => res.json({ pong: true, origin: req.headers.origin
 
 app.use('/auth', userRouter);
 
-app.use("/api/enrollment", enrollRouter);
-
-app.use("/api/courses", courseRouter);
-
-app.use("/api/modules", moduleRouter);
-
-app.use("/api/module-progress", moduleProgressRouter);
-
+app.use("/api/enrollment", preventCache, enrollRouter);
+app.use("/api/courses", preventCache, courseRouter);
+app.use("/api/modules", preventCache, moduleRouter);
+app.use("/api/module-progress", preventCache, moduleProgressRouter);
 app.use("/api/upload", uploadRoutes);
-
 app.use("/api/download", downloadRouter);
-
-app.use("/api/quiz", quizRouter);
-
-app.use("/api/certificate", certificateRouter);
+app.use("/api/quiz", preventCache, quizRouter);
+app.use("/api/certificate", preventCache, certificateRouter);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

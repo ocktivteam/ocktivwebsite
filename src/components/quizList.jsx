@@ -6,6 +6,7 @@ import axios from "axios";
 import "./../style/quizList.css";
 import { FaFileAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useSessionCheck } from '../hooks/useSessionCheck';
 
 // Helper: Score/PASS
 function getQuizStatus(quiz, studentAttempts) {
@@ -30,6 +31,8 @@ export default function QuizList({
   quizTitle = "Quiz",
   onQuizSelect, // for future
 }) {
+  useSessionCheck();
+  
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

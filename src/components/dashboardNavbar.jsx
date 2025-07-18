@@ -20,9 +20,18 @@ function DashboardNavbar() {
   }, []);
 
   const handleLogout = () => {
+    // Clear all session data
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
-    navigate("/login");
+    
+    // Use replace to prevent going back
+    navigate('/login', { replace: true });
+    
+    // Prevent back button
+    window.history.pushState(null, '', window.location.href);
+    window.onpopstate = function () {
+      window.history.go(1);
+    };
   };
 
   useEffect(() => {

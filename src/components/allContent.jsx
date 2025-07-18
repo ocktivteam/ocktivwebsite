@@ -12,6 +12,7 @@ import { MdDone } from "react-icons/md";
 import YouTube from "react-youtube";
 import QuizList from "./quizList";
 import CertificateTab from "./CertificateTab";
+import { useSessionCheck } from '../hooks/useSessionCheck';
 
 
 // API endpoints
@@ -151,6 +152,7 @@ async function forceImageDownload(url, filename) {
 }
 
 export default function AllContent() {
+    useSessionCheck();
   const { courseId } = useParams();
   const navigate = useNavigate();
   const user = getCurrentUser();
@@ -854,37 +856,39 @@ export default function AllContent() {
                   </div>
                 )}
                 {user?.role === "student" &&
-                  !hasYoutubeVideo(selectedModule) &&
-                  selectedIdx < modules.length - 1 &&
-                  !progress[selectedModule._id]?.completed && (
-                    <div
-                      style={{
-                        margin: "42px 0 0 0",
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        minHeight: 80,
-                      }}
-                    >
-                      <button
-                        className="allcontent-next-btn"
-                        style={{
-                          padding: "12px 30px",
-                          fontSize: "1.07rem",
-                          borderRadius: "7px",
-                          fontWeight: 600,
-                          color: "#fff",
-                          background: "#1664b6",
-                          border: "none",
-                          cursor: "pointer",
-                          boxShadow: "0 2px 10px 0 rgba(60, 105, 190, 0.13)",
-                          marginBottom: 30,
-                        }}
-                        onClick={handleManualCompleteAndNext}
-                      >
-                        Mark as Complete & Next Module
-                      </button>
-                    </div>
-                  )}
+  !hasYoutubeVideo(selectedModule) &&
+  !progress[selectedModule._id]?.completed && (
+    <div
+      style={{
+        margin: "42px 0 0 0",
+        display: "flex",
+        justifyContent: "flex-end",
+        minHeight: 80,
+      }}
+    >
+      <button
+        className="allcontent-next-btn"
+        style={{
+          padding: "12px 30px",
+          fontSize: "1.07rem",
+          borderRadius: "7px",
+          fontWeight: 600,
+          color: "#fff",
+          background: "#1664b6",
+          border: "none",
+          cursor: "pointer",
+          boxShadow: "0 2px 10px 0 rgba(60, 105, 190, 0.13)",
+          marginBottom: 30,
+        }}
+        onClick={handleManualCompleteAndNext}
+      >
+        {selectedIdx < modules.length - 1 
+          ? "Mark as Complete & Next Module"
+          : "Mark as Complete"
+        }
+      </button>
+    </div>
+  )}
 
               </>
             )

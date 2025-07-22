@@ -388,7 +388,7 @@
 @media (max-width: 900px) {
 
   .allcontent-main {
-    padding: 0 !important;
+    padding: 24px !important;  /* FIXED: Changed from 0 to 24px to match quizList padding */
   }
   
   .allcontent-body {

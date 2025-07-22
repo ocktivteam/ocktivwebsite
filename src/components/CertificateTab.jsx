@@ -358,14 +358,14 @@ export default function CertificateTab({ user, courseId }) {
                   >
                     <img src="/img/linkedin.png" alt="LinkedIn" className="share-icon" />
                   </a>
-                  <a
+                  {/* <a
                     href={`https://www.instagram.com/`} // Instagram doesn't support direct link sharing
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Share on Instagram"
                   >
                     <img src="/img/instagram.png" alt="Instagram" className="share-icon" />
-                  </a>
+                  </a> */}
                 </div>
                 <div className="share-popup-label">Manually copy the URL for sharing</div>
                 <div className="share-popup-url-row">

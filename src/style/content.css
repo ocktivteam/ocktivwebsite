@@ -96,6 +96,20 @@
   overflow-y: auto;
 }
 
+.file-card-block {
+  display: flex;
+  align-items: center;
+  background: #fafbfc;
+  border: 1.7px solid #d7e3f6;
+  border-radius: 12px;
+  padding: 13px 19px;
+  margin: 14px 0;
+  min-width: 240px;
+  max-width: 550px;
+  font-family: 'Montserrat', Arial, sans-serif;
+  box-shadow: 0 2px 7px 0 rgba(60,60,60,0.07);
+}
+
 /* Force all images inside the editor to a max width */
 .content-tiptap-editorarea img {
   max-width: 350px;

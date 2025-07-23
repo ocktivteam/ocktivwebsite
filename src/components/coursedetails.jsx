@@ -78,6 +78,18 @@ function CourseDetails() {
         if (!course?.modules || course.modules.length === 0) {
             return <div>No modules available yet.</div>;
         }
+        else if (!course?.modules || course.modules.length === 0) {
+            enrollBtnProps = {
+                disabled: true,
+                label: "Coming Soon",
+                color: "#ccc",
+                extraMsg: (
+                    <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
+                        Enrollment will open once modules are available.
+                    </p>
+                )
+            };
+        }        
         return (
             <>
                 {course.modules.map((mod, idx) => (
@@ -118,6 +130,17 @@ function CourseDetails() {
             extraMsg: (
                 <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
                     You are already enrolled in this course.
+                </p>
+            )
+        };
+    } else if (!course?.modules || course.modules.length === 0) {
+        enrollBtnProps = {
+            disabled: true,
+            label: "Coming Soon",
+            color: "#ccc",
+            extraMsg: (
+                <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
+                    Enrollment will open once modules are available.
                 </p>
             )
         };

@@ -207,6 +207,60 @@ button:hover {
   object-position: right top;
   border-radius: 0;
 }
+
+/* Password toggle styles */
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.login-password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 52%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #666;
+}
+
+.login-password-toggle:hover {
+  color: #333 !important;
+  background: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Also add focus styles to prevent green box on focus */
+.login-password-toggle:focus {
+  background: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Prevent any active state styling */
+.login-password-toggle:active {
+  background: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.login-password-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.password-input-wrapper input {
+  padding-right: 45px;
+}
  
 /* Tablet */
 @media (max-width: 900px) {

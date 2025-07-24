@@ -151,6 +151,35 @@ async function forceImageDownload(url, filename) {
   }
 }
 
+// === Helper to render <file-card> as nice card ===
+function renderCustomNodes(html) {
+  if (!html) return "";
+  return html.replace(
+    /<file-card[^>]*name="([^"]+)"[^>]*url="([^"]+)"[^>]*>([\s\S]*?)<\/file-card>/g,
+    (_, name, url) => {
+      // Pick icon by file extension
+      let icon = "📄";
+      const ext = name.split(".").pop().toLowerCase();
+      if (["pdf"].includes(ext)) icon = "📕";
+      if (["doc", "docx"].includes(ext)) icon = "📄";
+      if (["ppt", "pptx"].includes(ext)) icon = "📊";
+      if (["xls", "xlsx"].includes(ext)) icon = "📋";
+      if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) icon = "🖼️";
+      if (["zip", "rar", "7z"].includes(ext)) icon = "🗜️";
+      // HTML: make thin & long; remove text-decoration (no underline)
+      return `
+        <div style="display:flex;align-items:center;background:#fafbfc;border:1.7px solid #d7e3f6;border-radius:12px;padding:6px 22px;margin:14px 0;min-width:350px;max-width:950px;height:48px;box-shadow:0 2px 7px 0 rgba(60,60,60,0.07);">
+          <span style="font-size:1.7rem;margin-right:16px;user-select:none;">${icon}</span>
+          <a href="${url}" target="_blank" style="font-size:1.07rem;font-weight:700;color:#18305c;margin-right:10px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:text;text-decoration:none;">
+            ${name}
+          </a>
+        </div>
+      `;
+    }
+  ).replace(/(<div[^>]*><\/div>|\s*<br\s*\/?>\s*)+/g, ""); // remove empty lines and <br>
+}
+
+
 export default function AllContent() {
     useSessionCheck();
   const { courseId } = useParams();
@@ -796,9 +825,10 @@ export default function AllContent() {
                 </div>
                 <div className="allcontent-desc-label">Lectures Description</div>
                 <div
-                  className="allcontent-desc-body"
-                  dangerouslySetInnerHTML={{ __html: descriptionWithoutYouTube }}
-                />
+  className="allcontent-desc-body"
+  dangerouslySetInnerHTML={{ __html: renderCustomNodes(descriptionWithoutYouTube) }}
+/>
+
                 {attachedFiles.length > 0 && (
                   <div className="allcontent-files-section">
                     <div className="allcontent-files-label">

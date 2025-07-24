@@ -145,6 +145,57 @@
     border: 1px solid #d9534f !important;
     background-color: #fff5f5;
   }
+
+  /* Password toggle styles */
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.signup-password-toggle {
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;  /* Changed from 52% to 50% */
+  transform: translateY(-50%) !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  color: #666 !important;
+  z-index: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  display: flex !important;  /* Added this */
+  align-items: center !important;  /* Added this */
+  justify-content: center !important;  /* Added this */
+}
+
+.signup-password-toggle:hover {
+  color: #333 !important;
+  background: none !important;
+}
+
+.signup-password-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.password-input-wrapper input {
+  padding-right: 45px !important;
+  width: 100% !important;
+}
+
+/* Fix for password fields flex layout */
+.password-fields {
+  display: flex;
+  gap: 10px;
+}
+
+.password-fields .password-input-wrapper {
+  flex: 1;
+}
+
   /* Tablet */
   @media (max-width: 900px) {
     .signup-page {
@@ -192,6 +243,8 @@
       margin-bottom: 0px;
     }
   }
+  
+
   
   /* Mobile */
   @media (max-width: 600px) {

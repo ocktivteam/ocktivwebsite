@@ -28,7 +28,7 @@ import AllContent from "./components/allContent";
 import QuizPage from './components/QuizPage';
 import CertificateTab from "./components/CertificateTab";
 import CertificateViewer from "./components/CertificateViewer";
-
+import Assignment from './components/Assignment';
 
 function App() {
   return (
@@ -99,8 +99,11 @@ function App() {
         <Route path="/news" element={
           <SessionManager><News /></SessionManager>
         } />
-        <Route path="/evaluation" element={
+        {/* <Route path="/evaluation" element={
           <SessionManager><Evaluation /></SessionManager>
+        } /> */}
+        <Route path="/course/:courseId/assignment"  element={
+          <SessionManager><Assignment /></SessionManager>
         } />
         <Route path="/grades" element={
           <SessionManager><Grades /></SessionManager>

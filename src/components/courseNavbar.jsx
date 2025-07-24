@@ -19,7 +19,8 @@ const COURSE_SHELL_URL =
 const TABS = [
   { label: "Content", path: "content" },
   { label: "News", path: "news" },
-  { label: "Evaluation", path: "evaluation" },
+  //{ label: "Evaluation", path: "evaluation" },
+  { label: "Assignment", path: "assignment" },
   { label: "Gradebook", path: "grades" },
   { label: "Discussion", path: "discussion" }
 ];
@@ -100,8 +101,11 @@ function CourseNavbar() {
       case "News":
         navigate(`/news?courseId=${courseId}`);
         break;
-      case "Evaluation":
-        navigate(`/evaluation?courseId=${courseId}`);
+      // case "Evaluation":
+      //   navigate(`/evaluation?courseId=${courseId}`);
+      //   break;
+      case "Assignment":
+        navigate(`/course/${courseId}/assignment`);
         break;
       case "Gradebook":
         navigate(`/grades?courseId=${courseId}`);

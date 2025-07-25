@@ -19,7 +19,8 @@ const COURSE_SHELL_URL =
 const TABS = [
   { label: "Content", path: "content" },
   { label: "News", path: "news" },
-  { label: "Evaluation", path: "evaluation" },
+  //{ label: "Evaluation", path: "evaluation" },
+  { label: "Assignments", path: "assignment" },
   { label: "Gradebook", path: "grades" },
   { label: "Discussion", path: "discussion" }
 ];
@@ -100,8 +101,11 @@ function CourseNavbar() {
       case "News":
         navigate(`/news?courseId=${courseId}`);
         break;
-      case "Evaluation":
-        navigate(`/evaluation?courseId=${courseId}`);
+      // case "Evaluation":
+      //   navigate(`/evaluation?courseId=${courseId}`);
+      //   break;
+      case "Assignment":
+        navigate(`/course/${courseId}/assignment`);
         break;
       case "Gradebook":
         navigate(`/grades?courseId=${courseId}`);
@@ -123,9 +127,13 @@ function CourseNavbar() {
 
   // Home icon click handler
   const handleHomeClick = () => {
-    window.location.href = COURSE_SHELL_URL;
+    if (user?.role === "admin") {
+      navigate("/admin-dashboard");
+    } else {
+      window.location.href = COURSE_SHELL_URL;
+    }
   };
-
+  
   return (
     <>
       {/* Top Navbar */}

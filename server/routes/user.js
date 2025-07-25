@@ -216,6 +216,31 @@ router.post("/refresh-token", async (req, res) => {
     }
 });
 
+
+// ======================== GET INSTRUCTORS ========================
+router.get("/instructors", async (req, res) => {
+    try {
+        const instructors = await User.find({ role: "instructor" }).select("-password -resetToken -resetTokenExpiration");
+        res.json({ instructors });
+    } catch (err) {
+        console.error("Fetch instructors error:", err);
+        res.status(500).json({ message: "Failed to fetch instructors" });
+    }
+});
+
+
+// DELETE an instructor by ID
+router.delete("/instructors/:id", async (req, res) => {
+    try {
+      const deleted = await User.findByIdAndDelete(req.params.id);
+      if (!deleted) return res.status(404).json({ status: false, message: "Instructor not found" });
+      res.json({ status: true, message: "Instructor deleted" });
+    } catch (err) {
+      res.status(500).json({ status: false, message: err.message });
+    }
+  });
+  
+
 // ================== UPDATE LEGAL NAME & COUNTRY AFTER PAYMENT ==================
 router.patch("/:id/legal-country", async (req, res) => {
     const { legalName, country } = req.body;

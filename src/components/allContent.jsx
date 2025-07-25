@@ -186,6 +186,8 @@ export default function AllContent() {
   const navigate = useNavigate();
   const user = getCurrentUser();
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
+const isAdmin = params.get('admin') === '1';
 
   // [QUIZ-LOGIC-FIX] State logic for module idx & sidebar
   const [modules, setModules] = useState([]);
@@ -528,32 +530,51 @@ export default function AllContent() {
     return (
       <div>
         <CourseNavbar />
-        <div className="allcontent-body">
-          <div className="allcontent-sidebar">
-            <div className="allcontent-sidebar-header">Course Contents</div>
-            <div className="allcontent-empty">
-              {user?.role === "instructor" || user?.role === "professor" ? (
-                <>You have not created any modules yet.</>
-              ) : (
-                <>
-                  No modules yet.<br />
-                  (Ask your instructor to add content.)
-                </>
-              )}
-            </div>
-            {user?.role === "instructor" || user?.role === "professor" ? (
-              <div className="allcontent-add-btn-wrapper">
-                <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
-                  <FaPlusCircle size={36} />
-                </button>
-              </div>
-            ) : null}
-          </div>
-        </div>
+        {isAdmin && (
+      <div style={{ padding: 20, background: "#f5f5ff", margin: "0 0 20px 0", borderRadius: 9 }}>
+        <button
+          onClick={() => navigate("/admin-dashboard")}
+          style={{
+            background: "#1976d2",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            fontSize: 16,
+            padding: "10px 18px",
+            cursor: "pointer",
+            fontWeight: 600
+          }}
+        >
+          ← Back to Admin Dashboard
+        </button>
       </div>
-    );
-  }
-  function handleModuleSelect(idx) {
+    )}
+        <div className="allcontent-body">
+  <div className="allcontent-sidebar">
+    <div className="allcontent-sidebar-header">Course Contents</div>
+    <div className="allcontent-empty">
+      {user?.role === "instructor" || user?.role === "professor" || user?.role === "admin" ? (
+        <>You have not created any modules yet.</>
+      ) : (
+        <>
+          No modules yet.<br />
+          (Ask your instructor to add content.)
+        </>
+      )}
+    </div>
+    {(user?.role === "instructor" || user?.role === "professor" || user?.role === "admin") && (
+      <div className="allcontent-add-btn-wrapper">
+        <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
+          <FaPlusCircle size={36} />
+        </button>
+      </div>
+    )}
+  </div>
+</div>
+</div>
+);
+}
+function handleModuleSelect(idx) {
     setSelectedIdx(idx);
     setSelectedSidebar("module");
     if (modules[idx]?._id && courseId && user?._id) {
@@ -661,13 +682,14 @@ export default function AllContent() {
                 );
               })}
 
-              {user?.role === "instructor" && (
-                <div className="allcontent-add-btn-wrapper">
-                  <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
-                    <FaPlusCircle size={36} />
-                  </button>
-                </div>
-              )}
+{(user?.role === "instructor" || user?.role === "admin") && (
+  <div className="allcontent-add-btn-wrapper">
+    <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
+      <FaPlusCircle size={36} />
+    </button>
+  </div>
+)}
+
 
               {/* === QUIZ SIDEBAR ITEM ONLY IF QUIZZES EXIST === */}
               {quizStepExists && (
@@ -795,7 +817,7 @@ export default function AllContent() {
                     <span className="allcontent-module-title-main">
                       {selectedModule.moduleTitle}
                     </span>
-                    {user?.role === "instructor" && (
+                    {(user?.role === "instructor" || user?.role === "admin") && (
                       <div className="allcontent-module-actions">
                         <FaPen
                           className="allcontent-edit-icon"

@@ -1,0 +1,129 @@
+/* coursesGrid.css */
+
+.coursesgrid-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 0;
+}
+
+.coursesgrid-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.coursesgrid-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2b2b2b;
+}
+
+.coursesgrid-count {
+  color: #838383;
+  font-size: 15px;
+  font-weight: 400;
+  margin-left: 5px;
+}
+
+.coursesgrid-add-btn {
+  border: none;
+  background: #0080ff;
+  border-radius: 12px;
+  width: 54px;
+  height: 54px;
+  color: #fff;
+  font-size: 2.2rem;
+  cursor: pointer;
+  margin-left: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.13s;
+}
+
+.coursesgrid-add-btn:hover {
+  background: #0264c7;
+}
+
+.coursesgrid-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px 28px;
+  margin-bottom: 40px;
+}
+
+.coursesgrid-card {
+  background: #fff;
+  border: 1px solid #e4e4e4;
+  border-radius: 16px;
+  box-shadow: 0 3px 18px #d3d5ee;
+  padding: 32px 20px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow 0.15s, border 0.1s;
+  cursor: pointer;
+  min-height: 270px;
+  position: relative;
+}
+
+.coursesgrid-card:hover {
+  box-shadow: 0 8px 36px #040b4d;
+  border-color: #1d0c80;
+}
+
+.coursesgrid-logo {
+  width: 100%;
+  height: 130px;
+  object-fit: contain;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.coursesgrid-card-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #163f1a;
+}
+
+.coursesgrid-card-instructor {
+  color: #3b3b3b;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.coursesgrid-delete-btn {
+  border: none;
+  background: none;
+  margin-top: 8px;
+  cursor: pointer;
+  align-self: flex-start;
+  padding: 0;
+}
+
+.coursesgrid-no-results {
+  text-align: center;
+  color: #888;
+  font-size: 17px;
+  padding: 60px;
+}
+
+
+
+/* Responsive: Tablet & Mobile */
+@media (max-width: 950px) {
+  .coursesgrid-container {
+    padding: 0 7px;
+  }
+  .coursesgrid-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .coursesgrid-grid {
+    grid-template-columns: 1fr;
+  }
+}

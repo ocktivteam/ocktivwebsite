@@ -1,0 +1,107 @@
+.instructor-list-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1877d7;
+  margin-bottom: 10px;
+  padding-left: 32px;
+  margin-top: 18px;
+}
+
+.instructor-list-search-row {
+  padding: 0 32px 16px 32px;
+  margin-top: 45px;
+}
+
+.instructor-list-search {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 9px;
+  border: 1.5px solid #b2dfdb;
+  font-size: 1rem;
+  margin-bottom: 5px;
+  background: #f5f9fa;
+  outline: none;
+  transition: border 0.2s;
+}
+.instructor-list-search:focus {
+  border: 2px solid #69c787;
+  background: #fff;
+}
+
+
+.instructor-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 22px;
+  padding-right: 10px;
+  margin-top: 8px;
+}
+
+.instructor-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px 18px 38px;
+  background: transparent;
+  border-left: 6px solid #e5eaf0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #214023;
+  border-radius: 0 10px 10px 0;
+  margin-bottom: 2px;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s;
+}
+
+.instructor-list-item.active,
+.instructor-list-item:hover {
+  background: #eafcf5;
+  border-left: 6px solid #6ed6a3;
+  color: #09764d;
+}
+
+/* ========== NEW ========== */
+.instructor-list-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.instructor-list-name {
+  font-size: 1.21rem;
+  font-weight: 700;
+  color: #214023;
+  line-height: 1.13;
+}
+
+.instructor-list-email {
+  font-size: 0.99rem;
+  color: #38896d;
+  opacity: 0.88;
+  font-weight: 500;
+  line-height: 1.11;
+}
+/* ========== END NEW ========== */
+
+.instructor-list-delete {
+  color: #ff6363;
+  margin-left: 13px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.instructor-list-delete:hover {
+  color: #c50000;
+}
+
+.instructor-list-empty {
+  color: #bbb;
+  text-align: center;
+  padding: 32px 0;
+  font-size: 1.04rem;
+  font-weight: 400;
+}
+
+.instructor-list-title.mobile-centered {
+  justify-content: center;
+}
+

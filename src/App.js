@@ -29,6 +29,7 @@ import QuizPage from './components/QuizPage';
 import CertificateTab from "./components/CertificateTab";
 import CertificateViewer from "./components/CertificateViewer";
 import Assignment from './components/Assignment';
+import AdminDashboard from "./components/AdminDashboard";
 
 function App() {
   return (
@@ -40,6 +41,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        
+        <Route path="/admin-dashboard" element={
+        <SessionManager><AdminDashboard /></SessionManager>
+        } />
 
         {/* Protected routes: wrap with SessionManager */}
         <Route path="/courses" element={

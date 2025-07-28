@@ -25,10 +25,15 @@ export const createCourse = async (req, res) => {
   }
 };
 
-// READ all courses (populate instructors AND modules)
+// READ all courses (optionally filter by instructor, populate instructors AND modules)
 export const getCourses = async (req, res) => {
   try {
-    const courses = await Course.find()
+    const { instructorId } = req.query;
+    let query = {};
+    if (instructorId) {
+      query.instructors = instructorId; // will match if instructorId is in the instructors array
+    }
+    const courses = await Course.find(query)
       .populate("instructors", "firstName lastName email")
       .populate("modules", "_id");
 
@@ -43,7 +48,6 @@ export const getCourses = async (req, res) => {
     res.status(500).json({ status: false, message: err.message });
   }
 };
-
 // READ single course by id (populate instructors AND modules)
 export const getCourseById = async (req, res) => {
   try {
@@ -60,6 +64,7 @@ export const getCourseById = async (req, res) => {
     res.status(500).json({ status: false, message: err.message });
   }
 };
+
 
 // UPDATE a course (accepts instructors as array)
 export const updateCourse = async (req, res) => {

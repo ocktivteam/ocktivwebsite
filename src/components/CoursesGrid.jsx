@@ -64,7 +64,11 @@ function CoursesGrid({ selectedInstructor, instructors = [], courses = [], onDel
         <h2 className="coursesgrid-title">
           {header} <span className="coursesgrid-count">({filteredCourses.length})</span>
         </h2>
-        <button className="coursesgrid-add-btn" title="Add New Course">
+        <button
+          className="coursesgrid-add-btn"
+          title="Add New Course"
+          onClick={() => navigate("/admin/create")}
+        >
           +
         </button>
       </div>

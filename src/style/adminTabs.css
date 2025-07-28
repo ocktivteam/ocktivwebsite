@@ -1,0 +1,74 @@
+/* .admin-tabs-wrapper {
+    padding: 5rem;
+    background: #f2f2f2;
+    min-height: 100vh;
+  }
+  
+  .admin-tabs-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .admin-tab-btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    background: #eaeaea;
+    color: #1664b6;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .admin-tab-btn.active {
+    background: #0b751c;
+    color: white;
+  } */
+
+  .admin-tabs-wrapper {
+    padding: 5rem;
+    background: #f2f2f2;
+    min-height: 100vh;
+  }
+  
+  /* Wrap the tabs in a container that matches form width */
+  .admin-tabs-buttons {
+    display: flex;
+    gap: 15px;
+    margin: 0 auto 0px;
+    max-width: 1000px;
+    width: 90%;
+  }
+  
+  .admin-tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    background: #eaeaea;
+    color: #1664b6;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .admin-tab-btn.active {
+    background: #0b751c;
+    color: white;
+  }
+  
+  /* ✅ Mobile layout */
+@media (max-width: 768px) {
+    .admin-tabs-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .admin-tab-btn {
+      border-radius: 6px;
+      width: 100%;
+      max-width: 400px;
+    }
+  }

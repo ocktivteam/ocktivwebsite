@@ -30,6 +30,7 @@ import CertificateTab from "./components/CertificateTab";
 import CertificateViewer from "./components/CertificateViewer";
 import Assignment from './components/Assignment';
 import AdminDashboard from "./components/AdminDashboard";
+import AdminTabs from "./components/AdminTabs";
 
 function App() {
   return (
@@ -123,6 +124,9 @@ function App() {
  <Route path="/course-content/:courseId/quiz/:quizId" element={
           <SessionManager><QuizPage /></SessionManager>
         } />
+        <Route path="/admin/create" element={
+          <SessionManager><AdminTabs /></SessionManager>   
+          } />
       </Routes>
     </Router>
   );

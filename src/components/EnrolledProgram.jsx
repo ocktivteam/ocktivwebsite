@@ -175,7 +175,7 @@ const EnrolledProgram = () => {
                 
               >
                 <img
-                  src="/img/ocktivLogo.png"
+                  src={course.imageUrl || "/img/ocktivLogo.png"}
                   alt={course?.courseTitle || "[Image]"}
                   className="card-logo"
                 />

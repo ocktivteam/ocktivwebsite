@@ -19,9 +19,11 @@ export const uploadFileToS3 = async (req, res) => {
       return res.status(400).json({ error: "No file uploaded." });
     }
 
+    // Accept optional keyPrefix (for custom folder upload, e.g. "CourseImages/")
+    const keyPrefix = req.body.keyPrefix || "";
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
-      Key: `${Date.now()}-${req.file.originalname}`,
+      Key: keyPrefix + `${Date.now()}-${req.file.originalname}`,
       Body: req.file.buffer,
       ContentType: req.file.mimetype,
       //ACL: "public-read",

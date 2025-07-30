@@ -23,7 +23,7 @@ function AllCourses() {
     setLoading(true);
     axios.get(API_URL)
       .then(res => {
-        setCourses(res.data.courses || []);
+        setCourses((res.data.courses || []).reverse()); // Reverse to show latest first
         setLoading(false);
         setError("");
       })
@@ -76,7 +76,7 @@ function AllCourses() {
                 key={course._id || idx}
                 onClick={() => navigate(`/coursedetails/${course._id}`)}
               >
-                <img src={course.imageUrl || "/img/ocktivLogo.png"} alt="Course" className="card-logo" />
+                <img loading="lazy" src={course.imageUrl || "/img/ocktivLogo.png"} alt="Course" className="card-logo" />
                 <div className="card-title">{course.courseTitle}</div>
                 <div className="card-instructor">By {course.instructorNames}</div>
               </div>

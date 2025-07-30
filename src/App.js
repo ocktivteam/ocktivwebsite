@@ -31,6 +31,8 @@ import CertificateViewer from "./components/CertificateViewer";
 import Assignment from './components/Assignment';
 import AdminDashboard from "./components/AdminDashboard";
 import AdminTabs from "./components/AdminTabs";
+import CreateCourseForm from './components/CreateCourseForm';
+import RegisterInstructorForm from './components/RegisterInstructorForm';
 
 function App() {
   return (
@@ -127,6 +129,14 @@ function App() {
         <Route path="/admin/create" element={
           <SessionManager><AdminTabs /></SessionManager>   
           } />
+            {/* Edit course */}
+        <Route path="/admin/edit-course/:id" element={
+          <SessionManager><CreateCourseForm  /></SessionManager>
+        } />
+             {/* Edit instructor */}
+             <Route path="/admin/edit-instructor/:id" element={
+          <SessionManager><RegisterInstructorForm  /></SessionManager>
+        } />
       </Routes>
     </Router>
   );

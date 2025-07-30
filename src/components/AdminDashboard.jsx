@@ -1,6 +1,7 @@
 // src/components/AdminDashboard.jsx
 
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import AdminDashboardNavbar from "./adminDashboardNavbar";
 import InstructorList from "./InstructorList";
 import CoursesGrid from "./CoursesGrid";
@@ -23,21 +24,34 @@ export default function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [allInstructors, setAllInstructors] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
+  const location = useLocation();
   useSessionCheck();
 
   // Fetch all instructors & courses on mount
+  // useEffect(() => {
+  //   axios.get(INSTRUCTOR_API)
+  //     .then(res => {
+  //       setAllInstructors(res.data.instructors || []);
+  //       console.log("RAW INSTRUCTORS:", res.data.instructors || []);
+  //     });
+  //   axios.get(COURSES_API)
+  //     .then(res => {
+  //       setAllCourses(res.data.courses || []);
+  //       console.log("RAW COURSES:", res.data.courses || []);
+  //     });
+  // }, []);
   useEffect(() => {
-    axios.get(INSTRUCTOR_API)
-      .then(res => {
-        setAllInstructors(res.data.instructors || []);
-        console.log("RAW INSTRUCTORS:", res.data.instructors || []);
-      });
-    axios.get(COURSES_API)
-      .then(res => {
-        setAllCourses(res.data.courses || []);
-        console.log("RAW COURSES:", res.data.courses || []);
-      });
-  }, []);
+    async function fetchData() {
+      const [instructorRes, courseRes] = await Promise.all([
+        axios.get(INSTRUCTOR_API),
+        axios.get(COURSES_API),
+      ]);
+      setAllInstructors(instructorRes.data.instructors || []);
+      setAllCourses(courseRes.data.courses || []);
+    }
+  
+    fetchData();
+  }, [location.state?.refresh]); // trigger on refresh flag
 
   // ADD THIS: Instructor delete logic
   function handleDeleteInstructor(instructorId) {

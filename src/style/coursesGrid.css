@@ -94,6 +94,16 @@
   margin-bottom: 10px;
 }
 
+
+.coursesgrid-edit-btn {
+  border: none;
+  background: none;
+  margin-top: 8px;
+  cursor: pointer;
+  align-self: flex-start;
+  padding: 0;
+}
+
 .coursesgrid-delete-btn {
   border: none;
   background: none;

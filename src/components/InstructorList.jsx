@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaTrash, FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { FaTrash, FaPen, FaChevronUp, FaChevronDown } from "react-icons/fa";
 import "../style/instructorList.css";
 
 export default function InstructorList({
@@ -13,6 +14,7 @@ export default function InstructorList({
   // Responsive: detect mobile
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     function handleResize() {
@@ -83,14 +85,24 @@ export default function InstructorList({
                   {i.email}
                 </div>
               </div>
-              <FaTrash
-                className="instructor-list-delete"
-                title="Delete"
-                onClick={e => {
-                  e.stopPropagation();
-                  handleDelete(i._id);
-                }}
-              />
+              <div className="instructor-list-icons">
+                <FaPen
+                  className="instructor-list-edit"
+                  title="Edit"
+                  onClick={e => {
+                    e.stopPropagation();
+                    navigate(`/admin/edit-instructor/${i._id}`);
+                  }}
+                />
+                <FaTrash
+                  className="instructor-list-delete"
+                  title="Delete"
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleDelete(i._id);
+                  }}
+                />
+              </div>
             </div>
           ))}
           {instructors.length === 0 && (

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "../style/registerInstructorForm.css";
 import axios from "axios";
 
@@ -15,6 +15,43 @@ export default function RegisterInstructorForm() {
     const [message, setMessage] = useState("");
     const navigate = useNavigate(); // Add navigation hook
     const [showPassword, setShowPassword] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const { id: instructorId } = useParams();
+    const isEditMode = Boolean(instructorId);
+
+
+    useEffect(() => {
+        if (!isEditMode) return;
+
+        const url =
+            window.location.hostname === "localhost"
+                ? `http://localhost:5050/auth/instructors`
+                : `https://ocktivwebsite-3.onrender.com/auth/instructors`;
+
+        axios.get(url)
+            .then(res => {
+                const instructor = res.data.instructors.find(i => i._id === instructorId);
+                if (!instructor) return navigate("/admin-dashboard");
+
+                setFormData({
+                    firstName: instructor.firstName || "",
+                    lastName: instructor.lastName || "",
+                    email: instructor.email || "",
+                    password: "", // ✅ leave blank
+                });
+            })
+            .catch(() => navigate("/admin-dashboard"));
+    }, [instructorId]);
+
+    function validate() {
+        const errs = {};
+        if (!formData.firstName.trim()) errs.firstName = "First name is required.";
+        if (!formData.lastName.trim()) errs.lastName = "Last name is required.";
+        if (!formData.email.trim()) errs.email = "Email is required.";
+        if (!isEditMode && !formData.password.trim()) errs.password = "Password is required.";
+        return errs;
+    }
 
     const handleChange = (e) => {
         setFormData(prev => ({
@@ -27,36 +64,48 @@ export default function RegisterInstructorForm() {
         e.preventDefault();
         setLoading(true);
         setMessage("");
+        setErrors({});
+
+        const errs = validate();
+        if (Object.keys(errs).length > 0) {
+            setErrors(errs);
+            setLoading(false);
+            return;
+        }
+
+        const base = window.location.hostname === "localhost"
+            ? "http://localhost:5050/auth"
+            : "https://ocktivwebsite-3.onrender.com/auth";
+
+        const url = isEditMode
+            ? `${base}/instructors/${instructorId}`
+            : `${base}/signup`;
+
+        const payload = {
+            ...formData,
+            role: "instructor",
+            gender: null,
+            legalName: "N/A",
+            country: "N/A",
+        };
 
         try {
-            const url =
-                window.location.hostname === "localhost"
-                    ? "http://localhost:5050/auth/signup"
-                    : "https://ocktivwebsite-3.onrender.com/auth/signup";
-
-            const payload = {
-                ...formData,
-                role: "instructor",
-                gender: null,
-                legalName: "N/A",
-                country: "N/A",
-            };
-
-            const res = await axios.post(url, payload);
+            const res = isEditMode
+                ? await axios.put(url, payload)
+                : await axios.post(url, payload);
 
             if (res.data.status) {
-                setMessage("Instructor registered successfully.");
+                setMessage(isEditMode ? "Instructor updated successfully." : "Instructor registered successfully.");
                 setFormData({ firstName: "", lastName: "", email: "", password: "" });
 
-                // Redirect after 1 second
                 setTimeout(() => {
                     navigate("/admin-dashboard");
-                }, 1000);
+                }, 1500);
             } else {
                 setMessage("❌ " + (res.data.message || "Something went wrong."));
             }
         } catch (err) {
-            setMessage("❌ Registration failed. Please try again.");
+            setMessage("❌ " + (isEditMode ? "Update failed." : "Registration failed."));
         } finally {
             setLoading(false);
         }
@@ -65,16 +114,20 @@ export default function RegisterInstructorForm() {
     return (
         <div className="register-form-box">
             <form className="register-form" onSubmit={handleSubmit}>
+                <h2>{isEditMode ? "Edit Instructor" : "Register Instructor"}</h2>
                 <label>First Name <span className="required">*</span></label>
-                <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} required />
+                <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
+                {errors.firstName && <div className="form-error">{errors.firstName}</div>}
 
                 <label>Last Name <span className="required">*</span></label>
-                <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} required />
+                <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
+                {errors.lastName && <div className="form-error">{errors.lastName}</div>}
 
                 <label>Email <span className="required">*</span></label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} required />
+                <input type="email" name="email" value={formData.email} onChange={handleChange} />
+                {errors.email && <div className="form-error">{errors.email}</div>}
                 <label>
-                    Password <span className="required">*</span>
+                    Password {!isEditMode && <span className="required">*</span>}
                 </label>
                 <div className="password-input-wrapper">
                     <input
@@ -82,7 +135,7 @@ export default function RegisterInstructorForm() {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        required
+                        //required={!isEditMode}
                     />
                     <button
                         type="button"
@@ -107,11 +160,12 @@ export default function RegisterInstructorForm() {
                         )}
                     </button>
                 </div>
+                {errors.password && <div className="form-error">{errors.password}</div>}
                 <button type="submit" className="register-btn" disabled={loading}>
-                    {loading ? "Registering..." : "Register"}
+                    {loading ? (isEditMode ? "Updating..." : "Registering...") : (isEditMode ? "Update" : "Register")}
                 </button>
                 {message && (
-                    <div className={`content-success ${message.startsWith("Instructor") ? "" : "content-error"}`}>
+                    <div className={message.startsWith("Instructor") ? "form-success" : "form-error"}>
                         {message}
                     </div>
                 )}

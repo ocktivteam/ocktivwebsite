@@ -259,4 +259,34 @@ router.patch("/:id/legal-country", async (req, res) => {
     }
 });
 
+// ================== UPDATE INSTRUCTOR ==================
+router.put("/instructors/:id", async (req, res) => {
+    const { firstName, lastName, email, password } = req.body;
+  
+    try {
+      const existing = await User.findById(req.params.id);
+      if (!existing || existing.role !== "instructor") {
+        return res.status(404).json({ status: false, message: "Instructor not found" });
+      }
+  
+      existing.firstName = firstName || existing.firstName;
+      existing.lastName = lastName || existing.lastName;
+      existing.email = email || existing.email;
+  
+      // Update password only if provided
+      if (password) {
+        const hashed = await bcrypt.hash(password, 10);
+        existing.password = hashed;
+      }
+  
+      await existing.save();
+  
+      res.json({ status: true, message: "Instructor updated", instructor: existing });
+    } catch (err) {
+      console.error("Update instructor error:", err);
+      res.status(500).json({ status: false, message: "Failed to update instructor" });
+    }
+  });
+
+  
 export { router as userRouter };

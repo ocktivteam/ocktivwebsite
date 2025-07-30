@@ -1,5 +1,5 @@
 import React from "react";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom"; // <--- ADD THIS LINE
 import "../style/coursesGrid.css";
 
@@ -90,16 +90,28 @@ function CoursesGrid({ selectedInstructor, instructors = [], courses = [], onDel
               <div className="coursesgrid-card-instructor">
                 By {course.instructorName || course.instructorNames || ""}
               </div>
-              <button
-                className="coursesgrid-delete-btn"
-                onClick={e => {
-                  e.stopPropagation();    // <--- So clicking delete does NOT trigger navigation
-                  handleDelete(course._id);
-                }}
-                title="Delete Course"
-              >
-                <MdDelete size={24} color="red" />
-              </button>
+              <div className="coursesgrid-actions">
+                <button
+                  className="coursesgrid-edit-btn"
+                  onClick={e => {
+                    e.stopPropagation();
+                    navigate(`/admin/edit-course/${course._id}`); // or whatever your edit route is
+                  }}
+                  title="Edit Course"
+                >
+                  <MdEdit size={24} color="black"/>
+                </button>
+                <button
+                  className="coursesgrid-delete-btn"
+                  onClick={e => {
+                    e.stopPropagation();    // <--- So clicking delete does NOT trigger navigation
+                    handleDelete(course._id);
+                  }}
+                  title="Delete Course"
+                >
+                  <MdDelete size={24} color="red" />
+                </button>
+              </div>
             </div>
           ))
         ) : (

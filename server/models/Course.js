@@ -21,7 +21,8 @@ const courseSchema = new mongoose.Schema({
   modules: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Module' }],
   quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' }],
   assignments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Assignment' }],
-  discussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }]
+  discussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
+  imageUrl: { type: String, default: "/img/ocktivLogo.png" },
 }, { timestamps: true });
 
 const Course = mongoose.model("Course", courseSchema);

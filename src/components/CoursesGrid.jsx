@@ -82,7 +82,7 @@ function CoursesGrid({ selectedInstructor, instructors = [], courses = [], onDel
               style={{ cursor: "pointer" }}
             >
               <img
-                src={course.image || "/img/ocktivLogo.png"}
+                src={course.imageUrl || "/img/ocktivLogo.png"}
                 alt="Course"
                 className="coursesgrid-logo"
               />

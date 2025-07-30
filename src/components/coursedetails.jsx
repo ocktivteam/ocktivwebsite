@@ -203,14 +203,14 @@ function CourseDetails() {
 
                             {/* RIGHT COLUMN */}
                             <aside className="course-details-sidecard">
-                                <img src="/img/ocktivLogo.png" alt="Ocktiv logo" className="sidecard-logo" />
+                            <img src={course.imageUrl || "/img/ocktivLogo.png"} alt="Course logo" className="sidecard-logo" />
                                 <div className="sidecard-price">
                                     {(course.price === 0 || course.price === "0" || course.price === undefined) ? (
                                         <span className="free">FREE</span>
                                     ) : (
                                         <span className="sidecard-actual-price">${course.price}</span>
                                     )}
-                                    {course.price !== 0 && <span className="old-price">$99.5</span>}
+                                    {/* {course.price !== 0 && <span className="old-price">$99.5</span>} */}
                                 </div>
                                 {/* {showEnrollBtn && (
                                     <>

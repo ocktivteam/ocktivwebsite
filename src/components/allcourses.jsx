@@ -76,7 +76,7 @@ function AllCourses() {
                 key={course._id || idx}
                 onClick={() => navigate(`/coursedetails/${course._id}`)}
               >
-                <img src="/img/ocktivLogo.png" alt="Course" className="card-logo" />
+                <img src={course.imageUrl || "/img/ocktivLogo.png"} alt="Course" className="card-logo" />
                 <div className="card-title">{course.courseTitle}</div>
                 <div className="card-instructor">By {course.instructorNames}</div>
               </div>

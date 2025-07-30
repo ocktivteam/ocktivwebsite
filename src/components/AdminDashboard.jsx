@@ -27,32 +27,39 @@ export default function AdminDashboard() {
   const location = useLocation();
   useSessionCheck();
 
-  // Fetch all instructors & courses on mount
   // useEffect(() => {
-  //   axios.get(INSTRUCTOR_API)
-  //     .then(res => {
-  //       setAllInstructors(res.data.instructors || []);
-  //       console.log("RAW INSTRUCTORS:", res.data.instructors || []);
-  //     });
-  //   axios.get(COURSES_API)
-  //     .then(res => {
-  //       setAllCourses(res.data.courses || []);
-  //       console.log("RAW COURSES:", res.data.courses || []);
-  //     });
-  // }, []);
+  //   async function fetchData() {
+  //     const [instructorRes, courseRes] = await Promise.all([
+  //       axios.get(INSTRUCTOR_API),
+  //       axios.get(COURSES_API),
+  //     ]);
+  //     setAllInstructors(instructorRes.data.instructors || []);
+  //     setAllCourses(courseRes.data.courses || []);
+  //   }
+  
+  //   fetchData();
+  // }, [location.state?.refresh]); // trigger on refresh flag
+
+  // reverse-chronological order 
   useEffect(() => {
     async function fetchData() {
       const [instructorRes, courseRes] = await Promise.all([
         axios.get(INSTRUCTOR_API),
         axios.get(COURSES_API),
       ]);
+  
+      const sortedCourses = [...(courseRes.data.courses || [])].sort((a, b) => 
+        new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+      );
+  
       setAllInstructors(instructorRes.data.instructors || []);
-      setAllCourses(courseRes.data.courses || []);
+      setAllCourses(sortedCourses); // reverse-chronological order
     }
   
     fetchData();
-  }, [location.state?.refresh]); // trigger on refresh flag
+  }, [location.state?.refresh]);
 
+  
   // ADD THIS: Instructor delete logic
   function handleDeleteInstructor(instructorId) {
     setAllInstructors(list => list.filter(i => i._id !== instructorId));

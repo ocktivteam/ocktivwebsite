@@ -1,5 +1,5 @@
 import React from "react";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { MdDelete, MdEdit, MdMenuBook, MdInfoOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom"; // <--- ADD THIS LINE
 import "../style/coursesGrid.css";
 
@@ -58,6 +58,12 @@ function CoursesGrid({ selectedInstructor, instructors = [], courses = [], onDel
     }
   };
 
+  // for the 2 buttons - course details and course shell
+  const FRONTEND_URL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:3000"
+      : "https://ocktivwebsite.vercel.app";
+
   return (
     <div className="coursesgrid-container">
       <div className="coursesgrid-header-row">
@@ -95,11 +101,11 @@ function CoursesGrid({ selectedInstructor, instructors = [], courses = [], onDel
                   className="coursesgrid-edit-btn"
                   onClick={e => {
                     e.stopPropagation();
-                    navigate(`/admin/edit-course/${course._id}`); // or whatever your edit route is
+                    navigate(`/admin/edit-course/${course._id}`); 
                   }}
                   title="Edit Course"
                 >
-                  <MdEdit size={24} color="black"/>
+                  <MdEdit size={24} color="black" />
                 </button>
                 <button
                   className="coursesgrid-delete-btn"
@@ -111,6 +117,24 @@ function CoursesGrid({ selectedInstructor, instructors = [], courses = [], onDel
                 >
                   <MdDelete size={24} color="red" />
                 </button>
+                <MdInfoOutline
+                  size={24}
+                  title="View Course Details"
+                  style={{ cursor: "pointer", marginLeft: "6px"}}
+                  onClick={e => {
+                    e.stopPropagation();
+                    window.open(`${FRONTEND_URL}/coursedetails/${course._id}`, "_blank");
+                  }}
+                />
+                <MdMenuBook 
+                  size={24}
+                  title="Open Course Shell"
+                  style={{ cursor: "pointer", marginLeft: "6px", color: "#0d4f95" }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    window.open(`${FRONTEND_URL}/course/${course._id}`, "_blank");
+                  }}
+                />
               </div>
             </div>
           ))

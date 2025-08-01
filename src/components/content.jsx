@@ -1160,7 +1160,7 @@ export default function Content() {
   // --- Render ---
   return (
     <div>
-      <CourseNavbar />
+      {/* <CourseNavbar /> */}
       <div className="content-body">
         <Box className="content-form-card" sx={{ p: { xs: 2, md: 5 } }}>
           <Typography variant="h6" sx={{ color: "#1664b6", fontWeight: 700, mb: 2 }}>

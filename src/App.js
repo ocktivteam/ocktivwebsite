@@ -33,6 +33,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import AdminTabs from "./components/AdminTabs";
 import CreateCourseForm from './components/CreateCourseForm';
 import RegisterInstructorForm from './components/RegisterInstructorForm';
+import InstructorTabs from "./components/InstructorTabs";
 
 function App() {
   return (
@@ -136,6 +137,9 @@ function App() {
              {/* Edit instructor */}
              <Route path="/admin/edit-instructor/:id" element={
           <SessionManager><RegisterInstructorForm  /></SessionManager>
+        } />
+        <Route path="/instructor-tools/:courseId" element={
+          <SessionManager><InstructorTabs /></SessionManager>
         } />
       </Routes>
     </Router>

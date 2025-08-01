@@ -59,7 +59,7 @@
     color: white;
   }
   
-  /* ✅ Mobile layout */
+  /* Mobile layout */
 @media (max-width: 768px) {
     .admin-tabs-buttons {
       flex-direction: column;

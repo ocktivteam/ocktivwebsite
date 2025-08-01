@@ -232,7 +232,8 @@ const isAdmin = params.get('admin') === '1';
   }, []);
 
   function handleAddModule() {
-    navigate(`/course/${courseId}/content`);
+    // navigate(`/course/${courseId}/content`);
+    navigate(`/instructor-tools/${courseId}`);
   }
   function handleEditModule(moduleId) {
     navigate(`/course/${courseId}/content/${moduleId}`);

@@ -109,42 +109,54 @@ function CourseDetails() {
         label: "Enroll Now",
         color: undefined,
         extraMsg: null
-    };
-
-    if (userRole === "instructor") {
+      };
+      
+      if (userRole === "admin") {
         enrollBtnProps = {
-            disabled: true,
-            label: "Instructors cannot enroll",
-            color: "#ccc",
-            extraMsg: (
-                <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
-                    Instructors cannot enroll in courses.
-                </p>
-            )
+          disabled: true,
+          label: "Admins cannot enroll",
+          color: "#ccc",
+          extraMsg: (
+            <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
+              You are an admin and cannot enroll in courses.
+            </p>
+          )
         };
-    } else if (isEnrolled) {
+      } else if (userRole === "instructor") {
         enrollBtnProps = {
-            disabled: true,
-            label: "Already Enrolled",
-            color: "#ccc",
-            extraMsg: (
-                <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
-                    You are already enrolled in this course.
-                </p>
-            )
+          disabled: true,
+          label: "Instructors cannot enroll",
+          color: "#ccc",
+          extraMsg: (
+            <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
+              Instructors cannot enroll in courses.
+            </p>
+          )
         };
-    } else if (!course?.modules || course.modules.length === 0) {
+      } else if (isEnrolled) {
         enrollBtnProps = {
-            disabled: true,
-            label: "Coming Soon",
-            color: "#ccc",
-            extraMsg: (
-                <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
-                    Enrollment will open once modules are available.
-                </p>
-            )
+          disabled: true,
+          label: "Already Enrolled",
+          color: "#ccc",
+          extraMsg: (
+            <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
+              You are already enrolled in this course.
+            </p>
+          )
         };
-    }
+      } else if (!course?.modules || course.modules.length === 0) {
+        enrollBtnProps = {
+          disabled: true,
+          label: "Coming Soon",
+          color: "#ccc",
+          extraMsg: (
+            <p style={{ color: "#d32f2f", marginTop: "1rem", fontWeight: 500 }}>
+              Enrollment will open once modules are available.
+            </p>
+          )
+        };
+      }
+      
 
     // Only show enroll button for students/guests/instructors (never hide)
     const showEnrollBtn = true;

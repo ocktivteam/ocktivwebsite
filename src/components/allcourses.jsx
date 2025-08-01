@@ -23,7 +23,8 @@ function AllCourses() {
     setLoading(true);
     axios.get(API_URL)
       .then(res => {
-        setCourses((res.data.courses || []).reverse()); // Reverse to show latest first
+        console.log('Fetched courses:', res.data.courses.map(c => c.courseTitle));
+        setCourses(res.data.courses || []);
         setLoading(false);
         setError("");
       })
@@ -33,6 +34,7 @@ function AllCourses() {
         setError("Unable to fetch courses.");
       });
   }, []);
+  
 
   const filteredCourses = courses.filter(course =>
     (course.courseTitle || "").toLowerCase().includes(searchTerm.toLowerCase())

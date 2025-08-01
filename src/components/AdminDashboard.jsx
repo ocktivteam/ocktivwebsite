@@ -41,6 +41,24 @@ export default function AdminDashboard() {
   // }, [location.state?.refresh]); // trigger on refresh flag
 
   // reverse-chronological order 
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     const [instructorRes, courseRes] = await Promise.all([
+  //       axios.get(INSTRUCTOR_API),
+  //       axios.get(COURSES_API),
+  //     ]);
+  
+  //     const sortedCourses = [...(courseRes.data.courses || [])].sort((a, b) => 
+  //       new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+  //     );
+  
+  //     setAllInstructors(instructorRes.data.instructors || []);
+  //     setAllCourses(sortedCourses); // reverse-chronological order
+  //   }
+  
+  //   fetchData();
+  // }, [location.state?.refresh]);
+
   useEffect(() => {
     async function fetchData() {
       const [instructorRes, courseRes] = await Promise.all([
@@ -48,17 +66,13 @@ export default function AdminDashboard() {
         axios.get(COURSES_API),
       ]);
   
-      const sortedCourses = [...(courseRes.data.courses || [])].sort((a, b) => 
-        new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
-      );
-  
       setAllInstructors(instructorRes.data.instructors || []);
-      setAllCourses(sortedCourses); // reverse-chronological order
+      setAllCourses(courseRes.data.courses || []); // Use backend sort
     }
   
     fetchData();
   }, [location.state?.refresh]);
-
+  
   
   // ADD THIS: Instructor delete logic
   function handleDeleteInstructor(instructorId) {

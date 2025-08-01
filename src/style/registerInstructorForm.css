@@ -1,11 +1,12 @@
-    .register-form-box {
-    background: #f2f2f2;
-    display: flex;
-    justify-content: center;
-    padding: 2rem 0;
-    align-items: flex-start; 
-    min-height: 100vh;   
-  }
+.register-form-box {
+  background: #f2f2f2;
+  display: flex;
+  justify-content: center;
+  padding: 110px 0 2rem 0;
+  align-items: flex-start; 
+  min-height: 100vh;   
+}
+
   
   .register-form {
     background: white;
@@ -110,24 +111,43 @@
   
   /* Fix mobile layout */
   @media (max-width: 768px) {
-    .register-form-box {
-      padding: 1rem; /* minimal edge padding */
+    .create-course-bg, .register-form-box {
+      padding: 95px 0 0 0 !important;
+      min-height: 100vh;
+  }
+  
+    .create-course-form, .register-form {
+      padding: 1.1rem 4vw !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      max-width: 100vw !important;
+      width: 100vw !important;
+      min-height: unset !important;
     }
   
-    .register-form {
-      padding: 1.2rem;
-      border-radius: 10px;
-      box-shadow: none;
+    .create-course-form h2, .register-form h2 {
+      font-size: 1.17rem;
     }
-  
+    .create-course-form input,
+    .create-course-form textarea,
+    .create-course-form select,
     .register-form input {
-      font-size: 0.95rem;
+      font-size: 0.97rem;
     }
-  
-    .register-btn {
-      margin-top: 1.5rem;
-      padding: 10px 24px;
-      min-width: 140px;
+    .create-course-form .create-course-btn, .register-btn {
+      margin-top: 1rem;
+      padding: 10px 20px;
+      min-width: 120px;
+      font-size: 0.99rem;
+    }
+    .image-preview-wrapper { width: 110px; }
+    .image-preview { width: 82px; height: 82px; }
+    .image-drop-zone { min-height: 115px; }
+    .xp-bar-bg { height: 9px; }
+    .gamified-select {
+        font-size: 1rem;
+        padding: 14px 38px 14px 14px;
+        border-radius: 13px;
     }
   }
   

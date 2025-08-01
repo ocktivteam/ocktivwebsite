@@ -3,12 +3,25 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../style/registerInstructorForm.css";
 import axios from "axios";
 
+
+const INSTRUCTOR_DRAFT_KEY = "ocktiv_instructor_form_draft";
+
 export default function RegisterInstructorForm() {
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
+
+    const [formData, setFormData] = useState(() => {
+        const isEdit = window.location.pathname.includes("/edit");
+        if (!isEdit && localStorage.getItem(INSTRUCTOR_DRAFT_KEY)) {
+            try {
+                return JSON.parse(localStorage.getItem(INSTRUCTOR_DRAFT_KEY));
+            } catch {
+            }
+        }
+        return {
+            firstName: "",
+            lastName: "",
+            email: "",
+            password: "",
+        };
     });
 
     const [loading, setLoading] = useState(false);
@@ -19,7 +32,6 @@ export default function RegisterInstructorForm() {
 
     const { id: instructorId } = useParams();
     const isEditMode = Boolean(instructorId);
-
 
     useEffect(() => {
         if (!isEditMode) return;
@@ -38,11 +50,17 @@ export default function RegisterInstructorForm() {
                     firstName: instructor.firstName || "",
                     lastName: instructor.lastName || "",
                     email: instructor.email || "",
-                    password: "", // ✅ leave blank
+                    password: "",
                 });
             })
             .catch(() => navigate("/admin-dashboard"));
     }, [instructorId]);
+
+    useEffect(() => {
+        if (!isEditMode) {
+            localStorage.setItem(INSTRUCTOR_DRAFT_KEY, JSON.stringify(formData));
+        }
+    }, [formData, isEditMode]);
 
     function validate() {
         const errs = {};
@@ -98,6 +116,10 @@ export default function RegisterInstructorForm() {
                 setMessage(isEditMode ? "Instructor updated successfully." : "Instructor registered successfully.");
                 setFormData({ firstName: "", lastName: "", email: "", password: "" });
 
+                if (!isEditMode) {
+                    localStorage.removeItem(INSTRUCTOR_DRAFT_KEY);
+                }
+
                 setTimeout(() => {
                     navigate("/admin-dashboard");
                 }, 1500);
@@ -135,7 +157,6 @@ export default function RegisterInstructorForm() {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        //required={!isEditMode}
                     />
                     <button
                         type="button"

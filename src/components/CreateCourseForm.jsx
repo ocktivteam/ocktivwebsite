@@ -4,6 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FormControl, Select, MenuItem } from "@mui/material";
 import "../style/createCourseForm.css"; // Do NOT remove, your styles live here.
 
+// === DRAFT KEY FOR LOCAL STORAGE ===
+const COURSE_DRAFT_KEY = "ocktiv_course_form_draft";
+
 const COURSE_API =
     window.location.hostname === "localhost"
         ? "http://localhost:5050/api/courses"
@@ -21,19 +24,31 @@ const MAX_IMAGE_SIZE_MB = 15;
 const MAX_IMAGE_SIZE = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 const SUPPORTED_IMG = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
 
-
 export default function CreateCourseForm() {
     const navigate = useNavigate();
-    const [form, setForm] = useState({
-        courseTitle: "",
-        description: "",
-        certDesc: "",
-        courseType: null,
-        instructors: [],
-        price: "",
-        duration: "",
-        imageUrl: "",
+
+    // === DRAFT: Try loading draft if in create mode ===
+    const [form, setForm] = useState(() => {
+        const isEdit = window.location.pathname.includes("/edit");
+        if (!isEdit && localStorage.getItem(COURSE_DRAFT_KEY)) {
+            try {
+                return JSON.parse(localStorage.getItem(COURSE_DRAFT_KEY));
+            } catch {
+                // corrupted draft, ignore
+            }
+        }
+        return {
+            courseTitle: "",
+            description: "",
+            certDesc: "",
+            courseType: null,
+            instructors: [],
+            price: "",
+            duration: "",
+            imageUrl: "",
+        };
     });
+
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
@@ -41,6 +56,9 @@ export default function CreateCourseForm() {
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState("/img/ocktivLogo.png");
     const fileInputRef = useRef();
+
+    // Track original form data for comparison in edit mode
+    const [originalForm, setOriginalForm] = useState({});
 
     // NEW: Search filter state for instructors
     const [instructorSearch, setInstructorSearch] = useState("");
@@ -57,7 +75,7 @@ export default function CreateCourseForm() {
         axios.get(`${COURSE_API}/${courseId}`)
             .then(res => {
                 const course = res.data.course;
-                setForm({
+                const formData = {
                     courseTitle: course.courseTitle || "",
                     description: course.description || "",
                     certDesc: course.certDesc || "",
@@ -66,12 +84,13 @@ export default function CreateCourseForm() {
                     duration: course.duration || "",
                     imageUrl: course.imageUrl || "",
                     instructors: course.instructors?.map(i => i._id) || []
-                });
+                };
+                setForm(formData);
+                setOriginalForm(formData); // Store original for comparison
                 setImagePreview(course.imageUrl || "/img/ocktivLogo.png");
             })
             .catch(() => navigate("/admin-dashboard"));
     }, [courseId]);
-
 
     useEffect(() => {
         axios
@@ -79,6 +98,13 @@ export default function CreateCourseForm() {
             .then(res => setInstructors(res.data?.instructors || []))
             .catch(() => setInstructors([]));
     }, []);
+
+    // === DRAFT: Auto-save form as draft (create only) ===
+    useEffect(() => {
+        if (!isEditMode) {
+            localStorage.setItem(COURSE_DRAFT_KEY, JSON.stringify(form));
+        }
+    }, [form, isEditMode]);
 
     function handleChange(e) {
         const { name, value } = e.target;
@@ -242,6 +268,52 @@ export default function CreateCourseForm() {
         return errs;
     }
 
+    // Helper function to determine if changes are significant for filtering
+    function determineUpdateType() {
+        if (!isEditMode) return 'admin'; // New course creation
+
+        // Compare current form with original to see what changed
+        const significantFields = ['courseTitle', 'description', 'certDesc', 'price', 'duration', 'courseType'];
+        const nonSignificantFields = ['instructors', 'imageUrl'];
+        
+        let hasSignificantChange = false;
+        let hasNonSignificantChange = false;
+
+        // Check significant fields
+        for (const field of significantFields) {
+            if (form[field] !== originalForm[field]) {
+                hasSignificantChange = true;
+                break;
+            }
+        }
+
+        // Check non-significant fields
+        if (!hasSignificantChange) {
+            for (const field of nonSignificantFields) {
+                if (field === 'instructors') {
+                    // Compare arrays
+                    const current = [...form[field]].sort();
+                    const original = [...(originalForm[field] || [])].sort();
+                    if (JSON.stringify(current) !== JSON.stringify(original)) {
+                        hasNonSignificantChange = true;
+                        break;
+                    }
+                } else if (form[field] !== originalForm[field] || imageFile) {
+                    hasNonSignificantChange = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasSignificantChange) {
+            return 'admin_significant';
+        } else if (hasNonSignificantChange) {
+            return 'admin_minor';
+        }
+        
+        return 'admin'; // Default
+    }
+
     async function handleSubmit(e) {
         e.preventDefault();
         setErrors({});
@@ -277,9 +349,16 @@ export default function CreateCourseForm() {
             imageUrl: uploadedImageUrl || "/img/ocktivLogo.png",
         };
 
+        // Add update type for filtering logic
+        const updateType = determineUpdateType();
+        payload.updateType = updateType;
+
         try {
             const token = localStorage.getItem("authToken");
-            const headers = token ? { Authorization: `Bearer ${token}` } : {}; // DEFINE HEADERS HERE
+            const headers = { 
+                Authorization: token ? `Bearer ${token}` : '',
+                'X-Update-Source': 'admin' // Identify this as admin update
+            };
 
             let res;
             if (isEditMode) {
@@ -288,16 +367,19 @@ export default function CreateCourseForm() {
             } else {
                 res = await axios.post(COURSE_API, payload, { headers });
                 setSuccess("Course created successfully!");
-            }            
+            }
+
+            // === DRAFT: Clear draft after success ===
+            if (!isEditMode) {
+                localStorage.removeItem(COURSE_DRAFT_KEY);
+            }
 
             setLoading(false);
             setTimeout(() => {
                 setSuccess("");
                 navigate("/admin-dashboard", {
                     state: {
-                        // filterCourseId: res.data.course?._id,
-                        // filterInstructorIds: payload.instructors,
-                        refresh:true
+                        refresh: true
                     },
                 });
             }, 1500);

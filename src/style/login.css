@@ -110,6 +110,7 @@ button:hover {
  
 .login-form {
   width: 100%;
+  text-align: left;
 }
  
 .form-group {
@@ -307,6 +308,32 @@ button:hover {
 .signup-link a:hover {
   text-decoration: underline;
 }
+
+.remember-me-group {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  margin-left: 0;
+  justify-content: flex-start;
+  width: 100%;
+  padding-left: 4px;
+  /* Remove border, background, etc. */
+}
+
+.remember-me-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #53821c; /* optional: for green checkbox if supported */
+}
+
+.remember-me-group label {
+  margin-bottom: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
  
 /* Mobile */
 @media (max-width: 600px) {

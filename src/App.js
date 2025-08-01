@@ -34,6 +34,8 @@ import AdminTabs from "./components/AdminTabs";
 import CreateCourseForm from './components/CreateCourseForm';
 import RegisterInstructorForm from './components/RegisterInstructorForm';
 import InstructorTabs from "./components/InstructorTabs";
+import AdminDashboardNavbar from "./components/adminDashboardNavbar"; 
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
   return (
@@ -47,9 +49,12 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         
         <Route path="/admin-dashboard" element={
-        <SessionManager><AdminDashboard /></SessionManager>
-        } />
-
+  <AdminRoute>
+    <SessionManager>
+      <AdminDashboard />
+    </SessionManager>
+  </AdminRoute>
+} />
         {/* Protected routes: wrap with SessionManager */}
         <Route path="/courses" element={
           <SessionManager><AllCourses /></SessionManager>
@@ -127,20 +132,39 @@ function App() {
  <Route path="/course-content/:courseId/quiz/:quizId" element={
           <SessionManager><QuizPage /></SessionManager>
         } />
-        <Route path="/admin/create" element={
-          <SessionManager><AdminTabs /></SessionManager>   
-          } />
+<Route path="/admin/create" element={
+  <AdminRoute>
+    <SessionManager>
+      <AdminTabs />
+    </SessionManager>
+  </AdminRoute>
+} />
             {/* Edit course */}
-        <Route path="/admin/edit-course/:id" element={
-          <SessionManager><CreateCourseForm  /></SessionManager>
-        } />
-             {/* Edit instructor */}
-             <Route path="/admin/edit-instructor/:id" element={
-          <SessionManager><RegisterInstructorForm  /></SessionManager>
-        } />
-        <Route path="/instructor-tools/:courseId" element={
-          <SessionManager><InstructorTabs /></SessionManager>
-        } />
+            <Route path="/admin/edit-course/:id" element={
+  <AdminRoute>
+    <SessionManager>
+      <>
+        <AdminDashboardNavbar />
+        <CreateCourseForm />
+      </>
+    </SessionManager>
+  </AdminRoute>
+} />
+
+<Route path="/admin/edit-instructor/:id" element={
+  <AdminRoute>
+    <SessionManager>
+      <>
+        <AdminDashboardNavbar />
+        <RegisterInstructorForm />
+      </>
+    </SessionManager>
+  </AdminRoute>
+} />
+
+<Route path="/instructor-tools/:courseId" element={
+  <SessionManager><InstructorTabs /></SessionManager>
+} />
       </Routes>
     </Router>
   );

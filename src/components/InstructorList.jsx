@@ -11,15 +11,15 @@ export default function InstructorList({
   setSearch,
   onDelete // Optional, keep if needed
 }) {
-  // Responsive: detect mobile
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  // Responsive: detect mobile and tablet (≤ 1024px)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     function handleResize() {
-      setIsMobile(window.innerWidth <= 768);
-      if (window.innerWidth > 768) setSidebarOpen(true);
+      setIsMobile(window.innerWidth <= 1024);
+      if (window.innerWidth > 1024) setSidebarOpen(true);
     }
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);

@@ -6,6 +6,9 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/User.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import { jwtMiddleware } from "../middleware/jwtMiddleware.js";
+import { checkAdmin } from "../middleware/checkAdmin.js";
+
 
 const router = express.Router();
 
@@ -218,7 +221,7 @@ router.post("/refresh-token", async (req, res) => {
 
 
 // ======================== GET INSTRUCTORS ========================
-router.get("/instructors", async (req, res) => {
+router.get("/instructors", jwtMiddleware, checkAdmin, async (req, res) => {
     try {
         const instructors = await User.find({ role: "instructor" }).select("-password -resetToken -resetTokenExpiration");
         res.json({ instructors });
@@ -230,7 +233,7 @@ router.get("/instructors", async (req, res) => {
 
 
 // DELETE an instructor by ID
-router.delete("/instructors/:id", async (req, res) => {
+router.delete("/instructors/:id", jwtMiddleware, checkAdmin, async (req, res) => {
     try {
       const deleted = await User.findByIdAndDelete(req.params.id);
       if (!deleted) return res.status(404).json({ status: false, message: "Instructor not found" });

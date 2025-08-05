@@ -36,6 +36,7 @@ import RegisterInstructorForm from './components/RegisterInstructorForm';
 import InstructorTabs from "./components/InstructorTabs";
 import AdminDashboardNavbar from "./components/adminDashboardNavbar"; 
 import AdminRoute from "./components/AdminRoute";
+import CreateQuiz from './components/CreateQuiz';
 
 function App() {
   return (
@@ -150,6 +151,13 @@ function App() {
     </SessionManager>
   </AdminRoute>
 } />
+
+   {/* ADD THIS: Edit quiz route */}
+   <Route path="/edit-quiz/:id" element={
+              <SessionManager>
+                <CreateQuiz />
+              </SessionManager>
+            } />
 
 <Route path="/admin/edit-instructor/:id" element={
   <AdminRoute>

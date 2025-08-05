@@ -368,15 +368,25 @@ export default function QuizList({
                   tabIndex={isPassed ? -1 : 0}
                   role="button"
                   onClick={() => {
-                    if (!isPassed && user?.role === "student") {
+                    if (user?.role === "student" && !isPassed) {
+                      // Student: start or continue quiz
                       navigate(`/course-content/${courseId}/quiz/${quiz._id}`);
+                    } else if (user?.role === "instructor" || user?.role === "admin") {
+                      // Instructor/Admin: view quiz detail page (not attempt)
+                      navigate(`/course-content/${courseId}/quiz/${quiz._id}?view=1`);
+                      // (Or navigate to a special quiz details/view route, if you have one)
                     }
                   }}
                   onKeyPress={e => {
-                    if (!isPassed && user?.role === "student" && (e.key === "Enter" || e.key === " ")) {
-                      navigate(`/course-content/${courseId}/quiz/${quiz._id}`);
+                    if (e.key === "Enter" || e.key === " ") {
+                      if (user?.role === "student" && !isPassed) {
+                        navigate(`/course-content/${courseId}/quiz/${quiz._id}`);
+                      } else if (user?.role === "instructor" || user?.role === "admin") {
+                        navigate(`/course-content/${courseId}/quiz/${quiz._id}?view=1`);
+                      }
                     }
                   }}
+                  
                   aria-label={`Quiz card: ${quiz.quizTitle || quizTitle}`}
                   style={isPassed ? { pointerEvents: "none" } : undefined}
                 >

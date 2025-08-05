@@ -215,7 +215,6 @@
 
 
 // ==== new ====
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import "../style/createQuiz.css";
@@ -234,6 +233,7 @@ import {
     Select,
     MenuItem,
 } from "@mui/material";
+import CourseNavbar from "./courseNavbar"; // <-- Add this import
 
 const dummyQuestions = [
     {
@@ -292,148 +292,160 @@ const dummyQuestions = [
         correct: "c. MongoDB",
         points: 1,
     },
+    {
+        id: 9,
+        text: "Add?",
+    },
 ];
 
 export default function CreateQuiz() {
     const { id: quizId } = useParams();
     const isEditMode = Boolean(quizId);
-    
+
+    // Fake "user" for demo. Replace with actual user context/state in your app!
+    const user = JSON.parse(localStorage.getItem("user"));
+
     const [quizTitle, setQuizTitle] = useState("");
     const [totalPoints, setTotalPoints] = useState("15");
     const [selectedQ, setSelectedQ] = useState(dummyQuestions[3]); // default Q4
 
     return (
-        <div className="create-quiz-container">
-            <div className="create-quiz-form">
-                <Typography variant="h6" fontWeight={700} sx={{ color: "#1664b6", mb: 2 }}>
-                    Quiz Title <span style={{ color: "red" }}>*</span>
-                </Typography>
+        <>
+            {/* Show navbar for instructors only */}
+            {user?.role === "instructor" && <CourseNavbar />}
 
-                <OutlinedInput
-                    value={quizTitle}
-                    onChange={(e) => setQuizTitle(e.target.value)}
-                    fullWidth
-                    placeholder="Enter quiz title"
-                    sx={{
-                        background: "#fff",
-                        borderRadius: "8px",
-                        mb: 3,
-                        fontWeight: 500,
-                    }}
-                />
+            <div className="create-quiz-container">
+                <div className="create-quiz-form">
+                    <Typography variant="h6" fontWeight={700} sx={{ color: "#1664b6", mb: 2 }}>
+                        Quiz Title <span style={{ color: "red" }}>*</span>
+                    </Typography>
 
-                <Typography variant="h6" fontWeight={700} sx={{ color: "#1664b6", mb: 2 }}>
-                    Total points <span style={{ color: "red" }}>*</span>
-                </Typography>
-
-                <OutlinedInput
-                    value={totalPoints}
-                    onChange={(e) => setTotalPoints(e.target.value)}
-                    fullWidth
-                    sx={{
-                        background: "#fff",
-                        borderRadius: "8px",
-                        mb: 4,
-                        fontWeight: 500,
-                    }}
-                />
-
-                <Typography
-                    variant="h6"
-                    fontWeight={700}
-                    sx={{ color: "#1664b6", mb: 2 }}
-                >
-                    Questions
-                </Typography>
-
-                {/* Show dropdown only on mobile */}
-                <Box sx={{ display: { xs: "block", md: "none" }, mb: 2 }}>
-                    <Select
-                        value={`Q${selectedQ.id}`}
-                        onChange={(e) => {
-                            const qId = parseInt(e.target.value.replace("Q", ""));
-                            const newQ = dummyQuestions.find((q) => q.id === qId);
-                            setSelectedQ(newQ);
-                        }}
+                    <OutlinedInput
+                        value={quizTitle}
+                        onChange={(e) => setQuizTitle(e.target.value)}
                         fullWidth
-                        size="small"
+                        placeholder="Enter quiz title"
                         sx={{
-                            fontSize: "0.95rem",
-                            height: "38px",
                             background: "#fff",
-                            borderRadius: "6px",
+                            borderRadius: "8px",
+                            mb: 3,
+                            fontWeight: 500,
                         }}
-                        MenuProps={{
-                            PaperProps: {
-                                sx: {
-                                    maxHeight: 250,
-                                    fontSize: "0.92rem", // smaller font for dropdown items
+                    />
+
+                    <Typography variant="h6" fontWeight={700} sx={{ color: "#1664b6", mb: 2 }}>
+                        Total points <span style={{ color: "red" }}>*</span>
+                    </Typography>
+
+                    <OutlinedInput
+                        value={totalPoints}
+                        onChange={(e) => setTotalPoints(e.target.value)}
+                        fullWidth
+                        sx={{
+                            background: "#fff",
+                            borderRadius: "8px",
+                            mb: 4,
+                            fontWeight: 500,
+                        }}
+                    />
+
+                    <Typography
+                        variant="h6"
+                        fontWeight={700}
+                        sx={{ color: "#1664b6", mb: 2 }}
+                    >
+                        Questions
+                    </Typography>
+
+                    {/* Show dropdown only on mobile */}
+                    <Box sx={{ display: { xs: "block", md: "none" }, mb: 2 }}>
+                        <Select
+                            value={`Q${selectedQ.id}`}
+                            onChange={(e) => {
+                                const qId = parseInt(e.target.value.replace("Q", ""));
+                                const newQ = dummyQuestions.find((q) => q.id === qId);
+                                setSelectedQ(newQ);
+                            }}
+                            fullWidth
+                            size="small"
+                            sx={{
+                                fontSize: "0.95rem",
+                                height: "38px",
+                                background: "#fff",
+                                borderRadius: "6px",
+                            }}
+                            MenuProps={{
+                                PaperProps: {
+                                    sx: {
+                                        maxHeight: 250,
+                                        fontSize: "0.92rem", // smaller font for dropdown items
+                                    },
                                 },
-                            },
-                        }}
-                    >
-                        {dummyQuestions.map((q) => (
-                            <MenuItem
-                                key={q.id}
-                                value={`Q${q.id}`}
-                                sx={{ fontSize: "0.92rem", py: 0.8 }} // reduce padding
-                            >
-                                {`Q${q.id}`}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </Box>
-
-                <div className="quiz-question-section">
-                    <Paper
-                        elevation={0}
-                        className="quiz-question-list"
-                    >
-                        <List dense>
+                            }}
+                        >
                             {dummyQuestions.map((q) => (
-                                <ListItem
+                                <MenuItem
                                     key={q.id}
-                                    button
-                                    selected={selectedQ.id === q.id}
-                                    onClick={() => setSelectedQ(q)}
-                                    sx={{
-                                        borderBottom: "1px solid #ccc",
-                                        textAlign: "center",
-                                        py: 1,
-                                    }}
+                                    value={`Q${q.id}`}
+                                    sx={{ fontSize: "0.92rem", py: 0.8 }} // reduce padding
                                 >
-                                    <ListItemText primary={`Q${q.id}`} />
-                                </ListItem>
+                                    {`Q${q.id}`}
+                                </MenuItem>
                             ))}
-                        </List>
-                    </Paper>
+                        </Select>
+                    </Box>
 
-                    <Paper
-                        elevation={0}
-                        className="quiz-question-preview"
-                    >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                            <Typography fontWeight={700}>{`Q${selectedQ.id}`}</Typography>
-                            <Typography fontWeight={500}>{`${selectedQ.points} point`}</Typography>
-                        </Box>
-                        <Typography mb={2}>{selectedQ.text}</Typography>
-                        <RadioGroup>
-                            {selectedQ.options.map((opt, i) => (
-                                <FormControlLabel
-                                    key={i}
-                                    value={opt}
-                                    control={<Radio />}
-                                    label={opt}
-                                />
-                            ))}
-                        </RadioGroup>
-                    </Paper>
+                    <div className="quiz-question-section">
+                        <Paper
+                            elevation={0}
+                            className="quiz-question-list"
+                        >
+                            <List dense>
+                                {dummyQuestions.map((q) => (
+                                    <ListItem
+                                        key={q.id}
+                                        button
+                                        selected={selectedQ.id === q.id}
+                                        onClick={() => setSelectedQ(q)}
+                                        sx={{
+                                            borderBottom: "1px solid #ccc",
+                                            textAlign: "center",
+                                            py: 1,
+                                        }}
+                                    >
+                                        <ListItemText primary={`Q${q.id}`} />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Paper>
+
+                        <Paper
+                            elevation={0}
+                            className="quiz-question-preview"
+                        >
+                            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                                <Typography fontWeight={700}>{`Q${selectedQ.id}`}</Typography>
+                                <Typography fontWeight={500}>{`${selectedQ.points} point`}</Typography>
+                            </Box>
+                            <Typography mb={2}>{selectedQ.text}</Typography>
+                            <RadioGroup>
+                                {selectedQ.options.map((opt, i) => (
+                                    <FormControlLabel
+                                        key={i}
+                                        value={opt}
+                                        control={<Radio />}
+                                        label={opt}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        </Paper>
+                    </div>
+
+                    <button className="create-quiz-submit-btn">
+                        {isEditMode ? "Update Quiz" : "Create Quiz"}
+                    </button>
                 </div>
-                
-                <button className="create-quiz-submit-btn">
-                    {isEditMode ? "Update Quiz" : "Create Quiz"}
-                </button>
             </div>
-        </div>
+        </>
     );
 }

@@ -1,67 +1,32 @@
-.instructor-tabs-wrapper {
-    padding: 0.1rem 5rem 5rem 5rem; /* top right bottom left */
-    background: #f2f2f2;
-    min-height: 100vh;
-  }
-  
-  .instructor-tabs-buttons {
-    display: flex;
-    gap: 15px;
-    margin: 0 auto 0px;
-    max-width: 1000px;
-    width: 90%;
-    margin-top: 48px;
-    margin-bottom: 20px;
-  }
-  
-  .instructor-tab-btn {
-    flex: 1;
-    padding: 12px 20px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 6px 6px 0 0;
-    background: #eaeaea;
-    color: #1664b6;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  .instructor-tab-btn.active {
-    background: #0b751c;
-    color: white;
-  }
-  
-  /* Mobile layout */
-  @media (max-width: 768px) {
-    :root {
-      --instructor-tabs-top-padding: 100px;
-    }
-  
-    .instructor-tabs-wrapper {
-      padding: 0 !important;
-      min-height: 100vh;
-    }
-  
-    .instructor-tabs-buttons {
-      flex-direction: column;
-      align-items: stretch;
-      width: 100vw !important;
-      max-width: 100vw !important;
-      background: #f2f2f2;
-      padding: var(--instructor-tabs-top-padding) 4vw 0.5rem 4vw;
-      margin: 0 0 12px 0;
-      box-sizing: border-box;
-      position: relative;
-      z-index: 5;
-      margin-bottom: 20px;
-    }
-  
-    .instructor-tab-btn {
-      width: 100% !important;
-      border-radius: 0 !important;
-      margin: 0 0 10px 0;
-      box-shadow: 0 2px 8px rgba(60, 60, 60, 0.02);
-    }
-  }
-  
+.sidebar-actions-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.sidebar-btn {
+  flex: 1 1 0px;
+  min-width: 0;
+  padding: 14px 0;
+  font-size: 1.22rem;
+  font-weight: 700;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.module-btn {
+  background: #229324;
+  color: #fff;
+}
+
+.quiz-btn {
+  background: #f5f7fa;
+  color: #1976d2;
+  font-weight: 700;
+  border: 1.5px solid #e5eaf0;
+}

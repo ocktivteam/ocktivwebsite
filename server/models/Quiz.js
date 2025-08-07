@@ -3,14 +3,13 @@ const { Schema } = mongoose;
 
 const QuestionSchema = new Schema({
   questionText: { type: String, required: true },
-  options: [String], // Only for MCQ, T/F
-  correctAnswer: Schema.Types.Mixed, // Could be string, array, etc.
-  type: {
-    type: String,
-    enum: ['Mcq', 'matching', 'fillInTheBlanks', 'enumeration', 'trueOrFalse', 'longAnswer'],
-    required: true
-  }
+  options: [String],
+  correctAnswer: Schema.Types.Mixed,
+  type: { type: String, enum: ['Mcq', 'matching', 'fillInTheBlanks', 'enumeration', 'trueOrFalse', 'longAnswer'], required: true },
+  imageUrl: { type: String, default: "" },
+  points: { type: Number, default: 1 }
 });
+
 
 const StudentAttemptSchema = new Schema({
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -49,6 +48,8 @@ const QuizSchema = new Schema({
   isPublished: { type: Boolean, default: true },
   isGradedAutomatically: { type: Boolean, default: true },
   passingRate: { type: Number, default: 0.8 },
+  backgroundTheme: { type: String, default: "theme1" },
+  customBackground: { type: String, default: "" },   
 }, { timestamps: true });
 
 export const Quiz = mongoose.model("Quiz", QuizSchema);

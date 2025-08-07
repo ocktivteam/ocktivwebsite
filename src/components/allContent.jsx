@@ -563,13 +563,7 @@ const isAdmin = params.get('admin') === '1';
         </>
       )}
     </div>
-    {(user?.role === "instructor" || user?.role === "professor" || user?.role === "admin") && (
-      <div className="allcontent-add-btn-wrapper">
-        <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
-          <FaPlusCircle size={36} />
-        </button>
-      </div>
-    )}
+
   </div>
 </div>
 </div>
@@ -588,195 +582,210 @@ function handleModuleSelect(idx) {
     <div>
       <CourseNavbar />
       <div className="allcontent-body">
+       
         {/* Sidebar */}
         <aside className="allcontent-sidebar">
-          {/* Collapsible header on mobile */}
+  {/* Sidebar Header */}
+  <div
+    className={`allcontent-sidebar-header${isMobile ? " centered" : ""}`}
+    onClick={() => isMobile && setSidebarOpen((v) => !v)}
+    style={{
+      cursor: isMobile ? "pointer" : "default",
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: isMobile ? "center" : "flex-start",
+      gap: "8px",
+      userSelect: "none"
+    }}
+  >
+    Course Contents
+    {isMobile && (
+      sidebarOpen
+        ? <FaChevronUp style={{ marginLeft: 8, fontSize: 16 }} />
+        : <FaChevronDown style={{ marginLeft: 8, fontSize: 16 }} />
+    )}
+  </div>
+
+  {/* Progress bar, if you have it */}
+  {user?.role === "student" && (
+    <div className="allcontent-progress-row">
+      <div className="allcontent-progress-label">
+        Progress: <span>{percentComplete}% ({completedSteps}/{totalSteps})</span>
+      </div>
+      <div className="allcontent-progress-bar-modern">
+        <div
+          className="allcontent-progress-bar-gradient"
+          style={{
+            width: `${percentComplete}%`
+          }}
+        ></div>
+      </div>
+    </div>
+  )}
+
+  {/* Module/Quiz List */}
+  {(!isMobile || sidebarOpen) && (
+    <div className="allcontent-module-list">
+      {modules.map((mod, idx) => {
+        const prog = progress[String(mod._id)];
+        const isComplete = !!prog?.completed;
+        const isOngoing = !isComplete && prog && prog.lastWatchedTime > 0;
+        const isLocked = isModuleLocked(idx);
+
+        return (
           <div
-            className={`allcontent-sidebar-header${isMobile ? " centered" : ""}`}
-            onClick={() => isMobile && setSidebarOpen((v) => !v)}
-            style={{
-              cursor: isMobile ? "pointer" : "default",
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: isMobile ? "center" : "flex-start",
-              gap: "8px",
-              userSelect: "none"
+            className={
+              "allcontent-module-item" +
+              (selectedIdx === idx && selectedSidebar === "module" && (!isLocked || user?.role !== "student") ? " selected" : "") +
+              (isLocked && user?.role === "student" ? " locked" : "")
+            }
+            key={mod._id}
+            tabIndex={isLocked && user?.role === "student" ? -1 : 0}
+            onClick={() => {
+              if (!isLocked || user?.role !== "student") {
+                manualClickRef.current = true;
+                handleModuleSelect(idx);
+              }
             }}
+            onMouseEnter={() => isLocked && user?.role === "student" && setToastIdx(idx)}
+            onMouseLeave={() => isLocked && user?.role === "student" && setToastIdx(null)}
           >
-            Course Contents
-            {isMobile && (
-              sidebarOpen
-                ? <FaChevronUp style={{ marginLeft: 8, fontSize: 16 }} />
-                : <FaChevronDown style={{ marginLeft: 8, fontSize: 16 }} />
-            )}
+            <span className="allcontent-module-title">{mod.moduleTitle}</span>
+            <span className="allcontent-module-meta">
+              {user?.role === "student" && (
+                isComplete ? (
+                  <>
+                    <MdDone className="status-icon done" />
+                    <span className="allcontent-module-status done">Completed</span>
+                  </>
+                ) : isOngoing ? (
+                  <span className="allcontent-module-status ongoing">Ongoing</span>
+                ) : isLocked ? (
+                  <>
+                    <span className="allcontent-module-status locked">Not Started</span>
+                    <FaLock className="lock-icon" />
+                    {toastIdx === idx && (
+                      <span className="locked-toast">Complete previous <br />module to unlock</span>
+                    )}
+                  </>
+                ) : (
+                  <span className="allcontent-module-status notstarted">Not Started</span>
+                )
+              )}
+            </span>
           </div>
+        );
+      })}
 
-          {/*Progress Bar - only for students */}
-          {user?.role === "student" && (
-            <div className="allcontent-progress-row">
-              <div className="allcontent-progress-label">
-                Progress: <span>{percentComplete}% ({completedSteps}/{totalSteps})</span>
-              </div>
-              <div className="allcontent-progress-bar-modern">
-                <div
-                  className="allcontent-progress-bar-gradient"
-                  style={{
-                    width: `${percentComplete}%`
-                  }}
-                ></div>
-              </div>
-            </div>
-          )}
+      {/* === QUIZ SIDEBAR ITEM ONLY IF QUIZZES EXIST === */}
+      {quizStepExists && (
+        <div
+          className={
+            "allcontent-module-item" +
+            (selectedSidebar === "quiz" ? " selected" : "") +
+            ((user?.role === "student" && completedModules !== totalModules) ? " locked" : "")
+          }
+          tabIndex={(user?.role === "student" && completedModules !== totalModules) ? -1 : 0}
+          onClick={() => {
+            if (user?.role !== "student" || (completedModules === totalModules && totalModules > 0)) {
+              setSelectedSidebar("quiz");
+              if (user?._id) {
+                localStorage.setItem(`lastSelectedSidebar_${user._id}_${courseId}`, "quiz");
+              }
+            }
+          }}
+        >
+          <span className="allcontent-module-title">Quiz</span>
+          <span className="allcontent-module-meta">
+            {user?.role === "student" && (
+              allQuizzesPassed ? (
+                <>
+                  <MdDone className="status-icon done" />
+                  <span className="allcontent-module-status done">Completed</span>
+                </>
+              ) : (
+                (() => {
+                  // Find if at least one quiz is attempted
+                  const anyAttempted = quizList.some(q => (studentQuizData[q._id] || []).length > 0);
+                  return anyAttempted ? (
+                    <span className="allcontent-module-status ongoing">Ongoing</span>
+                  ) : (
+                    <>
+                      <span className="allcontent-module-status locked">Not Started</span>
+                      {(completedModules !== totalModules) && <FaLock className="lock-icon" />}
+                    </>
+                  );
+                })()
+              )
+            )}
+          </span>
+        </div>
+      )}
+      {/* === END QUIZ SIDEBAR ITEM === */}
 
-          {/* Module List */}
-          {(!isMobile || sidebarOpen) && (
-            <div className="allcontent-module-list">
-              {modules.map((mod, idx) => {
-                const prog = progress[String(mod._id)];
-                const isComplete = !!prog?.completed;
-                const isOngoing = !isComplete && prog && prog.lastWatchedTime > 0;
-                const isLocked = isModuleLocked(idx);
-
-                return (
-                  <div
-                    className={
-                      "allcontent-module-item" +
-                      (selectedIdx === idx && selectedSidebar === "module" && (!isLocked || user?.role !== "student") ? " selected" : "") +
-                      (isLocked && user?.role === "student" ? " locked" : "")
-                    }
-                    key={mod._id}
-                    tabIndex={isLocked && user?.role === "student" ? -1 : 0}
-                    onClick={() => {
-                      if (!isLocked || user?.role !== "student") {
-                        manualClickRef.current = true;
-                        handleModuleSelect(idx);
-                      }
-                    }}
-                    onMouseEnter={() => isLocked && user?.role === "student" && setToastIdx(idx)}
-                    onMouseLeave={() => isLocked && user?.role === "student" && setToastIdx(null)}
-                  >
-                    <span className="allcontent-module-title">{mod.moduleTitle}</span>
-                    <span className="allcontent-module-meta">
-                      {user?.role === "student" && (
-                        isComplete ? (
-                          <>
-                            <MdDone className="status-icon done" />
-                            <span className="allcontent-module-status done">Completed</span>
-                          </>
-                        ) : isOngoing ? (
-                          <span className="allcontent-module-status ongoing">Ongoing</span>
-                        ) : isLocked ? (
-                          <>
-                            <span className="allcontent-module-status locked">Not Started</span>
-                            <FaLock className="lock-icon" />
-                            {toastIdx === idx && (
-                              <span className="locked-toast">Complete previous <br />module to unlock</span>
-                            )}
-                          </>
-                        ) : (
-                          <span className="allcontent-module-status notstarted">Not Started</span>
-                        )
-                      )}
-                    </span>
-                  </div>
-                );
-              })}
-
-{(user?.role === "instructor" || user?.role === "admin") && (
-  <div className="allcontent-add-btn-wrapper">
-    <button className="allcontent-add-btn" title="Add Module" onClick={handleAddModule}>
-      <FaPlusCircle size={36} />
+      {/* === BUTTONS IN SIDEBAR === */}
+      {(user?.role === "instructor" || user?.role === "admin") && (
+  <div className="allcontent-sidebar-actions">
+    <button
+      className="allcontent-sidebar-btn module"
+      onClick={handleAddModule}
+    >
+      Create a new module
+    </button>
+    <button
+      className="allcontent-sidebar-btn quiz"
+      onClick={() => navigate(`/course/${courseId}/create-quiz`)}
+    >
+      Create a new Quiz
     </button>
   </div>
 )}
+      {/* === END BUTTONS === */}
 
+      {/* CERTIFICATE, IF NEEDED */}
+      {user?.role === "student" && (
+        <div
+          className={
+            "allcontent-module-item" +
+            (selectedSidebar === "certificate" ? " selected" : "") +
+            ((completedModules !== totalModules || !allQuizzesPassed) ? " locked" : "")
+          }
+          tabIndex={(completedModules !== totalModules || !allQuizzesPassed) ? -1 : 0}
+          onClick={() => {
+            if (completedModules === totalModules && allQuizzesPassed) {
+              setSelectedSidebar("certificate");
+              if (user?._id) {
+                localStorage.setItem(`lastSelectedSidebar_${user._id}_${courseId}`, "certificate");
+              }
+            }
+          }}
+        >
+          <span className="allcontent-module-title">Certificate</span>
+          <span className="allcontent-module-meta">
+            {(completedModules === totalModules && allQuizzesPassed) ? (
+              <>
+                <MdDone className="status-icon done" />
+                <span className="allcontent-module-status done">Unlocked</span>
+              </>
+            ) : (
+              <>
+                <span className="allcontent-module-status locked">Locked</span>
+                <FaLock className="lock-icon" />
+              </>
+            )}
+          </span>
+        </div>
+      )}
+    </div>
+  )}
 
-              {/* === QUIZ SIDEBAR ITEM ONLY IF QUIZZES EXIST === */}
-              {quizStepExists && (
-                <div
-                  className={
-                    "allcontent-module-item" +
-                    (selectedSidebar === "quiz" ? " selected" : "") +
-                    ((user?.role === "student" && completedModules !== totalModules) ? " locked" : "")
-                  }
-                  tabIndex={(user?.role === "student" && completedModules !== totalModules) ? -1 : 0}
-                  onClick={() => {
-                    if (user?.role !== "student" || (completedModules === totalModules && totalModules > 0)) {
-                      setSelectedSidebar("quiz");
-                      if (user?._id) {
-                        localStorage.setItem(`lastSelectedSidebar_${user._id}_${courseId}`, "quiz");
-                      }
-                    }
-                  }}
-                >
-                  <span className="allcontent-module-title">Quiz</span>
-                  <span className="allcontent-module-meta">
-                    {user?.role === "student" && (
-                      allQuizzesPassed ? (
-                        <>
-                          <MdDone className="status-icon done" />
-                          <span className="allcontent-module-status done">Completed</span>
-                        </>
-                      ) : (
-                        (() => {
-                          // Find if at least one quiz is attempted
-                          const anyAttempted = quizList.some(q => (studentQuizData[q._id] || []).length > 0);
-                          return anyAttempted ? (
-                            <span className="allcontent-module-status ongoing">Ongoing</span>
-                          ) : (
-                            <>
-                              <span className="allcontent-module-status locked">Not Started</span>
-                              {(completedModules !== totalModules) && <FaLock className="lock-icon" />}
-                            </>
-                          );
-                        })()
-                      )
-                    )}
-                  </span>
-                </div>
-              )}
-              {/* === END QUIZ SIDEBAR ITEM === */}
-              {user?.role === "student" && (
-                <div
-                  className={
-                    "allcontent-module-item" +
-                    (selectedSidebar === "certificate" ? " selected" : "") +
-                    ((completedModules !== totalModules || !allQuizzesPassed) ? " locked" : "")
-                  }
-                  tabIndex={(completedModules !== totalModules || !allQuizzesPassed) ? -1 : 0}
-                  onClick={() => {
-                    if (completedModules === totalModules && allQuizzesPassed) {
-                      setSelectedSidebar("certificate");
-                      if (user?._id) {
-                        localStorage.setItem(`lastSelectedSidebar_${user._id}_${courseId}`, "certificate");
-                      }
-                    }
-                  }}
-                >
-                  <span className="allcontent-module-title">Certificate</span>
-                  <span className="allcontent-module-meta">
-                    {(completedModules === totalModules && allQuizzesPassed) ? (
-                      <>
-                        <MdDone className="status-icon done" />
-                        <span className="allcontent-module-status done">Unlocked</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="allcontent-module-status locked">Locked</span>
-                        <FaLock className="lock-icon" />
-                      </>
-                    )}
-                  </span>
-                </div>
-              )}
+  {/* Sidebar Footer */}
+  <div className="allcontent-sidebar-footer">
+    Customer Support: <a href="mailto:support@ocktiv.com">support@ocktiv.com</a>
+  </div>
+</aside>
 
-            </div>
-          )}
-          <div className="allcontent-sidebar-footer">
-  Customer Support: <a href="mailto:support@ocktiv.com">support@ocktiv.com</a>
-</div>
-        </aside>
         {/* Main content */}
         <main className="allcontent-main">
           {selectedSidebar === "quiz" ? (

@@ -212,13 +212,14 @@ import { FaFileAlt } from "react-icons/fa";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useSessionCheck } from '../hooks/useSessionCheck';
+import { useLocation } from 'react-router-dom';
 
 // Helper: Score/PASS
 function getQuizStatus(quiz, studentAttempts) {
   if (!studentAttempts || studentAttempts.length === 0) return { status: "Not started" };
   const latest = studentAttempts[studentAttempts.length - 1];
-  const total = quiz.questions?.length || 0;
-  const score = latest?.score || 0;
+  const total = quiz.questions?.reduce((sum, q) => sum + (q.points || 1), 0) || 0;
+  const score = typeof latest?.score === "number" ? latest.score : 0;
   const rate = typeof quiz.passingRate === "number" ? quiz.passingRate : 0.8;
   const pass = score >= Math.ceil(total * rate);
   return {
@@ -229,6 +230,7 @@ function getQuizStatus(quiz, studentAttempts) {
   };
 }
 
+
 export default function QuizList({
   courseId,
   user,
@@ -237,62 +239,73 @@ export default function QuizList({
   onQuizSelect, // for future
 }) {
   useSessionCheck();
-  
+
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [studentQuizData, setStudentQuizData] = useState({}); // quizId => studentAttempts[]
   const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
+  // Fetch quizzes and student attempts together
+  const fetchQuizzesAndAttempts = async () => {
     if (!courseId) return;
     setLoading(true);
     setError("");
-    axios
-      .get(
+    try {
+      // 1. Get quizzes
+      const res = await axios.get(
         window.location.hostname === "localhost"
           ? `http://localhost:5050/api/quiz/course/${courseId}`
           : `https://ocktivwebsite-3.onrender.com/api/quiz/course/${courseId}`
-      )
-      .then(res => {
-        setQuizzes(res.data || []);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load quizzes.");
-        setLoading(false);
-      });
-  }, [courseId]);
-
-  // Fetch attempts for student
-  useEffect(() => {
-    if (!user || user.role !== "student" || !quizzes.length) return;
-    const fetchAll = async () => {
-      let result = {};
-      await Promise.all(
-        quizzes.map(async quiz => {
-          try {
-            const { data } = await axios.get(
-              (window.location.hostname === "localhost"
-                ? `http://localhost:5050/api/quiz/${quiz._id}`
-                : `https://ocktivwebsite-3.onrender.com/api/quiz/${quiz._id}`)
-            );
-            // Find student's attempts
-            let attempts =
-              (data && data.studentAttempts
-                ? data.studentAttempts
-                : quiz.studentAttempts || []
-              ).filter(attempt => (attempt.studentId === user._id || (attempt.studentId && attempt.studentId._id === user._id)));
-            result[quiz._id] = attempts;
-          } catch (e) {
-            result[quiz._id] = [];
-          }
-        })
       );
-      setStudentQuizData(result);
-    };
-    fetchAll();
-  }, [user, quizzes]);
+      const quizList = res.data || [];
+      setQuizzes(quizList);
+      setLoading(false);
+
+      // 2. If student, get attempts for each quiz
+      if (user && user.role === "student" && quizList.length > 0) {
+        let result = {};
+        await Promise.all(
+          quizList.map(async quiz => {
+            try {
+              const { data } = await axios.get(
+                (window.location.hostname === "localhost"
+                  ? `http://localhost:5050/api/quiz/${quiz._id}`
+                  : `https://ocktivwebsite-3.onrender.com/api/quiz/${quiz._id}`)
+              );
+              // Find student's attempts
+              let attempts =
+                (data && data.studentAttempts
+                  ? data.studentAttempts
+                  : quiz.studentAttempts || []
+                ).filter(attempt => (attempt.studentId === user._id || (attempt.studentId && attempt.studentId._id === user._id)));
+              result[quiz._id] = attempts;
+            } catch (e) {
+              result[quiz._id] = [];
+            }
+          })
+        );
+        setStudentQuizData(result);
+      } else {
+        setStudentQuizData({});
+      }
+    } catch (err) {
+      setError("Failed to load quizzes.");
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuizzesAndAttempts();
+    // eslint-disable-next-line
+  }, [courseId, user?._id]);
+
+  useEffect(() => {
+    window.addEventListener('focus', fetchQuizzesAndAttempts);
+    return () => window.removeEventListener('focus', fetchQuizzesAndAttempts);
+    // eslint-disable-next-line
+  }, [courseId, user?._id]);
 
   // Delete quiz functionality
   const handleDeleteQuiz = async (quizId) => {
@@ -303,7 +316,7 @@ export default function QuizList({
           ? "http://localhost:5050/api/quiz"
           : "https://ocktivwebsite-3.onrender.com/api/quiz";
       await fetch(`${baseUrl}/${quizId}`, { method: "DELETE" });
-      
+
       // Remove quiz from local state
       setQuizzes(prev => prev.filter(quiz => quiz._id !== quizId));
     } catch {
@@ -368,14 +381,7 @@ export default function QuizList({
                   tabIndex={isPassed ? -1 : 0}
                   role="button"
                   onClick={() => {
-                    if (user?.role === "student" && !isPassed) {
-                      // Student: start or continue quiz
-                      navigate(`/course-content/${courseId}/quiz/${quiz._id}`);
-                    } else if (user?.role === "instructor" || user?.role === "admin") {
-                      // Instructor/Admin: view quiz detail page (not attempt)
-                      navigate(`/course-content/${courseId}/quiz/${quiz._id}?view=1`);
-                      // (Or navigate to a special quiz details/view route, if you have one)
-                    }
+                    navigate(`/course-content/${courseId}/quiz/${quiz._id}/cover`);
                   }}
                   onKeyPress={e => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -386,7 +392,6 @@ export default function QuizList({
                       }
                     }
                   }}
-                  
                   aria-label={`Quiz card: ${quiz.quizTitle || quizTitle}`}
                   style={isPassed ? { pointerEvents: "none" } : undefined}
                 >
@@ -404,7 +409,7 @@ export default function QuizList({
                         {quiz.description || "No description."}
                       </div>
                     </div>
-                    
+
                     {/* Show score for students, edit/delete icons for admin/instructor */}
                     {user?.role === "student" && (
                       <div className="quizlist-score-group">

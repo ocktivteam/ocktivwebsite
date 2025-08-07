@@ -507,6 +507,45 @@
   background: #f9f9f9;
 }
 
+.allcontent-sidebar-btn {
+  width: 100%;
+  padding: 13px 0;
+  font-size: 1.12rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.13s;
+  box-shadow: 0 2px 8px rgba(60, 60, 60, 0.04);
+}
+
+.allcontent-sidebar-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0 8px 0;
+  padding: 0;
+  align-items: center; 
+}
+
+.allcontent-sidebar-btn.module {
+  background: #32902249;
+  color: #125d08;
+}
+.allcontent-sidebar-btn.module:hover {
+  background: #125d08;
+  color: #fff;
+}
+
+.allcontent-sidebar-btn.quiz {
+  background: #e9f0fa;
+  color: #1976d2;
+}
+.allcontent-sidebar-btn.quiz:hover {
+  background: #1976d2;
+  color: #fff;
+}
 
 @media (max-width: 768px) {
   .allcontent-sidebar {
@@ -539,6 +578,16 @@
     padding-left: 20px;
     padding-right: 20px;
     box-sizing: border-box;
+  }
+  .allcontent-sidebar-btn {
+    width: 96vw !important;
+    max-width: 97vw;
+    min-width: 0 !important;
+    font-size: 1.05rem !important;
+    padding: 15px 0 !important;
+  }
+  .allcontent-sidebar-actions {
+    gap: 10px !important;
   }
 }
 @media (max-width: 540px) {

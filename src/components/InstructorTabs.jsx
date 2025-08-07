@@ -5,27 +5,17 @@ import "../style/instructorTabs.css";
 import CourseNavbar from "./courseNavbar";
 
 export default function InstructorTabs() {
+  // You can default to "module" or "quiz"
   const [activeTab, setActiveTab] = useState("module");
 
   return (
     <div>
       <CourseNavbar />
       <div className="instructor-tabs-wrapper">
-        <div className="instructor-tabs-buttons">
-          <button
-            className={`instructor-tab-btn ${activeTab === "module" ? "active" : ""}`}
-            onClick={() => setActiveTab("module")}
-          >
-            Create a new module
-          </button>
-          <button
-            className={`instructor-tab-btn ${activeTab === "quiz" ? "active" : ""}`}
-            onClick={() => setActiveTab("quiz")}
-          >
-            Create a new Quiz
-          </button>
-        </div>
+        {/* You asked to REMOVE THE BUTTONS HERE */}
+        {/* Tab navigation is gone! */}
 
+        {/* You can switch activeTab programmatically if needed */}
         <div className="instructor-tabs-content">
           {activeTab === "module" ? <Content /> : <CreateQuiz />}
         </div>

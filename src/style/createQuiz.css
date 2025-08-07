@@ -1,124 +1,2081 @@
-.create-quiz-container {
-    background: #f2f2f2;
-    min-height: 100vh;
-    padding: 20px 0 80px 0;
-    display: flex;
-    justify-content: center;
-    box-sizing: border-box;
-  }
-  
-  .create-quiz-form {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 3px 14px rgba(60, 105, 190, 0.09);
-    padding: 38px 28px 34px 28px;
-    width: 90%;
-    max-width: 1000px;
-    box-sizing: border-box;
-  }
-  
-  /* Question Section Wrapper */
-  .quiz-question-section {
-    background: #eaeaea;
-    border-radius: 12px;
-    padding: 24px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    margin-top: 18px;
-  }
-  
-  /* Left - Question Selector */
-  .quiz-question-list {
-    width: 120px;
-    background: #fff;
-    border-radius: 6px;
-    overflow: auto;
-    max-height: 300px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  }
-  
-  /* Right - Question Preview */
-  .quiz-question-preview {
-    flex: 1;
-    background: #fff;
-    border-radius: 6px;
-    padding: 16px;
-    min-width: 250px;
-    border-top: 5px solid #1664b6;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-  }
-  
-  /* Button */
-  .create-quiz-submit-btn {
-    margin-top: 40px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 12px 48px;
-    font-weight: 700;
-    font-size: 1rem;
-    border-radius: 8px;
-    background-color: #1664b6;
-    color: #fff;
-    cursor: pointer;
-    border: none;
-    transition: background 0.2s ease;
-  }
-  
-  .create-quiz-submit-btn:hover {
-    background-color: #0d4f95;
-  }
-  
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-  @media (max-width: 700px) {
-    .create-quiz-container {
-      padding: 20px 12px 40px 1px;
-    }
+/* Root variables for consistent theming */
+:root {
+  --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --secondary-gradient: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  --accent-gradient: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+  --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   
-    .create-quiz-form {
-      padding: 20px 16px 22px 16px;
-      border-radius: 0;
-      max-width: 100vw;
-      width: 100vw;
-      box-shadow: none;
-    }
+  --card-bg: #ffffff;
+  --panel-bg: #f8fafc;
+  --border-light: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-light: #94a3b8;
   
-    .quiz-question-section {
-      flex-direction: column;
-      padding: 18px 12px;
-      gap: 16px;
-      border-radius: 10px;
-    }
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   
-    .quiz-question-list {
-      width: 100%;
-      max-height: none;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      overflow-x: auto;
-      border-radius: 8px;
-    }
-  
-    .quiz-question-preview {
-      padding: 14px;
-      border-radius: 8px;
-      min-width: unset;
-    }
-  
-    .create-quiz-submit-btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 10px;
-    }
+  --border-radius: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 20px;
+
+  /* Kahoot Colors */
+  --kahoot-red: #e21b3c;
+  --kahoot-blue: #1368ce;
+  --kahoot-yellow: #ffa602;
+  --kahoot-green: #26890c;
+  --kahoot-purple: #926aa6;
+  --kahoot-bg: #f2f2f2;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--kahoot-bg);
+  margin: 0;
+  padding: 0;
+}
+
+/* Main container - FIXED: Responsive approach */
+.create-quiz-container {
+  min-height: 100vh;
+  background: var(--kahoot-bg);
+  font-family: 'Inter', sans-serif;
+  /* Desktop: Full viewport with no scroll */
+  height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Make container responsive for mobile */
+@media (max-width: 1024px) {
+  .create-quiz-container {
+    padding: 20px;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
   }
-  /*dropdown*/
-  @media (max-width: 700px) {
-    .quiz-question-list {
-      display: none;
-    }
+}
+
+.question-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  margin-bottom: 40px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  transition: all 0.3s ease;
+  z-index: 10;
+  overflow: visible;
+  width: 800px !important;
+  max-width: 800px !important;
+  min-height: auto;
+}
+
+.question-card:hover {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) scale(1.005);
+}
+
+.question-card:last-child {
+  margin-bottom: 0 !important;
+  padding-bottom: 32px !important;
+}
+
+.question-card:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
+  border-radius: 4px 0 0 4px;
+  opacity: 0.8;
+}
+
+@keyframes fadeInCard {
+  from { opacity: 0; transform: scale(.96) translateY(24px);}
+  to   { opacity: 1; transform: scale(1) translateY(0);}
+}
+/* Header - Keep unchanged */
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card-bg);
+  padding: 24px 32px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 24px;
+  border: 1px solid var(--border-light);
+}
+
+.quiz-header-left h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.quiz-header-left p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.quiz-header-right {
+  display: flex;
+  gap: 12px;
+}
+
+.preview-btn, .save-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preview-btn {
+  background: var(--purple-gradient);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.preview-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.save-btn {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.save-btn:disabled {
+  background: var(--border-medium);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.back-to-modules-btn {
+  background: #e4f1e6;
+  color: #1c7a0b;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 18px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background 0.2s;
+}
+
+.back-to-modules-btn:hover {
+  background: #c5e1c9;
+}
+
+/* FIXED Kahoot Layout - Maintain your desktop layout but fix mobile */
+.kahoot-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr 350px;
+  gap: 0;
+  height: calc(100vh - 140px);
+  grid-template-rows: 1fr;
+  transition: all 0.3s ease;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* When right panel is collapsed, remove it from grid */
+.kahoot-layout.right-panel-collapsed {
+  grid-template-columns: 300px 1fr 0px;
+}
+
+/* Left Panel - unchanged */
+.left-panel {
+  background: white;
+  border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border-light);
+}
+
+/* Middle Panel - unchanged */
+.middle-panel {
+  background: white;
+  border-radius: 0;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  border-right: 1px solid var(--border-light);
+  position: relative;
+}
+
+.middle-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.1;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Right Panel - Updated collapse behavior */
+.right-panel {
+  background: white;
+  border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* When collapsed, completely hide the panel */
+.right-panel.collapsed {
+  display: none;
+}
+
+/* Show a small tab when panel is hidden */
+.right-panel-tab {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: white;
+  border: 2px solid var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  z-index: 1001;
+  transition: all 0.3s ease;
+  color: #10b981;
+  font-size: 18px;
+}
+
+.right-panel-tab:hover {
+  transform: translateY(-50%) scale(1.1);
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-xl);
+}
+
+/* FIXED Responsive breakpoints - Restore working mobile behavior */
+@media (max-width: 1400px) {
+  .kahoot-layout {
+    grid-template-columns: 280px 1fr 320px;
+  }
+  .kahoot-layout.right-panel-collapsed {
+    grid-template-columns: 280px 1fr 0px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .kahoot-layout {
+    grid-template-columns: 260px 1fr 300px;
+  }
+  .kahoot-layout.right-panel-collapsed {
+    grid-template-columns: 260px 1fr 0px;
+  }
+}
+
+/* FIXED Mobile layout - Restore the working mobile approach */
+@media (max-width: 1024px) {
+  .kahoot-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+    height: auto;
+    gap: 0;
   }
   
+  .kahoot-layout.right-panel-collapsed {
+    grid-template-rows: 60px auto 1fr;
+  }
+  
+  .left-panel {
+    order: 1;
+    height: 200px;
+    border-radius: var(--border-radius-lg);
+  }
+  
+  .middle-panel {
+    order: 2;
+    height: 600px;
+    border-radius: var(--border-radius-lg);
+  }
+  
+  .right-panel {
+    order: 0;
+    height: auto;
+    border-radius: var(--border-radius-lg);
+  }
+  
+  .right-panel.collapsed {
+    display: block;
+    width: auto;
+    height: 60px;
+    order: 0;
+  }
+  
+  .right-panel.collapsed .right-panel-header {
+    justify-content: space-between;
+    padding: 16px 20px;
+  }
+
+  .right-panel.collapsed .right-panel-header h3 {
+    display: block;
+  }
+  
+  /* On mobile, show tab in different position */
+  .right-panel-tab {
+    right: 10px;
+    top: 20px;
+    transform: none;
+  }
+}
+
+/* --- THE REST OF YOUR FILE BELOW IS 100% UNCHANGED --- */
+.left-panel-tabs {
+  display: flex;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border-light);
+}
+.left-panel-tabs .tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+.left-panel-tabs .tab-btn.active {
+  color: #10b981;
+  background: var(--card-bg);
+}
+.left-panel-tabs .tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-gradient);
+}
+.left-panel-tabs .tab-btn:hover:not(.active) {
+  background: rgba(16, 185, 129, 0.05);
+}
+.left-panel-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.question-slide {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--panel-bg);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.question-slide:hover {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: #10b981;
+}
+.question-slide.active {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+}
+.question-slide.dragging {
+  transform: rotate(2deg);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+}
+.question-slide-number {
+  width: 24px;
+  height: 24px;
+  background: var(--primary-gradient);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.question-slide-content {
+  flex: 1;
+  min-width: 0;
+}
+.question-slide-image {
+  width: 40px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+.question-slide-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.empty-questions-list {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+}
+.empty-questions-list .empty-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+.empty-questions-list p {
+  margin: 0;
+  font-size: 14px;
+}
+.add-question-btn-left {
+  padding: 12px 16px;
+  background: var(--secondary-gradient);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+  font-size: 14px;
+}
+.add-question-btn-left:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.customize-content .form-group {
+  margin-bottom: 24px;
+}
+.customize-content .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  border: 2px solid var(--border-light);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--card-bg);
+}
+.theme-option:hover {
+  border-color: #10b981;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.theme-option.selected {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+.theme-preview {
+  width: 60px;
+  height: 40px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.custom-preview {
+  background: var(--panel-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  font-size: 16px;
+}
+.custom-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.theme-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.middle-panel[data-theme="theme1"]::before {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.middle-panel[data-theme="theme2"]::before {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.middle-panel[data-theme="theme3"]::before {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.middle-panel[data-theme="theme4"]::before {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.middle-panel[data-theme="theme5"]::before {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.middle-panel[data-theme="custom"]::before {
+  background-image: var(--custom-bg-url);
+}
+
+.middle-panel-content {
+  padding-bottom: 64px !important;
+  height: 100%;
+  padding-bottom: 64px !important;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  padding-bottom: 48px; 
+}
+.question-editor {
+  /* NEW: Limit question card width for desktop */
+  width: 100%;
+  max-width: 680px;
+  min-width: 0;
+}
+.question-editor:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.question-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.question-info .question-number {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 18px;
+}
+.question-actions {
+  display: flex;
+  gap: 8px;
+}
+.duplicate-btn, .delete-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.duplicate-btn {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+.duplicate-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: scale(1.1);
+}
+.delete-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.1);
+}
+.question-editor-content .form-group {
+  margin-bottom: 24px;
+}
+.question-editor-content .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+.question-editor-content textarea {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid var(--border-light);
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: white;
+  resize: vertical;
+  min-height: 120px;
+}
+.question-editor-content textarea:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Image Upload Area - Kahoot Style */
+.image-upload-area {
+  position: relative;
+  border: 2px dashed var(--border-medium);
+  border-radius: var(--border-radius);
+  padding: 40px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.image-upload-area:hover {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.02);
+}
+
+.uploaded-image {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.uploaded-image img {
+  max-width: 300px;
+  max-height: 200px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+}
+
+.remove-image {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: #ef4444;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+}
+
+.file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-placeholder {
+  color: var(--text-secondary);
+}
+
+.upload-placeholder .upload-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  color: var(--text-light);
+}
+
+.upload-placeholder p {
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Answer Options - Kahoot Style */
+.answer-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.answer-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--panel-bg);
+  border: 2px solid var(--border-light);
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+.answer-option.required {
+  border-left: 4px solid var(--kahoot-blue);
+}
+
+.answer-option.optional {
+  border-left: 4px solid var(--text-light);
+}
+
+.answer-option:hover {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: #10b981;
+}
+
+.option-shape {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Kahoot Shapes */
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 26px solid var(--kahoot-red);
+}
+
+.diamond {
+  width: 24px;
+  height: 24px;
+  background: var(--kahoot-blue);
+  transform: rotate(45deg);
+}
+
+.circle {
+  width: 28px;
+  height: 28px;
+  background: var(--kahoot-yellow);
+  border-radius: 50%;
+}
+
+.square {
+  width: 28px;
+  height: 28px;
+  background: var(--kahoot-green);
+  border-radius: 4px;
+}
+
+.answer-option input[type="text"] {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.answer-option input[type="text"]:focus {
+  outline: none;
+}
+
+.answer-option input[type="text"]::placeholder {
+  color: var(--text-light);
+}
+
+.correct-answer-radio {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.correct-answer-radio input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-medium);
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.correct-answer-radio input[type="radio"]:checked + .radio-custom {
+  border-color: #10b981;
+  background: #10b981;
+}
+
+.correct-answer-radio input[type="radio"]:checked + .radio-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.add-media-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-medium);
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.add-media-btn:hover {
+  background: var(--panel-bg);
+  border-color: #10b981;
+}
+
+/* Empty Middle Panel */
+.empty-middle-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: var(--text-light);
+}
+
+.empty-middle-panel .empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.empty-middle-panel h3 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  color: var(--text-secondary);
+}
+
+.empty-middle-panel p {
+  margin: 0 0 24px 0;
+  font-size: 16px;
+}
+
+.add-question-btn-middle {
+  padding: 16px 32px;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+}
+
+.add-question-btn-middle:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.right-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--panel-bg);
+}
+
+.right-panel-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.right-panel.collapsed .right-panel-header h3 {
+  display: none;
+}
+
+.collapse-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.collapse-btn:hover {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.right-panel-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.right-panel.collapsed .right-panel-content {
+  display: none;
+}
+
+.right-panel.collapsed .collapse-btn {
+  transform: rotate(180deg);
+}
+
+.right-panel-content .form-group {
+  margin-bottom: 20px;
+}
+
+.right-panel-content .form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.right-panel-content input,
+.right-panel-content textarea,
+.right-panel-content select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--border-light);
+  border-radius: var(--border-radius);
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.right-panel-content input:focus,
+.right-panel-content textarea:focus,
+.right-panel-content select:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.right-panel-content textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.checkbox-group {
+  margin-top: 20px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #10b981;
+}
+
+/* Error styles */
+.error-text {
+  color: #ef4444;
+  font-size: 11px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Success/Error messages */
+.success-message, .error-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 16px 24px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-xl);
+  animation: slideIn 0.3s ease;
+}
+
+.success-message {
+  background: var(--success-gradient);
+  color: white;
+}
+
+.error-message {
+  background: var(--danger-gradient);
+  color: white;
+}
+
+.success-content,
+.error-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.success-icon,
+.error-icon {
+  font-size: 16px;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.question-slide {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Loading states */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Scrollbar styling */
+.left-panel-content::-webkit-scrollbar,
+.middle-panel-content::-webkit-scrollbar,
+.right-panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.left-panel-content::-webkit-scrollbar-track,
+.middle-panel-content::-webkit-scrollbar-track,
+.right-panel-content::-webkit-scrollbar-track {
+  background: var(--panel-bg);
+}
+
+.left-panel-content::-webkit-scrollbar-thumb,
+.middle-panel-content::-webkit-scrollbar-thumb,
+.right-panel-content::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 3px;
+}
+
+.left-panel-content::-webkit-scrollbar-thumb:hover,
+.middle-panel-content::-webkit-scrollbar-thumb:hover,
+.right-panel-content::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+
+/* Custom select arrow */
+.right-panel-content select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 36px;
+  appearance: none;
+}
+
+
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for better accessibility */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border-light: #000000;
+    --border-medium: #000000;
+    --text-light: #000000;
+  }
+}
+
+/* Print styles */
+@media print {
+  .create-quiz-container {
+    background: white;
+  }
+  
+  .quiz-header-right,
+  .left-panel,
+  .right-panel,
+  .success-message,
+  .error-message {
+    display: none;
+  }
+  
+  .kahoot-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .middle-panel {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}
+
+/* Enhanced hover effects */
+.question-slide:hover .question-slide-number {
+  transform: scale(1.1);
+}
+
+.theme-option:hover .theme-preview {
+  transform: scale(1.05);
+}
+
+.add-question-btn-left:active,
+.add-question-btn-middle:active {
+  transform: translateY(0);
+}
+
+/* Drag and drop enhancements */
+.question-slide.react-beautiful-dnd-dragging {
+  z-index: 1000;
+  box-shadow: var(--shadow-xl);
+}
+
+/* Custom file input styling enhancement */
+.file-input::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+/* Enhanced loading states */
+.form-group.loading input,
+.form-group.loading textarea,
+.form-group.loading select {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Enhanced focus states */
+.question-slide:focus {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* Image optimization */
+.question-slide-image,
+.uploaded-image img,
+.custom-preview img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Enhanced error states */
+.form-group.error input,
+.form-group.error textarea,
+.form-group.error select {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-group.error label {
+  color: #ef4444;
+}
+
+/* Success states */
+.form-group.success input,
+.form-group.success textarea,
+.form-group.success select {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Progress indicator */
+.progress-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-gradient);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+  z-index: 1001;
+}
+
+.progress-indicator.active {
+  transform: scaleX(1);
+}
+
+/* Enhanced Mobile Layout - Replace existing mobile styles */
+@media (max-width: 768px) {
+  .create-quiz-container {
+    padding: 12px;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+  
+  .quiz-header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .quiz-header-left {
+    text-align: center;
+  }
+  
+  .quiz-header-left h1 {
+    font-size: 22px;
+  }
+  
+  .quiz-header-right {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  /* Mobile Layout: Stack panels vertically */
+  .kahoot-layout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    gap: 12px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Right panel (Quiz Settings) - Always at top on mobile */
+  .right-panel {
+    order: 0;
+    border-radius: var(--border-radius-lg);
+    height: auto;
+    min-height: auto;
+    width: 100%;
+  }
+  
+  .right-panel.collapsed {
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .right-panel.collapsed .right-panel-content {
+    display: none;
+  }
+  
+  .right-panel.collapsed .right-panel-header {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+  }
+  
+  .right-panel.collapsed .right-panel-header h3 {
+    display: block;
+    margin: 0;
+  }
+  
+  /* Left panel (Questions) - Second on mobile */
+  .left-panel {
+    order: 1;
+    border-radius: var(--border-radius-lg);
+    height: 250px;
+    width: 100%;
+  }
+  
+  /* Middle panel (Quiz Editor) - Last on mobile */
+  .middle-panel {
+    order: 2;
+    border-radius: var(--border-radius-lg);
+    height: auto;
+    min-height: 400px;
+    width: 100%;
+  }
+  
+  .middle-panel-content {
+    padding: 16px;
+    padding-bottom: 80px;
+  }
+  
+  /* Question cards mobile optimization */
+  .question-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 24px 0;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  .question-editor-content textarea {
+    min-height: 100px;
+    font-size: 14px;
+  }
+  
+  .answer-options {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .answer-option {
+    padding: 12px;
+  }
+  
+  /* Arrow directions for mobile */
+  .collapse-btn {
+    font-size: 16px;
+  }
+  
+  /* Hide the floating right panel tab on mobile */
+  .right-panel-tab {
+    display: none;
+  }
+}
+
+/* Enhanced Tablet Layout */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .create-quiz-container {
+    padding: 16px;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+  
+  .quiz-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .quiz-header-left {
+    text-align: center;
+  }
+  
+  .quiz-header-right {
+    justify-content: center;
+  }
+  
+  /* Tablet Layout: Stack panels vertically like mobile */
+  .kahoot-layout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    gap: 16px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Right panel at top for tablets */
+  .right-panel {
+    order: 0;
+    border-radius: var(--border-radius-lg);
+    height: auto;
+    width: 100%;
+  }
+  
+  .right-panel.collapsed {
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .right-panel.collapsed .right-panel-content {
+    display: none;
+  }
+  
+  .right-panel.collapsed .right-panel-header {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  .right-panel.collapsed .right-panel-header h3 {
+    display: block;
+    margin: 0;
+  }
+  
+  /* Left and Middle panels side by side on tablets */
+  .tablet-content-area {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 16px;
+    order: 1;
+  }
+  
+  .left-panel {
+    border-radius: var(--border-radius-lg);
+    height: 400px;
+  }
+  
+  .middle-panel {
+    border-radius: var(--border-radius-lg);
+    height: 400px;
+    min-height: 400px;
+  }
+  
+  .middle-panel-content {
+    padding: 20px;
+    padding-bottom: 60px;
+  }
+  
+  /* Question cards tablet optimization */
+  .question-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 32px 0;
+    padding: 24px;
+  }
+  
+  .answer-options {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  
+  /* Hide the floating right panel tab on tablets */
+  .right-panel-tab {
+    display: none;
+  }
+}
+
+/* Preview Modal Styles - Add this to your CreateQuiz.css file */
+
+/* Preview Modal Overlay */
+.preview-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  animation: fadeInOverlay 0.3s ease;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Preview Modal Container */
+.preview-modal {
+  width: 95vw;
+  max-width: 1400px;
+  height: 90vh;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popImageIn 0.3s ease;
+  position: relative;
+}
+
+@keyframes popImageIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Preview Modal Header */
+.preview-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 2px solid var(--border-light);
+  background: var(--panel-bg);
+  flex-shrink: 0;
+}
+
+.preview-modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.preview-close-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.preview-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.1);
+}
+
+/* Preview Quiz Game Layout */
+.preview-quiz-game-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+  background: var(--kahoot-bg);
+}
+
+/* Preview Left Panel */
+.preview-quiz-left-panel {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid var(--border-light);
+  overflow: hidden;
+}
+
+/* Preview Exit Button */
+.preview-exit-btn {
+  background: #fff;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.15);
+  transition: all 0.2s ease;
+}
+
+.preview-exit-btn:hover {
+  background: rgba(239, 68, 68, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Preview Middle Panel */
+.preview-quiz-mid-panel {
+  background: white;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Theme backgrounds for preview */
+.preview-quiz-mid-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.15;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.preview-quiz-mid-panel[data-theme="theme1"]::before {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.preview-quiz-mid-panel[data-theme="theme2"]::before {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.preview-quiz-mid-panel[data-theme="theme3"]::before {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.preview-quiz-mid-panel[data-theme="theme4"]::before {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.preview-quiz-mid-panel[data-theme="theme5"]::before {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.preview-quiz-mid-panel[data-theme="custom"]::before {
+  background-image: var(--custom-bg-url);
+  opacity: 0.2;
+}
+
+/* Preview Responsive Design */
+@media (max-width: 1200px) {
+  .preview-modal {
+    width: 98vw;
+    height: 95vh;
+  }
+  
+  .preview-quiz-game-layout {
+    grid-template-columns: 250px 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .preview-modal {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  
+  .preview-modal-overlay {
+    padding: 0;
+  }
+  
+  .preview-quiz-game-layout {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .preview-quiz-left-panel {
+    order: 0;
+    height: 160px;
+    border-right: none;
+    border-bottom: 2px solid var(--border-light);
+  }
+  
+  .preview-quiz-mid-panel {
+    order: 1;
+    flex: 1;
+  }
+  
+  .quiz-left-panel-content {
+    padding: 8px 12px;
+    max-height: calc(160px - 50px);
+  }
+  
+  .quiz-left-panel-header {
+    min-height: 50px;
+    padding: 10px 16px;
+  }
+  
+  .quiz-left-panel-header h3 {
+    font-size: 14px;
+  }
+  
+  .preview-exit-btn {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+  
+  .quiz-left-panel-list {
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 4px;
+    white-space: nowrap;
+  }
+  
+  .quiz-nav-q {
+    min-width: 180px;
+    height: 45px;
+    padding: 6px 10px;
+    flex-shrink: 0;
+  }
+  
+  .question-nav-number {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+  
+  .question-nav-text {
+    font-size: 11px;
+  }
+  
+  .question-nav-meta {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 600px) {
+  .preview-modal-header {
+    padding: 15px 20px;
+  }
+  
+  .preview-modal-header h2 {
+    font-size: 20px;
+  }
+  
+  .preview-close-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+  }
+}
+
+/* Quiz Content Styling in Preview */
+.preview-modal .quiz-gamified-main {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px;
+  padding: 24px 16px 60px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  position: relative;
+  min-height: calc(100vh - 120px);
+}
+
+.preview-modal .quiz-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #166534;
+  margin-bottom: 10px;
+  letter-spacing: -1px;
+  text-align: center;
+  margin-top: 8px;
+  filter: drop-shadow(0 4px 16px rgba(22, 101, 52, 0.15));
+  text-shadow:
+    2px 2px 0 #fff,
+    -2px 2px 0 #fff,
+    2px -2px 0 #fff,
+    -2px -2px 0 #fff,
+    0 2px 0 #fff,
+    2px 0 0 #fff,
+    0 -2px 0 #fff,
+    -2px 0 0 #fff;
+}
+
+.preview-modal .quiz-description {
+  font-size: 1.1rem;
+  color: #18723f;
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-shadow:
+    1px 1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px -1px 0 #fff;
+}
+
+.preview-modal .quiz-q-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(22, 101, 52, 0.12);
+  padding: 30px 28px 28px 28px;
+  margin-bottom: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  animation: quiz-card-in 0.4s ease;
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  min-height: auto;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.preview-modal .quiz-q-card:hover {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 12px 40px rgba(22, 101, 52, 0.18);
+  transform: translateY(-2px) scale(1.002);
+}
+
+/* Scrollbar for preview */
+.preview-quiz-mid-panel::-webkit-scrollbar,
+.preview-modal .quiz-left-panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.preview-quiz-mid-panel::-webkit-scrollbar-track,
+.preview-modal .quiz-left-panel-content::-webkit-scrollbar-track {
+  background: var(--panel-bg);
+  border-radius: 3px;
+}
+
+.preview-quiz-mid-panel::-webkit-scrollbar-thumb,
+.preview-modal .quiz-left-panel-content::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 3px;
+}
+
+.preview-quiz-mid-panel::-webkit-scrollbar-thumb:hover,
+.preview-modal .quiz-left-panel-content::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+
+/* Animation for preview modal */
+@keyframes quiz-card-in {
+  from { opacity: 0; transform: translateY(20px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Preview Timer Adjustments */
+.preview-modal .quiz-timer-bar-wrap {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 25px auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  height: 40px;
+}
+
+.preview-modal .quiz-timer-bar-bg {
+  flex: 1;
+  height: 20px;
+  background: #e0f2fe;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 3px 12px rgba(22, 101, 52, 0.10);
+}
+
+.preview-modal .quiz-timer-bar {
+  height: 100%;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #166534 0%, #22d3ee 100%);
+  transition: width 0.38s cubic-bezier(.87,.14,.31,.89);
+}
+
+.preview-modal .quiz-timer-label {
+  min-width: 65px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #166534;
+  margin-left: 12px;
+  transition: color 0.2s;
+}
+
+.preview-modal .quiz-timer-label.urgent {
+  color: #ef4444;
+  animation: quiz-timer-shake 1.1s infinite;
+}
+
+/* Ensure preview modal is above everything */
+.preview-modal-overlay {
+  z-index: 99999;
+}
+
+/* Fix z-index conflicts */
+.preview-modal .quiz-image-popup-overlay {
+  z-index: 999999;
+}
+
+/* Desktop - Keep existing layout unchanged */
+@media (min-width: 1025px) {
+  /* All existing desktop styles remain the same */
+  .kahoot-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr 350px;
+    gap: 0;
+    height: calc(100vh - 140px);
+    grid-template-rows: 1fr;
+    transition: all 0.3s ease;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .kahoot-layout.right-panel-collapsed {
+    grid-template-columns: 300px 1fr 0px;
+  }
+  
+  /* Desktop collapse behavior - horizontal arrows */
+  .collapse-btn {
+    font-size: 14px;
+  }
+  
+  .right-panel.collapsed {
+    display: none;
+  }
+  
+  .right-panel-tab {
+    display: flex;
+  }
+}
+
+/* Additional mobile optimizations */
+@media (max-width: 480px) {
+  .quiz-header-left h1 {
+    font-size: 20px;
+  }
+  
+  .quiz-header-right {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .quiz-header-right button {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .question-card {
+    padding: 16px;
+  }
+  
+  .answer-option {
+    padding: 10px;
+  }
+  
+  .middle-panel-content {
+    padding: 12px;
+  }
+}
+

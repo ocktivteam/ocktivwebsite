@@ -1,8 +1,14 @@
 {
-    "build": {
-      "env": {
-        "NODE_VERSION": "20.14.0"
-      }
+  "framework": "create-react-app",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "build": {
+    "env": {
+      "NODE_VERSION": "20.14.0"
     }
-  }
-  
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

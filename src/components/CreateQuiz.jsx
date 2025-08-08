@@ -1233,7 +1233,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import "../style/CreateQuiz.css";
+import "../style/createQuiz.css";
 import { useSessionCheck } from '../hooks/useSessionCheck';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { FaRegCopy, FaRegTrashAlt, FaRegImage } from "react-icons/fa";

@@ -8,6 +8,13 @@
 
 // const QUIZ_DRAFT_KEY = "ocktiv_quiz_form_draft";
 
+// // Configuration for input limits - easily adjustable for future changes
+// const INPUT_LIMITS = {
+//   POINTS: 100,
+//   ATTEMPTS_ALLOWED: 100,
+//   PASSING_RATE: 100
+// };
+
 // const API_ROOT =
 //   window.location.hostname === "localhost"
 //     ? "http://localhost:5050"
@@ -39,6 +46,14 @@
 //     return null;
 //   }
 // }
+
+// // Utility function to enforce input limits
+// const enforceLimit = (value, maxLimit) => {
+//   const numValue = Number(value);
+//   if (isNaN(numValue) || numValue < 0) return 0;
+//   if (numValue > maxLimit) return maxLimit;
+//   return numValue;
+// };
 
 // // --- PreviewModal Component: Student View ---
 // const PreviewModal = ({ quiz, isOpen, onClose, themeImages }) => {
@@ -177,7 +192,7 @@
 //                     onMouseEnter={() => setPreviewCurrentQuestion(idx)}
 //                   >
 //                     <div className="quiz-q-meta">
-//                       <span className="quiz-q-index">Q{idx + 1}</span>
+//                       <span className="quiz-q-index">Question {idx + 1}</span>
 //                       <span className="quiz-q-points">{question.points || 1} pt</span>
 //                     </div>
 //                     <div className="quiz-q-text">{question.questionText}</div>
@@ -403,7 +418,34 @@
 //             typeof quiz.courseId === "object" && quiz.courseId._id
 //               ? quiz.courseId._id
 //               : quiz.courseId
-//           );          
+//           );         
+
+//           let quizTime = 'unlimited';
+//           let customTime = '';
+//           let customTimeUnit = 'minutes';
+    
+//           if (quiz.quizTime === null || quiz.quizTime === undefined) {
+//             quizTime = 'unlimited';
+//           } else if ([5,10,15,20,30,45,60].includes(Number(quiz.quizTime))) {
+//             quizTime = String(quiz.quizTime);
+//           } else if (typeof quiz.quizTime === 'number' && quiz.quizTime > 0) {
+//             quizTime = 'custom';
+//             // If it's divisible by 60, treat as hours (ex: 120 => 2 hours)
+//             if (quiz.quizTime % 60 === 0) {
+//               customTime = String(quiz.quizTime / 60);
+//               customTimeUnit = 'hours';
+//             } else {
+//               customTime = String(quiz.quizTime);
+//               customTimeUnit = 'minutes';
+//             }
+//           }
+    
+//           // If quizTime is custom, customTime should NOT be empty!
+//           if (quizTime === 'custom' && !customTime) {
+//             customTime = String(quiz.quizTime);
+//             customTimeUnit = 'minutes';
+//           }
+    
 //         const formData = {
 //           quizTitle: quiz.quizTitle || "",
 //           description: quiz.description || "",
@@ -414,9 +456,12 @@
 //           attemptsAllowed: quiz.attemptsAllowed || 0,
 //           dueDate: quiz.dueDate ? quiz.dueDate.split('T')[0] : "",
 //           quizGrade: quiz.quizGrade || 1,
-//           quizTime: quiz.quizTime || 'unlimited',
-//           customTime: "",
-//           customTimeUnit: "minutes",
+//         //   quizTime: quiz.quizTime || 'unlimited',
+//         //   customTime: "",
+//         //   customTimeUnit: "minutes",
+//         quizTime,        
+//         customTime,      
+//         customTimeUnit, 
 //           isPublished: quiz.isPublished !== undefined ? quiz.isPublished : true,
 //           isGradedAutomatically: quiz.isGradedAutomatically !== undefined ? quiz.isGradedAutomatically : true,
 //           passingRate: quiz.passingRate || 0.8,
@@ -452,11 +497,26 @@
 
 //   const handleChange = useCallback((e) => {
 //     const { name, value, type, checked } = e.target;
+//     let finalValue = type === 'checkbox' ? checked : value;
+
+//     // Apply limits for specific fields
+//     if (name === 'attemptsAllowed') {
+//       finalValue = enforceLimit(finalValue, INPUT_LIMITS.ATTEMPTS_ALLOWED);
+//     } else if (name === 'passingRate') {
+//       finalValue = enforceLimit(finalValue, INPUT_LIMITS.PASSING_RATE) / 100;
+//     }
+
 //     setForm(prev => ({
 //       ...prev,
-//       [name]: type === 'checkbox' ? checked : value,
+//       [name]: finalValue,
 //     }));
 //     setErrors(prev => ({ ...prev, [name]: undefined }));
+//   }, []);
+
+//   // Handler specifically for points with limit enforcement
+//   const handlePointsChange = useCallback((index, value) => {
+//     const limitedValue = enforceLimit(value, INPUT_LIMITS.POINTS);
+//     updateQuestion(index, 'points', limitedValue);
 //   }, []);
 
 //   const addQuestion = useCallback(() => {
@@ -904,15 +964,17 @@
 //                       )}
 //                     </div>
 //                     <div className="form-group" style={{ maxWidth: 200 }}>
-//   <label>Points</label>
-//   <input
-//     type="number"
-//     min="1"
-//     value={question.points || 1}
-//     onChange={e => updateQuestion(index, 'points', Number(e.target.value))}
-//     style={{ width: 80 }}
-//   />
-// </div>
+//                       <label>Points (Max: {INPUT_LIMITS.POINTS})</label>
+//                       <input
+//                         type="number"
+//                         min="1"
+//                         max={INPUT_LIMITS.POINTS}
+//                         value={question.points || 1}
+//                         onChange={e => handlePointsChange(index, e.target.value)}
+//                         onBlur={e => handlePointsChange(index, e.target.value)}
+//                         style={{ width: 80 }}
+//                       />
+//                     </div>
 
 //                     <div className="form-group">
 //                       <label>Find and insert media</label>
@@ -1081,37 +1143,35 @@
 //                       value={form.customTimeUnit}
 //                       onChange={handleChange}
 //                     >
-//                       <option value="minutes">Minutes</option>
-//                       <option value="hours">Hours</option>
+//                       <option value="minutes">Minute(s)</option>
+//                       <option value="hours">Hour(s)</option>
 //                     </select>
 //                   </div>
 //                 </>
 //               )}
 //               <div className="form-group">
-//                 <label>Attempts Allowed</label>
+//                 <label>Attempts Allowed (Max: {INPUT_LIMITS.ATTEMPTS_ALLOWED})</label>
 //                 <input
 //                   type="number"
 //                   name="attemptsAllowed"
 //                   value={form.attemptsAllowed}
 //                   onChange={handleChange}
+//                   onBlur={handleChange}
 //                   placeholder="0 = Unlimited"
 //                   min="0"
+//                   max={INPUT_LIMITS.ATTEMPTS_ALLOWED}
 //                 />
 //               </div>
 //               <div className="form-group">
-//                 <label>Passing Rate (%)</label>
+//                 <label>Passing Rate (%) - Max: {INPUT_LIMITS.PASSING_RATE}%</label>
 //                 <input
 //                   type="number"
 //                   name="passingRate"
 //                   value={Math.round(form.passingRate * 100)}
-//                   onChange={(e) => handleChange({
-//                     target: {
-//                       name: 'passingRate',
-//                       value: Number(e.target.value) / 100
-//                     }
-//                   })}
+//                   onChange={handleChange}
+//                   onBlur={handleChange}
 //                   min="0"
-//                   max="100"
+//                   max={INPUT_LIMITS.PASSING_RATE}
 //                 />
 //               </div>
 //               {/* <div className="form-group">
@@ -1169,8 +1229,7 @@
 // export default CreateQuiz;
 
 
-//  ==== new ====
-
+// ==== new ====
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -1230,252 +1289,251 @@ const enforceLimit = (value, maxLimit) => {
 
 // --- PreviewModal Component: Student View ---
 const PreviewModal = ({ quiz, isOpen, onClose, themeImages }) => {
-    const [previewAnswers, setPreviewAnswers] = useState([]);
-    const [previewCurrentQuestion, setPreviewCurrentQuestion] = useState(0);
-    const [previewPopupImg, setPreviewPopupImg] = useState(null);
-    const [previewTimeLeft, setPreviewTimeLeft] = useState(null);
-  
-    // Timer setup
-    useEffect(() => {
-      if (isOpen && quiz.quizTime && !isNaN(quiz.quizTime)) {
-        setPreviewTimeLeft(Number(quiz.quizTime) * 60);
-      } else {
-        setPreviewTimeLeft(null);
-      }
-    }, [isOpen, quiz.quizTime]);
-  
-    useEffect(() => {
-      if (!isOpen || previewTimeLeft === null || previewTimeLeft === 0) return;
-      const timer = setTimeout(() => setPreviewTimeLeft(t => t - 1), 1000);
-      return () => clearTimeout(timer);
-    }, [previewTimeLeft, isOpen]);
-  
-    useEffect(() => {
-      if (isOpen) {
-        setPreviewAnswers([]);
-        setPreviewCurrentQuestion(0);
-        setPreviewPopupImg(null);
-      }
-    }, [isOpen]);
-  
-    if (!isOpen) return null;
-  
-    const handlePreviewAnswer = (questionIndex, optionIndex) => {
-      setPreviewAnswers(prev => {
-        const next = [...prev];
-        next[questionIndex] = optionIndex;
-        return next;
-      });
-    };
-  
-    const goToPreviewQuestion = (index) => {
-      setPreviewCurrentQuestion(index);
-      const element = document.getElementById(`preview-quiz-q-card-${index}`);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    };
-  
-    const getPreviewBackgroundStyle = () => {
-      if (quiz.backgroundTheme === 'custom' && quiz.customBackground) {
-        return {
-          '--custom-bg-url': `url(${quiz.customBackground})`
-        };
-      }
-      return {};
-    };
-  
-    const getPreviewThemeAttribute = () => {
-      if (quiz.backgroundTheme === 'custom') {
-        return "custom";
-      }
-      return quiz.backgroundTheme || "theme1";
-    };
-  
-    return (
-      <div className="preview-modal-overlay" onClick={onClose}>
-        <div className="preview-modal" onClick={e => e.stopPropagation()}>
-          <div className="preview-modal-header">
-            <h2>Student Preview</h2>
-            <button className="preview-close-btn" onClick={onClose}>×</button>
-          </div>
-          <div className="preview-quiz-game-layout">
-            {/* LEFT PANEL: Question Nav */}
-            <div className="preview-quiz-left-panel">
-              <div className="quiz-left-panel-header">
-                <h3>Questions</h3>
-                <button className="preview-exit-btn" onClick={onClose}>
-                  Exit Quiz
-                </button>
-              </div>
-              <div className="quiz-left-panel-content">
-                <div className="quiz-left-panel-list">
-                  {quiz.questions?.map((question, idx) => (
-                    <div
-                      className={`quiz-nav-q ${previewAnswers[idx] !== undefined ? "answered" : ""} ${previewCurrentQuestion === idx ? "active" : ""}`}
-                      key={idx}
-                      onClick={() => goToPreviewQuestion(idx)}
-                    >
-                      <div className="question-nav-number">{idx + 1}</div>
-                      <div className="question-nav-content">
-                        <div className="question-nav-text">
-                          {question.questionText?.substring(0, 40)}
-                          {question.questionText?.length > 40 ? "..." : ""}
-                        </div>
-                        <div className="question-nav-meta">
-                          {previewAnswers[idx] !== undefined ? "Answered" : "Not answered"}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+  const [previewAnswers, setPreviewAnswers] = useState([]);
+  const [previewCurrentQuestion, setPreviewCurrentQuestion] = useState(0);
+  const [previewPopupImg, setPreviewPopupImg] = useState(null);
+  const [previewTimeLeft, setPreviewTimeLeft] = useState(null);
+
+  // Timer setup
+  useEffect(() => {
+    if (isOpen && quiz.quizTime && !isNaN(quiz.quizTime)) {
+      setPreviewTimeLeft(Number(quiz.quizTime) * 60);
+    } else {
+      setPreviewTimeLeft(null);
+    }
+  }, [isOpen, quiz.quizTime]);
+
+  useEffect(() => {
+    if (!isOpen || previewTimeLeft === null || previewTimeLeft === 0) return;
+    const timer = setTimeout(() => setPreviewTimeLeft(t => t - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [previewTimeLeft, isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setPreviewAnswers([]);
+      setPreviewCurrentQuestion(0);
+      setPreviewPopupImg(null);
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handlePreviewAnswer = (questionIndex, optionIndex) => {
+    setPreviewAnswers(prev => {
+      const next = [...prev];
+      next[questionIndex] = optionIndex;
+      return next;
+    });
+  };
+
+  const goToPreviewQuestion = (index) => {
+    setPreviewCurrentQuestion(index);
+    const element = document.getElementById(`preview-quiz-q-card-${index}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
+  const getPreviewBackgroundStyle = () => {
+    if (quiz.backgroundTheme === 'custom' && quiz.customBackground) {
+      return {
+        '--custom-bg-url': `url(${quiz.customBackground})`
+      };
+    }
+    return {};
+  };
+
+  const getPreviewThemeAttribute = () => {
+    if (quiz.backgroundTheme === 'custom') {
+      return "custom";
+    }
+    return quiz.backgroundTheme || "theme1";
+  };
+
+  return (
+    <div className="preview-modal-overlay" onClick={onClose}>
+      <div className="preview-modal" onClick={e => e.stopPropagation()}>
+        <div className="preview-modal-header">
+          <h2>Student Preview</h2>
+          <button className="preview-close-btn" onClick={onClose}>×</button>
+        </div>
+        <div className="preview-quiz-game-layout">
+          {/* LEFT PANEL: Question Nav */}
+          <div className="preview-quiz-left-panel">
+            <div className="quiz-left-panel-header">
+              <h3>Questions</h3>
+              <button className="preview-exit-btn" onClick={onClose}>
+                Exit Quiz
+              </button>
             </div>
-            {/* MIDDLE PANEL: Student Quiz View */}
-            <div
-              className="preview-quiz-mid-panel"
-              data-theme={getPreviewThemeAttribute()}
-              style={getPreviewBackgroundStyle()}
-            >
-              <div className="quiz-gamified-main">
-                <div className="quiz-title">{quiz.quizTitle}</div>
-                <div className="quiz-description">{quiz.description}</div>
-                {previewTimeLeft !== null && (
-                  <div className="quiz-timer-bar-wrap">
-                    <div className="quiz-timer-bar-bg">
-                      <div
-                        className="quiz-timer-bar"
-                        style={{
-                          width: quiz.quizTime
-                            ? `${Math.max(0, (previewTimeLeft / (quiz.quizTime * 60)) * 100)}%`
-                            : "100%",
-                        }}
-                      ></div>
-                    </div>
-                    <div className={`quiz-timer-label${previewTimeLeft < 30 ? " urgent" : ""}`}>
-                      {Math.floor(previewTimeLeft / 60)}:{String(previewTimeLeft % 60).padStart(2, "0")}
-                    </div>
-                  </div>
-                )}
+            <div className="quiz-left-panel-content">
+              <div className="quiz-left-panel-list">
                 {quiz.questions?.map((question, idx) => (
                   <div
+                    className={`quiz-nav-q ${previewAnswers[idx] !== undefined ? "answered" : ""} ${previewCurrentQuestion === idx ? "active" : ""}`}
                     key={idx}
-                    className="quiz-q-card"
-                    id={`preview-quiz-q-card-${idx}`}
-                    onMouseEnter={() => setPreviewCurrentQuestion(idx)}
+                    onClick={() => goToPreviewQuestion(idx)}
                   >
-                    <div className="quiz-q-meta">
-                      <span className="quiz-q-index">Question {idx + 1}</span>
-                      <span className="quiz-q-points">{question.points || 1} pt</span>
-                    </div>
-                    <div className="quiz-q-text">{question.questionText}</div>
-                    {question.imageUrl && (
-                      <div className="quiz-q-image">
-                        <img
-                          src={question.imageUrl}
-                          alt="Quiz question visual"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => setPreviewPopupImg(question.imageUrl)}
-                          onError={(e) => { e.target.style.display = 'none'; }}
-                        />
+                    <div className="question-nav-number">{idx + 1}</div>
+                    <div className="question-nav-content">
+                      <div className="question-nav-text">
+                        {question.questionText?.substring(0, 40)}
+                        {question.questionText?.length > 40 ? "..." : ""}
                       </div>
-                    )}
-                    <div className="quiz-q-options">
-                      {question.options?.map((option, optionIndex) => (
-                        <label
-                          key={optionIndex}
-                          className={`quiz-q-option${previewAnswers[idx] === optionIndex ? " selected" : ""}`}
-                        >
-                          <input
-                            type="radio"
-                            name={`preview-question-${idx}`}
-                            value={optionIndex}
-                            checked={previewAnswers[idx] === optionIndex}
-                            onChange={() => handlePreviewAnswer(idx, optionIndex)}
-                          />
-                          <span className="quiz-q-option-label">
-                            {String.fromCharCode(65 + optionIndex)}
-                          </span>
-                          <span className="quiz-q-option-text">{option}</span>
-                        </label>
-                      ))}
+                      <div className="question-nav-meta">
+                        {previewAnswers[idx] !== undefined ? "Answered" : "Not answered"}
+                      </div>
                     </div>
                   </div>
                 ))}
-                {quiz.questions?.length > 0 && (
-                  <div style={{ textAlign: 'center', marginTop: '40px' }}>
-                    <button 
-                      className="quiz-submit-btn" 
-                      onClick={() => alert("This is preview mode - quiz not submitted")}
-                      style={{
-                        padding: '16px 32px',
-                        background: 'var(--primary-gradient)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '12px',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        boxShadow: 'var(--shadow-md)',
-                        transition: 'all 0.3s ease'
-                      }}
-                    >
-                      Submit Quiz (Preview)
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           </div>
-          {/* Preview Image Popup */}
-          {previewPopupImg && (
-            <div
-              className="quiz-image-popup-overlay"
-              onClick={() => setPreviewPopupImg(null)}
+          {/* MIDDLE PANEL: Student Quiz View */}
+          <div
+            className="preview-quiz-mid-panel"
+            data-theme={getPreviewThemeAttribute()}
+            style={getPreviewBackgroundStyle()}
+          >
+            <div className="quiz-gamified-main">
+              <div className="quiz-title">{quiz.quizTitle}</div>
+              <div className="quiz-description">{quiz.description}</div>
+              {previewTimeLeft !== null && (
+                <div className="quiz-timer-bar-wrap">
+                  <div className="quiz-timer-bar-bg">
+                    <div
+                      className="quiz-timer-bar"
+                      style={{
+                        width: quiz.quizTime
+                          ? `${Math.max(0, (previewTimeLeft / (quiz.quizTime * 60)) * 100)}%`
+                          : "100%",
+                      }}
+                    ></div>
+                  </div>
+                  <div className={`quiz-timer-label${previewTimeLeft < 30 ? " urgent" : ""}`}>
+                    {Math.floor(previewTimeLeft / 60)}:{String(previewTimeLeft % 60).padStart(2, "0")}
+                  </div>
+                </div>
+              )}
+              {quiz.questions?.map((question, idx) => (
+                <div
+                  key={idx}
+                  className="quiz-q-card"
+                  id={`preview-quiz-q-card-${idx}`}
+                  onMouseEnter={() => setPreviewCurrentQuestion(idx)}
+                >
+                  <div className="quiz-q-meta">
+                    <span className="quiz-q-index">Question {idx + 1}</span>
+                    <span className="quiz-q-points">{question.points || 1} pt</span>
+                  </div>
+                  <div className="quiz-q-text">{question.questionText}</div>
+                  {question.imageUrl && (
+                    <div className="quiz-q-image">
+                      <img
+                        src={question.imageUrl}
+                        alt="Quiz question visual"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setPreviewPopupImg(question.imageUrl)}
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    </div>
+                  )}
+                  <div className="quiz-q-options">
+                    {question.options?.map((option, optionIndex) => (
+                      <label
+                        key={optionIndex}
+                        className={`quiz-q-option${previewAnswers[idx] === optionIndex ? " selected" : ""}`}
+                      >
+                        <input
+                          type="radio"
+                          name={`preview-question-${idx}`}
+                          value={optionIndex}
+                          checked={previewAnswers[idx] === optionIndex}
+                          onChange={() => handlePreviewAnswer(idx, optionIndex)}
+                        />
+                        <span className="quiz-q-option-label">
+                          {String.fromCharCode(65 + optionIndex)}
+                        </span>
+                        <span className="quiz-q-option-text">{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {quiz.questions?.length > 0 && (
+                <div style={{ textAlign: 'center', marginTop: '40px' }}>
+                  <button 
+                    className="quiz-submit-btn" 
+                    onClick={() => alert("This is preview mode - quiz not submitted")}
+                    style={{
+                      padding: '16px 32px',
+                      background: 'var(--primary-gradient)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      boxShadow: 'var(--shadow-md)',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    Submit Quiz (Preview)
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        {/* Preview Image Popup */}
+        {previewPopupImg && (
+          <div
+            className="quiz-image-popup-overlay"
+            onClick={() => setPreviewPopupImg(null)}
+            style={{
+              position: "fixed",
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: "rgba(0,0,0,0.7)",
+              zIndex: 10000,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <img
+              src={previewPopupImg}
+              alt="Full screen quiz question"
+              style={{
+                maxWidth: "90vw",
+                maxHeight: "85vh",
+                borderRadius: 16,
+                boxShadow: "0 8px 40px #0008",
+                background: "#fff"
+              }}
+              onClick={e => e.stopPropagation()}
+            />
+            <button
               style={{
                 position: "fixed",
-                top: 0, left: 0, right: 0, bottom: 0,
-                background: "rgba(0,0,0,0.7)",
-                zIndex: 10000,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
+                top: 32,
+                right: 44,
+                background: "rgba(0,0,0,0.6)",
+                color: "white",
+                border: "none",
+                fontSize: 32,
+                cursor: "pointer",
+                borderRadius: 8,
+                padding: "6px 18px"
               }}
-            >
-              <img
-                src={previewPopupImg}
-                alt="Full screen quiz question"
-                style={{
-                  maxWidth: "90vw",
-                  maxHeight: "85vh",
-                  borderRadius: 16,
-                  boxShadow: "0 8px 40px #0008",
-                  background: "#fff"
-                }}
-                onClick={e => e.stopPropagation()}
-              />
-              <button
-                style={{
-                  position: "fixed",
-                  top: 32,
-                  right: 44,
-                  background: "rgba(0,0,0,0.6)",
-                  color: "white",
-                  border: "none",
-                  fontSize: 32,
-                  cursor: "pointer",
-                  borderRadius: 8,
-                  padding: "6px 18px"
-                }}
-                onClick={() => setPreviewPopupImg(null)}
-              >×</button>
-            </div>
-          )}
-        </div>
+              onClick={() => setPreviewPopupImg(null)}
+            >×</button>
+          </div>
+        )}
       </div>
-    );
-  };
-  
+    </div>
+  );
+};
 
 const CreateQuiz = () => {
   useSessionCheck();
@@ -1528,6 +1586,7 @@ const CreateQuiz = () => {
   const [success, setSuccess] = useState("");
   const middlePanelRef = useRef();
   const fileInputRef = useRef();
+  const scrollTimeoutRef = useRef(); // kept
 
   useEffect(() => {
     const handleResize = () => {
@@ -1629,12 +1688,12 @@ const CreateQuiz = () => {
           attemptsAllowed: quiz.attemptsAllowed || 0,
           dueDate: quiz.dueDate ? quiz.dueDate.split('T')[0] : "",
           quizGrade: quiz.quizGrade || 1,
-        //   quizTime: quiz.quizTime || 'unlimited',
-        //   customTime: "",
-        //   customTimeUnit: "minutes",
-        quizTime,        
-        customTime,      
-        customTimeUnit, 
+          // quizTime: quiz.quizTime || 'unlimited',
+          // customTime: "",
+          // customTimeUnit: "minutes",
+          quizTime,        
+          customTime,      
+          customTimeUnit, 
           isPublished: quiz.isPublished !== undefined ? quiz.isPublished : true,
           isGradedAutomatically: quiz.isGradedAutomatically !== undefined ? quiz.isGradedAutomatically : true,
           passingRate: quiz.passingRate || 0.8,
@@ -1652,6 +1711,57 @@ const CreateQuiz = () => {
       localStorage.setItem(QUIZ_DRAFT_KEY, JSON.stringify(form));
     }
   }, [form, isEditMode]);
+
+  // === SYNC HIGHLIGHT WITH SCROLL (IntersectionObserver: pick most visible) ===
+  useEffect(() => {
+    const root = middlePanelRef.current;
+    if (!root || form.questions.length === 0) return;
+
+    const visibility = new Map();
+    let raf = null;
+
+    const updateActiveFromVisibility = () => {
+      let maxRatio = -1;
+      let bestIndex = 0;
+      for (let i = 0; i < form.questions.length; i++) {
+        const r = visibility.get(i) ?? 0;
+        if (r > maxRatio) {
+          maxRatio = r;
+          bestIndex = i;
+        }
+      }
+      setSelectedQuestion(bestIndex);
+      raf = null;
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.id; // e.g. "question-3"
+          const idx = Number(id.split("-")[1]);
+          visibility.set(idx, entry.intersectionRatio);
+        });
+        if (!raf) {
+          raf = requestAnimationFrame(updateActiveFromVisibility);
+        }
+      },
+      {
+        root,
+        threshold: [0.1, 0.25, 0.5, 0.75, 1.0],
+      }
+    );
+
+    // Observe all question elements
+    for (let i = 0; i < form.questions.length; i++) {
+      const el = document.getElementById(`question-${i}`);
+      if (el) observer.observe(el);
+    }
+
+    return () => {
+      observer.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [form.questions.length]);
 
   // THEME: Middle panel background
   let middlePanelBg = {};
@@ -1705,7 +1815,17 @@ const CreateQuiz = () => {
       ...prev,
       questions: [...prev.questions, newQuestion]
     }));
-    setSelectedQuestion(form.questions.length);
+    
+    const newQuestionIndex = form.questions.length;
+    setSelectedQuestion(newQuestionIndex);
+    
+    // AUTO-SCROLL: Scroll to the new question after it's rendered
+    setTimeout(() => {
+      const questionElement = document.getElementById(`question-${newQuestionIndex}`);
+      if (questionElement && middlePanelRef.current) {
+        questionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100); // Small delay to ensure DOM is updated
   }, [form.questions.length]);
 
   const duplicateQuestion = useCallback((index) => {
@@ -1947,12 +2067,12 @@ const CreateQuiz = () => {
             ← Back to Modules
           </button>
           <button
-  type="button"
-  className="preview-btn"
-  onClick={() => setShowPreview(!showPreview)}
->
-  {showPreview ? "Hide Preview" : "Show Preview"}
-</button>
+            type="button"
+            className="preview-btn"
+            onClick={() => setShowPreview(!showPreview)}
+          >
+            {showPreview ? "Hide Preview" : "Show Preview"}
+          </button>
 
           <button
             type="button"
@@ -2030,13 +2150,13 @@ const CreateQuiz = () => {
               </div>
             ) : (
               <div className="customize-content">
-<div className="form-group">
-  <label>Background Theme</label>
+                <div className="form-group">
+                  <label>Background Theme</label>
 
-  {themeError && <div className="error-text">{themeError}</div>}
-  {!loadingThemes && themeImages.length === 0 && (
-    <div style={{ color: "#aaa", marginBottom: 12 }}>No themes found.</div>
-  )}
+                  {themeError && <div className="error-text">{themeError}</div>}
+                  {!loadingThemes && themeImages.length === 0 && (
+                    <div style={{ color: "#aaa", marginBottom: 12 }}>No themes found.</div>
+                  )}
                   <div className="theme-grid">
                     {themeImages.map((img, i) => (
                       <div
@@ -2103,22 +2223,22 @@ const CreateQuiz = () => {
                       <span className="question-number">Question {index + 1}</span>
                     </div>
                     <div className="question-actions">
-                    <button
-  type="button"
-  className="duplicate-btn"
-  onClick={() => duplicateQuestion(index)}
-  title="Duplicate Question"
->
-  <FaRegCopy size={22} />
-</button>
-<button
-  type="button"
-  className="delete-btn"
-  onClick={() => deleteQuestion(index)}
-  title="Delete Question"
->
-  <FaRegTrashAlt size={22} color="#e74c3c" />
-</button>
+                      <button
+                        type="button"
+                        className="duplicate-btn"
+                        onClick={() => duplicateQuestion(index)}
+                        title="Duplicate Question"
+                      >
+                        <FaRegCopy size={22} />
+                      </button>
+                      <button
+                        type="button"
+                        className="delete-btn"
+                        onClick={() => deleteQuestion(index)}
+                        title="Delete Question"
+                      >
+                        <FaRegTrashAlt size={22} color="#e74c3c" />
+                      </button>
 
                     </div>
                   </div>
@@ -2173,36 +2293,36 @@ const CreateQuiz = () => {
                           }}
                           className="file-input"
                         />
-<div className="upload-placeholder">
-  <div className="upload-icon">
-    <FaRegImage size={48} color="#8898aa" />
-  </div>
-  <p>{question.imageUrl ? "Change media" : "Upload file or drag here to upload"}</p>
-</div>
-</div>
-{errors[`question_${index}_image`] && (
-  <div className="error-text">{errors[`question_${index}_image`]}</div>
-)}
+                        <div className="upload-placeholder">
+                          <div className="upload-icon">
+                            <FaRegImage size={48} color="#8898aa" />
+                          </div>
+                          <p>{question.imageUrl ? "Change media" : "Upload file or drag here to upload"}</p>
+                        </div>
+                      </div>
+                      {errors[`question_${index}_image`] && (
+                        <div className="error-text">{errors[`question_${index}_image`]}</div>
+                      )}
 
                     </div>
                     <div className="answer-options">
                       {question.options.map((option, optionIndex) => (
                         <div key={optionIndex} className={`answer-option ${optionIndex < 2 ? 'required' : 'optional'}`}>
                           <div className="option-label" style={{
-  fontWeight: 700,
-  fontSize: 18,
-  width: 26,
-  height: 26,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  borderRadius: "7px",
-  background: "#f2f6fb",
-  color: "#1d2a40",
-  marginRight: 12,
-}}>
-  {String.fromCharCode(65 + optionIndex)}
-</div>
+                            fontWeight: 700,
+                            fontSize: 18,
+                            width: 26,
+                            height: 26,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "7px",
+                            background: "#f2f6fb",
+                            color: "#1d2a40",
+                            marginRight: 12,
+                          }}>
+                            {String.fromCharCode(65 + optionIndex)}
+                          </div>
 
                           <input
                             type="text"
@@ -2247,12 +2367,12 @@ const CreateQuiz = () => {
           <div className="right-panel-header">
             <h3>Quiz Settings</h3>
             <button 
-  className="collapse-btn"
-  onClick={() => setRightPanelCollapsed(!rightPanelCollapsed)}
-  title={rightPanelCollapsed ? "Expand Settings Panel" : "Collapse Settings Panel"}
->
-  {windowWidth <= 1024 ? (rightPanelCollapsed ? '↓' : '↑') : (rightPanelCollapsed ? '←' : '→')}
-</button>
+              className="collapse-btn"
+              onClick={() => setRightPanelCollapsed(!rightPanelCollapsed)}
+              title={rightPanelCollapsed ? "Expand Settings Panel" : "Collapse Settings Panel"}
+            >
+              {windowWidth <= 1024 ? (rightPanelCollapsed ? '↓' : '↑') : (rightPanelCollapsed ? '←' : '→')}
+            </button>
 
           </div>
           {!rightPanelCollapsed && (
@@ -2388,12 +2508,12 @@ const CreateQuiz = () => {
       )}
 
       {/* STUDENT PREVIEW MODAL */}
-<PreviewModal 
-  quiz={form}
-  isOpen={showPreview}
-  onClose={() => setShowPreview(false)}
-  themeImages={themeImages}
-/>
+      <PreviewModal 
+        quiz={form}
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        themeImages={themeImages}
+      />
 
     </div>
   );

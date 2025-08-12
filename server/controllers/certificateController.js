@@ -491,18 +491,12 @@ export const generateCertificate = async (req, res) => {
 
     ctx.font = "54px Roboto";
     ctx.fillStyle = "#000";
-    ctx.fillText(completionDate, 2300, 1941);
+    ctx.fillText(completionDate, 2330, 1941);
 
-    // ctx.font = "bold 40px Arial";
-    // ctx.fillStyle = "#000";
-    // ctx.textAlign = "left";
-    // ctx.fillText(`${certId}`, 2340, 2300);
-
-    ctx.font = "54px Arial";         // swap to Arial OR register Roboto (see below)
-ctx.fillStyle = "#000";
-ctx.textAlign = "left";          // <— key part so x is the left edge
-ctx.textBaseline = "alphabetic"; // or "top" if you prefer a tighter anchor
-ctx.fillText(completionDate, 2300, 1941);
+    ctx.font = "bold 40px Arial";
+    ctx.fillStyle = "#000";
+    ctx.textAlign = "left";
+    ctx.fillText(`${certId}`, 2340, 2300);
 
     ctx.font = "36px Arial";
     ctx.fillStyle = "#1d4f91";

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "../style/courseNavbar.css";
 import { MdOutlineMail, MdNotificationsNone, MdHome } from "react-icons/md"; // <-- Add MdHome
+import EmailComposePopup from "./EmailComposePopup";
 
 const COURSE_API =
   window.location.hostname === "localhost"
@@ -32,6 +33,8 @@ function CourseNavbar() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [tabOpen, setTabOpen] = useState(false);
+
+  const [showEmailPopup, setShowEmailPopup] = useState(false);
 
   useEffect(() => {
     // Get user info from localStorage
@@ -62,10 +65,10 @@ function CourseNavbar() {
     // Clear all session data
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
-    
+
     // Use replace to prevent going back
     navigate('/login', { replace: true });
-    
+
     // Prevent back button
     window.history.pushState(null, '', window.location.href);
     window.onpopstate = function () {
@@ -133,23 +136,29 @@ function CourseNavbar() {
       window.location.href = COURSE_SHELL_URL;
     }
   };
-  
+
+  // ↓Open compose helpers
+  const openCompose = () => setShowEmailPopup(true);
+  const closeCompose = () => setShowEmailPopup(false);
+
+  const senderId = user?._id; // used by the popup
+
   return (
     <>
       {/* Top Navbar */}
       <nav className="course-navbar">
         <div className="course-navbar-left">
-        <a
-  href="https://ocktiv.com/"
-  target="_blank"
-  rel="noopener noreferrer"
->
-  <img
-    src="/img/GreenLogoOnly.png"
-    alt="Course Logo"
-    className="course-navbar-logo"
-  />
-</a>
+          <a
+            href="https://ocktiv.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="/img/GreenLogoOnly.png"
+              alt="Course Logo"
+              className="course-navbar-logo"
+            />
+          </a>
           <span className="course-navbar-title">{courseTitle}</span>
         </div>
         {/* Desktop Right */}
@@ -165,12 +174,21 @@ function CourseNavbar() {
             <MdHome className="course-icon" size={36} />
           </button>
           {/* EMAIL ICON */}
-          <button
+          {/* <button
             className="course-icon-btn"
             title="Email"
             aria-label="Email"
             type="button"
             onClick={() => alert("Email clicked!")}
+          >
+            <MdOutlineMail className="course-icon" size={36} />
+          </button> */}
+           <button
+            className="course-icon-btn"
+            title="Email"
+            aria-label="Email"
+            type="button"
+            onClick={openCompose}
           >
             <MdOutlineMail className="course-icon" size={36} />
           </button>
@@ -304,6 +322,14 @@ function CourseNavbar() {
             ))}
           </ul>
         </div>
+      )}
+   {/* Compose popup (bottom-right) */}
+   {showEmailPopup && user?._id && (
+        <EmailComposePopup
+          courseId={courseId}
+          senderId={senderId}
+          onClose={closeCompose}
+        />
       )}
     </>
   );

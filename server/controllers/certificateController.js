@@ -491,7 +491,7 @@ export const generateCertificate = async (req, res) => {
 
     ctx.font = "54px Roboto";
     ctx.fillStyle = "#000";
-    ctx.fillText(completionDate, 2310, 1941);
+    ctx.fillText(completionDate, 2330, 1941);
 
     ctx.font = "bold 40px Arial";
     ctx.fillStyle = "#000";

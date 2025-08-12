@@ -174,15 +174,6 @@ function CourseNavbar() {
             <MdHome className="course-icon" size={36} />
           </button>
           {/* EMAIL ICON */}
-          {/* <button
-            className="course-icon-btn"
-            title="Email"
-            aria-label="Email"
-            type="button"
-            onClick={() => alert("Email clicked!")}
-          >
-            <MdOutlineMail className="course-icon" size={36} />
-          </button> */}
            <button
             className="course-icon-btn"
             title="Email"
@@ -248,7 +239,7 @@ function CourseNavbar() {
                 <span
                   className="course-menu-link"
                   style={{ display: "flex", alignItems: "center" }}
-                  onClick={() => alert("Email clicked!")}
+                  onClick={() => { setMenuOpen(false); openCompose(); }}
                 >
                   <MdOutlineMail className="course-icon" style={{ marginRight: 8 }} size={16} /> Email
                 </span>

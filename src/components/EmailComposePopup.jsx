@@ -316,35 +316,35 @@ export default function EmailComposePopup({ courseId, senderId, onClose }) {
     async function handleSend() {
         if (!canSend) return;
         try {
-          const fd = new FormData();
-          fd.append("senderId", senderId);
-          fd.append("courseId", courseId);
-          recipients.forEach(r => fd.append("instructorIds[]", r.id));
-          fd.append("subject", subject);
-          fd.append("message", message);
-          files.forEach(f => fd.append("attachments", f));
-      
-          const { data } = await axios.post(
-            `${API_ROOT}/api/email/student-to-instructor`,
-            fd,
-            { headers: { "Content-Type": "multipart/form-data" } }
-          );
-      
-          if (data?.status) {
-            alert(`Email sent successfully to ${recipients.map(r => r.name).join(", ")}!`);
-            setSubject("");
-            setMessage("");
-            setFiles([]);
-            onClose?.();
-          } else {
-            alert(data?.message || "Failed to send email");
-          }
+            const fd = new FormData();
+            fd.append("senderId", senderId);
+            fd.append("courseId", courseId);
+            recipients.forEach(r => fd.append("instructorIds[]", r.id));
+            fd.append("subject", subject);
+            fd.append("message", message);
+            files.forEach(f => fd.append("attachments", f));
+
+            const { data } = await axios.post(
+                `${API_ROOT}/api/email/student-to-instructor`,
+                fd,
+                { headers: { "Content-Type": "multipart/form-data" } }
+            );
+
+            if (data?.status) {
+                alert(`Email sent successfully to ${recipients.map(r => r.name).join(", ")}!`);
+                setSubject("");
+                setMessage("");
+                setFiles([]);
+                onClose?.();
+            } else {
+                alert(data?.message || "Failed to send email");
+            }
         } catch (err) {
-          console.error("Send email error:", err?.response?.data || err.message);
-          alert(err?.response?.data?.message || "Failed to send email");
+            console.error("Send email error:", err?.response?.data || err.message);
+            alert(err?.response?.data?.message || "Failed to send email");
         }
-      }
-      
+    }
+
     return (
         <Paper
             elevation={16}

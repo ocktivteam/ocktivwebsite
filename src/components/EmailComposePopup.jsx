@@ -375,7 +375,7 @@ export default function EmailComposePopup({ courseId, senderId, onClose }) {
                 }}
             >
                 <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                    Email Instructors
+                    Email Instructor(s)
                 </Typography>
                 <IconButton size="small" onClick={onClose} sx={{ color: "#fff" }} aria-label="Close compose">
                     <CloseIcon />
@@ -417,7 +417,7 @@ export default function EmailComposePopup({ courseId, senderId, onClose }) {
                 />
 
                 {/* Message + expand toggle */}
-                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1.25 }}>
+                {/* <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1.25 }}>
                     <Typography variant="caption" sx={{ color: "text.secondary" }}>
                         Message
                     </Typography>
@@ -426,7 +426,12 @@ export default function EmailComposePopup({ courseId, senderId, onClose }) {
                             {expanded ? <CloseFullscreenIcon fontSize="small" /> : <OpenInFullIcon fontSize="small" />}
                         </IconButton>
                     </Tooltip>
-                </Stack>
+                </Stack> */}
+                {/* Message label */}
+                <Typography variant="caption" sx={{ color: "text.secondary", mt: 2, display: "block" }}>
+                    Message
+                </Typography>
+
                 <TextField
                     placeholder="Message"
                     fullWidth

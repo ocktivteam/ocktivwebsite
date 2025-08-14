@@ -8,3 +8,16 @@ export function checkAdmin(req, res, next) {
     next();
   }
   
+
+// Reusable role gate: pass allowed roles, e.g. ["instructor","admin"]
+export function requireRole(roles = []) {
+  return (req, res, next) => {
+    const user = req.user;
+    const role = String(user?.role || "").toLowerCase();
+    const allowed = roles.map(r => r.toLowerCase());
+    if (!user || !allowed.includes(role)) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+    next();
+  };
+}

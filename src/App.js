@@ -38,6 +38,9 @@ import AdminDashboardNavbar from "./components/adminDashboardNavbar";
 import AdminRoute from "./components/AdminRoute";
 import CreateQuiz from './components/CreateQuiz';
 import QuizCover from "./components/QuizCover";
+import ClassList from "./components/ClassList";
+// import ClassListTable from "./components/ClassListTable";
+
 
 function App() {
   return (
@@ -159,6 +162,14 @@ function App() {
                 <CreateQuiz />
               </SessionManager>
             } />
+
+<Route path="/course/:courseId/classlist" element={
+  <SessionManager><ClassList /></SessionManager>
+} />
+
+{/* <Route path="/course/:courseId/classlist-table" element={
+  <SessionManager><ClassListTable /></SessionManager>
+} /> */}
 
 <Route path="/course/:courseId/create-quiz" element={<CreateQuiz />} />
 

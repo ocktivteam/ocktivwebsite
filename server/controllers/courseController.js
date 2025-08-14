@@ -94,6 +94,12 @@
 
 
 import { Course } from "../models/Course.js";
+import { Enrollment } from "../models/Enrollment.js";
+import { ModuleProgress } from "../models/ModuleProgress.js";
+import { Certificate } from "../models/Certificate.js";
+import { Quiz } from "../models/Quiz.js";
+import mongoose from "mongoose";
+
 
 /**
  * Join instructor names naturally (Oxford comma style):
@@ -339,3 +345,165 @@ export const deleteCourse = async (req, res) => {
     res.status(500).json({ status: false, message: err.message });
   }
 };
+
+// GET: /api/courses/:id/classlist
+export const getClassListForCourse = async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({ status: false, message: "Invalid course id" });
+    }
+
+    // 1) Get course to know total modules
+    const course = await Course.findById(courseId).populate("modules", "_id");
+    if (!course) return res.status(404).json({ status: false, message: "Course not found" });
+    const totalModules = Array.isArray(course.modules) ? course.modules.length : 0;
+
+    // 2) Enrollments (students only)
+    const enrollments = await Enrollment.find({ course: courseId })
+      .populate({ path: "user", select: "firstName lastName email country role" });
+
+    const students = enrollments
+      .filter(e => e.user && (e.user.role === "student" || !e.user.role))
+      .map(e => ({
+        userId: String(e.user._id),
+        fullName: `${e.user.firstName} ${e.user.lastName}`.trim(),
+        email: e.user.email || "",
+        country: e.user.country || "",
+      }));
+
+    if (students.length === 0) {
+      return res.json({ status: true, students: [], meta: { totalModules, quizCount: 0 } });
+    }
+    const studentIds = students.map(s => new mongoose.Types.ObjectId(s.userId));
+
+    // 3) Module progress for these students in this course
+    const progressDocs = await ModuleProgress.find({
+      courseId: courseId,
+      userId: { $in: studentIds }
+    }).select("userId status completed updatedAt");
+
+    const perUserProgress = new Map(); // userId -> { started, completedCount, lastActive }
+    for (const p of progressDocs) {
+      const uid = String(p.userId);
+      const cur = perUserProgress.get(uid) || { started: false, completedCount: 0, lastActive: null };
+      if (p.status && p.status !== "not_started") cur.started = true;
+      if (p.completed) cur.completedCount += 1;
+      const ts = p.updatedAt ? new Date(p.updatedAt).getTime() : 0;
+      if (!cur.lastActive || ts > cur.lastActive) cur.lastActive = ts;
+      perUserProgress.set(uid, cur);
+    }
+
+    // 4) Quizzes + attempts (to detect "quiz started" AND pass state)
+    const quizzes = await Quiz.find({ courseId })
+      .select("_id questions passingRate studentAttempts");
+    const quizCount = quizzes.length;
+
+    // Prepare helpers for quiz status
+    const quizStartedByUser = new Map(); // userId -> { started: true, latest: ts }
+    const allQuizzesPassedByUser = new Map(); // userId -> boolean
+
+    // Initialize map for all users as true (will AND over quizzes)
+    for (const s of students) allQuizzesPassedByUser.set(s.userId, quizCount > 0 ? true : false);
+
+    for (const q of quizzes) {
+      const totalPoints = (q.questions || []).reduce((sum, qq) => sum + (qq.points || 1), 0);
+      const passRate = typeof q.passingRate === "number" ? q.passingRate : 0.8;
+      const passPoints = Math.ceil(totalPoints * passRate);
+
+      // Build latest attempt per user for this quiz
+      const latestByUser = new Map();
+      for (const att of (q.studentAttempts || [])) {
+        const uid = String(att.studentId);
+        if (!studentIds.some(id => String(id) === uid)) continue;
+        const existing = latestByUser.get(uid);
+        if (!existing || new Date(att.submittedAt) > new Date(existing.submittedAt)) {
+          latestByUser.set(uid, att);
+        }
+      }
+
+      // Update per-user quiz started + pass state
+      for (const s of students) {
+        const uid = s.userId;
+        const att = latestByUser.get(uid);
+        const entry = quizStartedByUser.get(uid) || { started: false, latest: null };
+        if (att) {
+          entry.started = true;
+          const ts = att.submittedAt ? new Date(att.submittedAt).getTime() : 0;
+          if (!entry.latest || ts > entry.latest) entry.latest = ts;
+          quizStartedByUser.set(uid, entry);
+
+          const passed = typeof att.score === "number" ? (att.score >= passPoints) : false;
+          const prevAll = allQuizzesPassedByUser.get(uid);
+          allQuizzesPassedByUser.set(uid, prevAll && passed);
+        } else {
+          // No attempt => mark not started and not passed
+          const prevAll = allQuizzesPassedByUser.get(uid);
+          allQuizzesPassedByUser.set(uid, quizCount > 0 ? false : prevAll);
+        }
+      }
+    }
+
+    // 5) Certificates per user
+    const certs = await Certificate.find({
+      course: courseId,
+      user: { $in: studentIds }
+    }).select("user issuedDate");
+
+    const certUsers = new Map(); // userId -> issuedAt ts
+    for (const c of certs) {
+      certUsers.set(String(c.user), c.issuedDate ? new Date(c.issuedDate).getTime() : null);
+    }
+
+    // 6) Merge -> output rows
+    const out = students.map(s => {
+      const prog = perUserProgress.get(s.userId) || { started: false, completedCount: 0, lastActive: null };
+      const quiz = quizStartedByUser.get(s.userId) || { started: false, latest: null };
+      const certTs = certUsers.get(s.userId) || null;
+
+      const moduleProgressPct = totalModules > 0
+        ? Math.round((prog.completedCount / totalModules) * 100)
+        : 0;
+
+      // Match AllContent.jsx logic: add a single "quiz step" if all quizzes are passed
+      const quizStepExists = quizCount > 0;
+      const allQuizzesPassed = allQuizzesPassedByUser.get(s.userId) || false;
+      const totalSteps = totalModules + (quizStepExists ? 1 : 0);
+      const completedSteps = prog.completedCount + (quizStepExists && allQuizzesPassed ? 1 : 0);
+      const courseProgressPct = totalSteps === 0 ? 0 : Math.round((completedSteps / totalSteps) * 100);
+
+      const lastActive = Math.max(
+        prog.lastActive || 0,
+        quiz.latest || 0,
+        certTs || 0
+      ) || null;
+
+      return {
+        userId: s.userId,
+        fullName: s.fullName,
+        email: s.email,
+        country: s.country,
+        moduleProgressPct,
+        courseProgressPct, // <- overall progress (modules + quiz step) like AllContent.jsx
+        status: {
+          moduleStarted: !!prog.started,
+          quizStarted: !!quiz.started,
+          certReceived: certUsers.has(s.userId),
+        },
+        lastActive: lastActive ? new Date(lastActive).toISOString() : null
+      };
+    });
+
+    out.sort((a, b) => a.fullName.localeCompare(b.fullName));
+
+    return res.json({
+      status: true,
+      students: out,
+      meta: { totalModules, quizCount }
+    });
+  } catch (err) {
+    console.error("getClassListForCourse error:", err);
+    return res.status(500).json({ status: false, message: "Failed to load class list" });
+  }
+};
+

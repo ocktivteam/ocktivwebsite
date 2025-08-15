@@ -469,8 +469,14 @@ function CourseNavbar() {
   };
 
   // ↓Open compose helpers
-  const openCompose = () => setShowEmailPopup(true);
-  const closeCompose = () => setShowEmailPopup(false);
+  const openCompose = () => {
+    if (user?.role === "student") {
+      setShowEmailPopup(true);
+    } else {
+      alert("This feature is only available for students.");
+    }
+  };
+    const closeCompose = () => setShowEmailPopup(false);
 
   const senderId = user?._id; // used by the popup
 

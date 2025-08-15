@@ -50,6 +50,10 @@ country:   {
     type: Date,
     default: null,
   },
+  lastLoginAt: {
+    type: Date,
+    default: null,
+  },
 }, { timestamps: true }); // Adds createdAt and updatedAt automatically
 
 const UserModel = mongoose.model("User", userSchema);

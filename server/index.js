@@ -16,6 +16,7 @@ import downloadRouter from "./routes/download.js";
 import quizRouter from "./routes/quizRoutes.js";
 import certificateRouter from "./routes/certificate.js";
 import { preventCache } from "./middleware/preventCache.js";
+import { emailRouter } from "./routes/emailRoutes.js";
 
 const app = express();
 
@@ -54,6 +55,10 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/download", downloadRouter);
 app.use("/api/quiz", preventCache, quizRouter);
 app.use("/api/certificate", preventCache, certificateRouter);
+console.log("Hitting Email route")
+console.log("emailRouter value is:", emailRouter);
+app.use("/api/email", emailRouter);
+console.log("hit email")
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

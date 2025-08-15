@@ -1,4 +1,3 @@
-
 // import React, { useEffect, useState, useRef } from "react";
 // import { useParams, useNavigate, useLocation } from "react-router-dom";
 // import axios from "axios";
@@ -181,13 +180,13 @@
 
 
 // export default function AllContent() {
-//     useSessionCheck();
+//   useSessionCheck();
 //   const { courseId } = useParams();
 //   const navigate = useNavigate();
 //   const user = getCurrentUser();
 //   const location = useLocation();
 //   const params = new URLSearchParams(location.search);
-// const isAdmin = params.get('admin') === '1';
+//   const isAdmin = params.get('admin') === '1';
 
 //   // [QUIZ-LOGIC-FIX] State logic for module idx & sidebar
 //   const [modules, setModules] = useState([]);
@@ -302,10 +301,9 @@
 //   useEffect(() => {
 //     if (!user || user.role !== "student" || !quizList.length) return;
     
-//       // Prevent refetching if already fetched
-//   const alreadyFetchedAll = quizList.every(q => studentQuizData[q._id]);
-//   if (alreadyFetchedAll) return;
-
+//     // Prevent refetching if already fetched
+//     const alreadyFetchedAll = quizList.every(q => studentQuizData[q._id]);
+//     if (alreadyFetchedAll) return;
 
 //     const fetchAll = async () => {
 //       let result = {};
@@ -532,44 +530,63 @@
 //       <div>
 //         <CourseNavbar />
 //         {isAdmin && (
-//       <div style={{ padding: 20, background: "#f5f5ff", margin: "0 0 20px 0", borderRadius: 9 }}>
-//         <button
-//           onClick={() => navigate("/admin-dashboard")}
-//           style={{
-//             background: "#1976d2",
-//             color: "#fff",
-//             border: "none",
-//             borderRadius: 6,
-//             fontSize: 16,
-//             padding: "10px 18px",
-//             cursor: "pointer",
-//             fontWeight: 600
-//           }}
-//         >
-//           ← Back to Admin Dashboard
-//         </button>
-//       </div>
-//     )}
+//           <div style={{ padding: 20, background: "#f5f5ff", margin: "0 0 20px 0", borderRadius: 9 }}>
+//             <button
+//               onClick={() => navigate("/admin-dashboard")}
+//               style={{
+//                 background: "#1976d2",
+//                 color: "#fff",
+//                 border: "none",
+//                 borderRadius: 6,
+//                 fontSize: 16,
+//                 padding: "10px 18px",
+//                 cursor: "pointer",
+//                 fontWeight: 600
+//               }}
+//             >
+//               ← Back to Admin Dashboard
+//             </button>
+//           </div>
+//         )}
 //         <div className="allcontent-body">
-//   <div className="allcontent-sidebar">
-//     <div className="allcontent-sidebar-header">Course Contents</div>
-//     <div className="allcontent-empty">
-//       {user?.role === "instructor" || user?.role === "professor" || user?.role === "admin" ? (
-//         <>You have not created any modules yet.</>
-//       ) : (
-//         <>
-//           No modules yet.<br />
-//           (Ask your instructor to add content.)
-//         </>
-//       )}
-//     </div>
+//           <div className="allcontent-sidebar">
+//             <div className="allcontent-sidebar-header">Course Contents</div>
+//             <div className="allcontent-empty">
+//               {user?.role === "instructor" || user?.role === "professor" || user?.role === "admin" ? (
+//                 <>You have not created any modules yet.</>
+//               ) : (
+//                 <>
+//                   No modules yet.<br />
+//                   (Ask your instructor to add content.)
+//                 </>
+//               )}
+//             </div>
 
-//   </div>
-// </div>
-// </div>
-// );
-// }
-// function handleModuleSelect(idx) {
+//             {/* === ALWAYS-SHOW ACTION BUTTONS FOR INSTRUCTORS/ADMINS (EMPTY STATE) === */}
+//             {(user?.role === "instructor" || user?.role === "admin") && (
+//               <div className="allcontent-sidebar-actions" style={{ marginTop: 12 }}>
+//                 <button
+//                   className="allcontent-sidebar-btn module"
+//                   onClick={handleAddModule}
+//                 >
+//                   Create a new module
+//                 </button>
+//                 <button
+//                   className="allcontent-sidebar-btn quiz"
+//                   onClick={() => navigate(`/course/${courseId}/create-quiz`)}
+//                 >
+//                   Create a new Quiz
+//                 </button>
+//               </div>
+//             )}
+//             {/* === END BUTTONS === */}
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   function handleModuleSelect(idx) {
 //     setSelectedIdx(idx);
 //     setSelectedSidebar("module");
 //     if (modules[idx]?._id && courseId && user?._id) {
@@ -585,206 +602,206 @@
        
 //         {/* Sidebar */}
 //         <aside className="allcontent-sidebar">
-//   {/* Sidebar Header */}
-//   <div
-//     className={`allcontent-sidebar-header${isMobile ? " centered" : ""}`}
-//     onClick={() => isMobile && setSidebarOpen((v) => !v)}
-//     style={{
-//       cursor: isMobile ? "pointer" : "default",
-//       width: "100%",
-//       display: "flex",
-//       alignItems: "center",
-//       justifyContent: isMobile ? "center" : "flex-start",
-//       gap: "8px",
-//       userSelect: "none"
-//     }}
-//   >
-//     Course Contents
-//     {isMobile && (
-//       sidebarOpen
-//         ? <FaChevronUp style={{ marginLeft: 8, fontSize: 16 }} />
-//         : <FaChevronDown style={{ marginLeft: 8, fontSize: 16 }} />
-//     )}
-//   </div>
-
-//   {/* Progress bar, if you have it */}
-//   {user?.role === "student" && (
-//     <div className="allcontent-progress-row">
-//       <div className="allcontent-progress-label">
-//         Progress: <span>{percentComplete}% ({completedSteps}/{totalSteps})</span>
-//       </div>
-//       <div className="allcontent-progress-bar-modern">
-//         <div
-//           className="allcontent-progress-bar-gradient"
-//           style={{
-//             width: `${percentComplete}%`
-//           }}
-//         ></div>
-//       </div>
-//     </div>
-//   )}
-
-//   {/* Module/Quiz List */}
-//   {(!isMobile || sidebarOpen) && (
-//     <div className="allcontent-module-list">
-//       {modules.map((mod, idx) => {
-//         const prog = progress[String(mod._id)];
-//         const isComplete = !!prog?.completed;
-//         const isOngoing = !isComplete && prog && prog.lastWatchedTime > 0;
-//         const isLocked = isModuleLocked(idx);
-
-//         return (
+//           {/* Sidebar Header */}
 //           <div
-//             className={
-//               "allcontent-module-item" +
-//               (selectedIdx === idx && selectedSidebar === "module" && (!isLocked || user?.role !== "student") ? " selected" : "") +
-//               (isLocked && user?.role === "student" ? " locked" : "")
-//             }
-//             key={mod._id}
-//             tabIndex={isLocked && user?.role === "student" ? -1 : 0}
-//             onClick={() => {
-//               if (!isLocked || user?.role !== "student") {
-//                 manualClickRef.current = true;
-//                 handleModuleSelect(idx);
-//               }
+//             className={`allcontent-sidebar-header${isMobile ? " centered" : ""}`}
+//             onClick={() => isMobile && setSidebarOpen((v) => !v)}
+//             style={{
+//               cursor: isMobile ? "pointer" : "default",
+//               width: "100%",
+//               display: "flex",
+//               alignItems: "center",
+//               justifyContent: isMobile ? "center" : "flex-start",
+//               gap: "8px",
+//               userSelect: "none"
 //             }}
-//             onMouseEnter={() => isLocked && user?.role === "student" && setToastIdx(idx)}
-//             onMouseLeave={() => isLocked && user?.role === "student" && setToastIdx(null)}
 //           >
-//             <span className="allcontent-module-title">{mod.moduleTitle}</span>
-//             <span className="allcontent-module-meta">
-//               {user?.role === "student" && (
-//                 isComplete ? (
-//                   <>
-//                     <MdDone className="status-icon done" />
-//                     <span className="allcontent-module-status done">Completed</span>
-//                   </>
-//                 ) : isOngoing ? (
-//                   <span className="allcontent-module-status ongoing">Ongoing</span>
-//                 ) : isLocked ? (
-//                   <>
-//                     <span className="allcontent-module-status locked">Not Started</span>
-//                     <FaLock className="lock-icon" />
-//                     {toastIdx === idx && (
-//                       <span className="locked-toast">Complete previous <br />module to unlock</span>
-//                     )}
-//                   </>
-//                 ) : (
-//                   <span className="allcontent-module-status notstarted">Not Started</span>
-//                 )
-//               )}
-//             </span>
+//             Course Contents
+//             {isMobile && (
+//               sidebarOpen
+//                 ? <FaChevronUp style={{ marginLeft: 8, fontSize: 16 }} />
+//                 : <FaChevronDown style={{ marginLeft: 8, fontSize: 16 }} />
+//             )}
 //           </div>
-//         );
-//       })}
 
-//       {/* === QUIZ SIDEBAR ITEM ONLY IF QUIZZES EXIST === */}
-//       {quizStepExists && (
-//         <div
-//           className={
-//             "allcontent-module-item" +
-//             (selectedSidebar === "quiz" ? " selected" : "") +
-//             ((user?.role === "student" && completedModules !== totalModules) ? " locked" : "")
-//           }
-//           tabIndex={(user?.role === "student" && completedModules !== totalModules) ? -1 : 0}
-//           onClick={() => {
-//             if (user?.role !== "student" || (completedModules === totalModules && totalModules > 0)) {
-//               setSelectedSidebar("quiz");
-//               if (user?._id) {
-//                 localStorage.setItem(`lastSelectedSidebar_${user._id}_${courseId}`, "quiz");
-//               }
-//             }
-//           }}
-//         >
-//           <span className="allcontent-module-title">Quiz</span>
-//           <span className="allcontent-module-meta">
-//             {user?.role === "student" && (
-//               allQuizzesPassed ? (
-//                 <>
-//                   <MdDone className="status-icon done" />
-//                   <span className="allcontent-module-status done">Completed</span>
-//                 </>
-//               ) : (
-//                 (() => {
-//                   // Find if at least one quiz is attempted
-//                   const anyAttempted = quizList.some(q => (studentQuizData[q._id] || []).length > 0);
-//                   return anyAttempted ? (
-//                     <span className="allcontent-module-status ongoing">Ongoing</span>
-//                   ) : (
-//                     <>
-//                       <span className="allcontent-module-status locked">Not Started</span>
-//                       {(completedModules !== totalModules) && <FaLock className="lock-icon" />}
-//                     </>
-//                   );
-//                 })()
-//               )
-//             )}
-//           </span>
-//         </div>
-//       )}
-//       {/* === END QUIZ SIDEBAR ITEM === */}
+//           {/* Progress bar, if you have it */}
+//           {user?.role === "student" && (
+//             <div className="allcontent-progress-row">
+//               <div className="allcontent-progress-label">
+//                 Progress: <span>{percentComplete}% ({completedSteps}/{totalSteps})</span>
+//               </div>
+//               <div className="allcontent-progress-bar-modern">
+//                 <div
+//                   className="allcontent-progress-bar-gradient"
+//                   style={{
+//                     width: `${percentComplete}%`
+//                   }}
+//                 ></div>
+//               </div>
+//             </div>
+//           )}
 
-//       {/* === BUTTONS IN SIDEBAR === */}
-//       {(user?.role === "instructor" || user?.role === "admin") && (
-//   <div className="allcontent-sidebar-actions">
-//     <button
-//       className="allcontent-sidebar-btn module"
-//       onClick={handleAddModule}
-//     >
-//       Create a new module
-//     </button>
-//     <button
-//       className="allcontent-sidebar-btn quiz"
-//       onClick={() => navigate(`/course/${courseId}/create-quiz`)}
-//     >
-//       Create a new Quiz
-//     </button>
-//   </div>
-// )}
-//       {/* === END BUTTONS === */}
+//           {/* Module/Quiz List */}
+//           {(!isMobile || sidebarOpen) && (
+//             <div className="allcontent-module-list">
+//               {modules.map((mod, idx) => {
+//                 const prog = progress[String(mod._id)];
+//                 const isComplete = !!prog?.completed;
+//                 const isOngoing = !isComplete && prog && prog.lastWatchedTime > 0;
+//                 const isLocked = isModuleLocked(idx);
 
-//       {/* CERTIFICATE, IF NEEDED */}
-//       {user?.role === "student" && (
-//         <div
-//           className={
-//             "allcontent-module-item" +
-//             (selectedSidebar === "certificate" ? " selected" : "") +
-//             ((completedModules !== totalModules || !allQuizzesPassed) ? " locked" : "")
-//           }
-//           tabIndex={(completedModules !== totalModules || !allQuizzesPassed) ? -1 : 0}
-//           onClick={() => {
-//             if (completedModules === totalModules && allQuizzesPassed) {
-//               setSelectedSidebar("certificate");
-//               if (user?._id) {
-//                 localStorage.setItem(`lastSelectedSidebar_${user._id}_${courseId}`, "certificate");
-//               }
-//             }
-//           }}
-//         >
-//           <span className="allcontent-module-title">Certificate</span>
-//           <span className="allcontent-module-meta">
-//             {(completedModules === totalModules && allQuizzesPassed) ? (
-//               <>
-//                 <MdDone className="status-icon done" />
-//                 <span className="allcontent-module-status done">Unlocked</span>
-//               </>
-//             ) : (
-//               <>
-//                 <span className="allcontent-module-status locked">Locked</span>
-//                 <FaLock className="lock-icon" />
-//               </>
-//             )}
-//           </span>
-//         </div>
-//       )}
-//     </div>
-//   )}
+//                 return (
+//                   <div
+//                     className={
+//                       "allcontent-module-item" +
+//                       (selectedIdx === idx && selectedSidebar === "module" && (!isLocked || user?.role !== "student") ? " selected" : "") +
+//                       (isLocked && user?.role === "student" ? " locked" : "")
+//                     }
+//                     key={mod._id}
+//                     tabIndex={isLocked && user?.role === "student" ? -1 : 0}
+//                     onClick={() => {
+//                       if (!isLocked || user?.role !== "student") {
+//                         manualClickRef.current = true;
+//                         handleModuleSelect(idx);
+//                       }
+//                     }}
+//                     onMouseEnter={() => isLocked && user?.role === "student" && setToastIdx(idx)}
+//                     onMouseLeave={() => isLocked && user?.role === "student" && setToastIdx(null)}
+//                   >
+//                     <span className="allcontent-module-title">{mod.moduleTitle}</span>
+//                     <span className="allcontent-module-meta">
+//                       {user?.role === "student" && (
+//                         isComplete ? (
+//                           <>
+//                             <MdDone className="status-icon done" />
+//                             <span className="allcontent-module-status done">Completed</span>
+//                           </>
+//                         ) : isOngoing ? (
+//                           <span className="allcontent-module-status ongoing">Ongoing</span>
+//                         ) : isLocked ? (
+//                           <>
+//                             <span className="allcontent-module-status locked">Not Started</span>
+//                             <FaLock className="lock-icon" />
+//                             {toastIdx === idx && (
+//                               <span className="locked-toast">Complete previous <br />module to unlock</span>
+//                             )}
+//                           </>
+//                         ) : (
+//                           <span className="allcontent-module-status notstarted">Not Started</span>
+//                         )
+//                       )}
+//                     </span>
+//                   </div>
+//                 );
+//               })}
 
-//   {/* Sidebar Footer */}
-//   <div className="allcontent-sidebar-footer">
-//     Customer Support: <a href="mailto:support@ocktiv.com">support@ocktiv.com</a>
-//   </div>
-// </aside>
+//               {/* === QUIZ SIDEBAR ITEM ONLY IF QUIZZES EXIST === */}
+//               {quizStepExists && (
+//                 <div
+//                   className={
+//                     "allcontent-module-item" +
+//                     (selectedSidebar === "quiz" ? " selected" : "") +
+//                     ((user?.role === "student" && completedModules !== totalModules) ? " locked" : "")
+//                   }
+//                   tabIndex={(user?.role === "student" && completedModules !== totalModules) ? -1 : 0}
+//                   onClick={() => {
+//                     if (user?.role !== "student" || (completedModules === totalModules && totalModules > 0)) {
+//                       setSelectedSidebar("quiz");
+//                       if (user?._id) {
+//                         localStorage.setItem(`lastSelectedSidebar_${user._id}_${courseId}`, "quiz");
+//                       }
+//                     }
+//                   }}
+//                 >
+//                   <span className="allcontent-module-title">Quiz</span>
+//                   <span className="allcontent-module-meta">
+//                     {user?.role === "student" && (
+//                       allQuizzesPassed ? (
+//                         <>
+//                           <MdDone className="status-icon done" />
+//                           <span className="allcontent-module-status done">Completed</span>
+//                         </>
+//                       ) : (
+//                         (() => {
+//                           // Find if at least one quiz is attempted
+//                           const anyAttempted = quizList.some(q => (studentQuizData[q._id] || []).length > 0);
+//                           return anyAttempted ? (
+//                             <span className="allcontent-module-status ongoing">Ongoing</span>
+//                           ) : (
+//                             <>
+//                               <span className="allcontent-module-status locked">Not Started</span>
+//                               {(completedModules !== totalModules) && <FaLock className="lock-icon" />}
+//                             </>
+//                           );
+//                         })()
+//                       )
+//                     )}
+//                   </span>
+//                 </div>
+//               )}
+//               {/* === END QUIZ SIDEBAR ITEM === */}
+
+//               {/* === BUTTONS IN SIDEBAR === */}
+//               {(user?.role === "instructor" || user?.role === "admin") && (
+//                 <div className="allcontent-sidebar-actions">
+//                   <button
+//                     className="allcontent-sidebar-btn module"
+//                     onClick={handleAddModule}
+//                   >
+//                     Create a new module
+//                   </button>
+//                   <button
+//                     className="allcontent-sidebar-btn quiz"
+//                     onClick={() => navigate(`/course/${courseId}/create-quiz`)}
+//                   >
+//                     Create a new Quiz
+//                   </button>
+//                 </div>
+//               )}
+//               {/* === END BUTTONS === */}
+
+//               {/* CERTIFICATE, IF NEEDED */}
+//               {user?.role === "student" && (
+//                 <div
+//                   className={
+//                     "allcontent-module-item" +
+//                     (selectedSidebar === "certificate" ? " selected" : "") +
+//                     ((completedModules !== totalModules || !allQuizzesPassed) ? " locked" : "")
+//                   }
+//                   tabIndex={(completedModules !== totalModules || !allQuizzesPassed) ? -1 : 0}
+//                   onClick={() => {
+//                     if (completedModules === totalModules && allQuizzesPassed) {
+//                       setSelectedSidebar("certificate");
+//                       if (user?._id) {
+//                         localStorage.setItem(`lastSelectedSidebar_${user._id}_${courseId}`, "certificate");
+//                       }
+//                     }
+//                   }}
+//                 >
+//                   <span className="allcontent-module-title">Certificate</span>
+//                   <span className="allcontent-module-meta">
+//                     {(completedModules === totalModules && allQuizzesPassed) ? (
+//                       <>
+//                         <MdDone className="status-icon done" />
+//                         <span className="allcontent-module-status done">Unlocked</span>
+//                       </>
+//                     ) : (
+//                       <>
+//                         <span className="allcontent-module-status locked">Locked</span>
+//                         <FaLock className="lock-icon" />
+//                       </>
+//                     )}
+//                   </span>
+//                 </div>
+//               )}
+//             </div>
+//           )}
+
+//           {/* Sidebar Footer */}
+//           <div className="allcontent-sidebar-footer">
+//             Customer Support: <a href="mailto:support@ocktiv.com">support@ocktiv.com</a>
+//           </div>
+//         </aside>
 
 //         {/* Main content */}
 //         <main className="allcontent-main">
@@ -857,9 +874,9 @@
 //                 </div>
 //                 <div className="allcontent-desc-label">Lectures Description</div>
 //                 <div
-//   className="allcontent-desc-body"
-//   dangerouslySetInnerHTML={{ __html: renderCustomNodes(descriptionWithoutYouTube) }}
-// />
+//                   className="allcontent-desc-body"
+//                   dangerouslySetInnerHTML={{ __html: renderCustomNodes(descriptionWithoutYouTube) }}
+//                 />
 
 //                 {attachedFiles.length > 0 && (
 //                   <div className="allcontent-files-section">
@@ -918,39 +935,39 @@
 //                   </div>
 //                 )}
 //                 {user?.role === "student" &&
-//   !hasYoutubeVideo(selectedModule) &&
-//   !progress[selectedModule._id]?.completed && (
-//     <div
-//       style={{
-//         margin: "42px 0 0 0",
-//         display: "flex",
-//         justifyContent: "flex-end",
-//         minHeight: 80,
-//       }}
-//     >
-//       <button
-//         className="allcontent-next-btn"
-//         style={{
-//           padding: "12px 30px",
-//           fontSize: "1.07rem",
-//           borderRadius: "7px",
-//           fontWeight: 600,
-//           color: "#fff",
-//           background: "#1664b6",
-//           border: "none",
-//           cursor: "pointer",
-//           boxShadow: "0 2px 10px 0 rgba(60, 105, 190, 0.13)",
-//           marginBottom: 30,
-//         }}
-//         onClick={handleManualCompleteAndNext}
-//       >
-//         {selectedIdx < modules.length - 1 
-//           ? "Mark as Complete & Next Module"
-//           : "Mark as Complete"
-//         }
-//       </button>
-//     </div>
-//   )}
+//                   !hasYoutubeVideo(selectedModule) &&
+//                   !progress[selectedModule._id]?.completed && (
+//                     <div
+//                       style={{
+//                         margin: "42px 0 0 0",
+//                         display: "flex",
+//                         justifyContent: "flex-end",
+//                         minHeight: 80,
+//                       }}
+//                     >
+//                       <button
+//                         className="allcontent-next-btn"
+//                         style={{
+//                           padding: "12px 30px",
+//                           fontSize: "1.07rem",
+//                           borderRadius: "7px",
+//                           fontWeight: 600,
+//                           color: "#fff",
+//                           background: "#1664b6",
+//                           border: "none",
+//                           cursor: "pointer",
+//                           boxShadow: "0 2px 10px 0 rgba(60, 105, 190, 0.13)",
+//                           marginBottom: 30,
+//                         }}
+//                         onClick={handleManualCompleteAndNext}
+//                       >
+//                         {selectedIdx < modules.length - 1 
+//                           ? "Mark as Complete & Next Module"
+//                           : "Mark as Complete"
+//                         }
+//                       </button>
+//                     </div>
+//                   )}
 
 //               </>
 //             )
@@ -962,8 +979,7 @@
 // }
 
 
-
-//  === new ===
+// new
 
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -1223,6 +1239,15 @@ export default function AllContent() {
       setError("Delete failed. Try again.");
       setDeleting(false);
     }
+  }
+
+  // [QUIZ-BLOCK] Single gate for Create-Quiz actions
+  function handleCreateQuiz() {
+    if (modules.length === 0) {
+      alert("Please create at least one module before creating a quiz.");
+      return;
+    }
+    navigate(`/course/${courseId}/create-quiz`);
   }
 
   // [QUIZ-LOGIC] Only set selectedIdx if on "module" tab
@@ -1540,7 +1565,11 @@ export default function AllContent() {
                 </button>
                 <button
                   className="allcontent-sidebar-btn quiz"
-                  onClick={() => navigate(`/course/${courseId}/create-quiz`)}
+                  onClick={handleCreateQuiz}                 // [QUIZ-BLOCK]
+                  disabled={true}                              // [QUIZ-BLOCK] disabled in empty state
+                  aria-disabled="true"
+                  title="Create at least one module first"
+                  style={{ opacity: 0.6, cursor: "not-allowed" }}
                 >
                   Create a new Quiz
                 </button>
@@ -1719,7 +1748,10 @@ export default function AllContent() {
                   </button>
                   <button
                     className="allcontent-sidebar-btn quiz"
-                    onClick={() => navigate(`/course/${courseId}/create-quiz`)}
+                    onClick={handleCreateQuiz}             // [QUIZ-BLOCK]
+                    disabled={modules.length === 0}         // [QUIZ-BLOCK] (defensive; should be false here)
+                    aria-disabled={modules.length === 0}
+                    title={modules.length === 0 ? "Create at least one module first" : undefined}
                   >
                     Create a new Quiz
                   </button>

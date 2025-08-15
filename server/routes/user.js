@@ -9,7 +9,6 @@ import nodemailer from "nodemailer";
 import { jwtMiddleware } from "../middleware/jwtMiddleware.js";
 import { checkAdmin } from "../middleware/checkAdmin.js";
 
-
 const router = express.Router();
 
 // ======================== SIGN UP ========================
@@ -35,6 +34,7 @@ router.post("/signup", async (req, res) => {
             password: hashed,
             role: userRole
         });
+        newUser.lastLoginAt = new Date();
         await newUser.save();
 
         // Create JWT
@@ -77,6 +77,9 @@ router.post("/login", async (req, res) => {
         if (!valid) {
             return res.status(401).json({ status: false, message: "Password is incorrect" });
         }
+
+        user.lastLoginAt = new Date();
+        await user.save();        
 
         // Create JWT
         const token = jwt.sign(
@@ -235,14 +238,14 @@ router.get("/instructors", jwtMiddleware, checkAdmin, async (req, res) => {
 // DELETE an instructor by ID
 router.delete("/instructors/:id", jwtMiddleware, checkAdmin, async (req, res) => {
     try {
-      const deleted = await User.findByIdAndDelete(req.params.id);
-      if (!deleted) return res.status(404).json({ status: false, message: "Instructor not found" });
-      res.json({ status: true, message: "Instructor deleted" });
+        const deleted = await User.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).json({ status: false, message: "Instructor not found" });
+        res.json({ status: true, message: "Instructor deleted" });
     } catch (err) {
-      res.status(500).json({ status: false, message: err.message });
+        res.status(500).json({ status: false, message: err.message });
     }
-  });
-  
+});
+
 
 // ================== UPDATE LEGAL NAME & COUNTRY AFTER PAYMENT ==================
 router.patch("/:id/legal-country", async (req, res) => {
@@ -265,31 +268,31 @@ router.patch("/:id/legal-country", async (req, res) => {
 // ================== UPDATE INSTRUCTOR ==================
 router.put("/instructors/:id", async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
-  
-    try {
-      const existing = await User.findById(req.params.id);
-      if (!existing || existing.role !== "instructor") {
-        return res.status(404).json({ status: false, message: "Instructor not found" });
-      }
-  
-      existing.firstName = firstName || existing.firstName;
-      existing.lastName = lastName || existing.lastName;
-      existing.email = email || existing.email;
-  
-      // Update password only if provided
-      if (password) {
-        const hashed = await bcrypt.hash(password, 10);
-        existing.password = hashed;
-      }
-  
-      await existing.save();
-  
-      res.json({ status: true, message: "Instructor updated", instructor: existing });
-    } catch (err) {
-      console.error("Update instructor error:", err);
-      res.status(500).json({ status: false, message: "Failed to update instructor" });
-    }
-  });
 
-  
+    try {
+        const existing = await User.findById(req.params.id);
+        if (!existing || existing.role !== "instructor") {
+            return res.status(404).json({ status: false, message: "Instructor not found" });
+        }
+
+        existing.firstName = firstName || existing.firstName;
+        existing.lastName = lastName || existing.lastName;
+        existing.email = email || existing.email;
+
+        // Update password only if provided
+        if (password) {
+            const hashed = await bcrypt.hash(password, 10);
+            existing.password = hashed;
+        }
+
+        await existing.save();
+
+        res.json({ status: true, message: "Instructor updated", instructor: existing });
+    } catch (err) {
+        console.error("Update instructor error:", err);
+        res.status(500).json({ status: false, message: "Failed to update instructor" });
+    }
+});
+
+
 export { router as userRouter };

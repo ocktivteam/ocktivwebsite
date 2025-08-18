@@ -1,6 +1,5 @@
 // // src/components/courseNavbar.jsx
-
-// import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect, useMemo } from "react";
 // import { useNavigate, useParams } from "react-router-dom";
 // import axios from "axios";
 // import "../style/courseNavbar.css";
@@ -16,7 +15,8 @@
 //     ? "http://localhost:3000/course-shell"
 //     : "https://ocktivwebsite.vercel.app/course-shell";
 
-// const TABS = [
+// // Base tabs (we'll insert Class List dynamically after Content)
+// const BASE_TABS = [
 //   { label: "Content", path: "content" },
 //   { label: "News", path: "news" },
 //   //{ label: "Evaluation", path: "evaluation" },
@@ -62,10 +62,8 @@
 //     // Clear all session data
 //     localStorage.removeItem("authToken");
 //     localStorage.removeItem("user");
-    
 //     // Use replace to prevent going back
 //     navigate('/login', { replace: true });
-    
 //     // Prevent back button
 //     window.history.pushState(null, '', window.location.href);
 //     window.onpopstate = function () {
@@ -81,10 +79,21 @@
 //     ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
 //     : "";
 
+//   // Build tabs dynamically: insert "Class List" after Content for instructors/admins only
+//   const tabs = useMemo(() => {
+//     const arr = [...BASE_TABS];
+//     const canSeeClassList = user && (user.role === "instructor" || user.role === "admin");
+//     if (canSeeClassList) {
+//       // Insert right after "Content" (index 0)
+//       arr.splice(1, 0, { label: "Class List", path: "classlist" });
+//     }
+//     return arr;
+//   }, [user]);
+
 //   // For tab highlight, check location
 //   const currentPath = window.location.pathname;
 //   const getActiveTab = () => {
-//     for (const t of TABS) {
+//     for (const t of tabs) {
 //       if (currentPath.includes(t.path)) return t.label;
 //     }
 //     return "Content";
@@ -98,6 +107,9 @@
 //       case "Content":
 //         navigate(`/course/${courseId}`);
 //         break;
+//       case "Class List":
+//         navigate(`/course/${courseId}/classlist`);
+//         break;
 //       case "News":
 //         navigate(`/news?courseId=${courseId}`);
 //         break;
@@ -105,6 +117,7 @@
 //       //   navigate(`/evaluation?courseId=${courseId}`);
 //       //   break;
 //       case "Assignment":
+//       case "Assignments": // handle both just in case
 //         navigate(`/course/${courseId}/assignment`);
 //         break;
 //       case "Gradebook":
@@ -139,17 +152,17 @@
 //       {/* Top Navbar */}
 //       <nav className="course-navbar">
 //         <div className="course-navbar-left">
-//         <a
-//   href="https://ocktiv.com/"
-//   target="_blank"
-//   rel="noopener noreferrer"
-// >
-//   <img
-//     src="/img/GreenLogoOnly.png"
-//     alt="Course Logo"
-//     className="course-navbar-logo"
-//   />
-// </a>
+//           <a
+//             href="https://ocktiv.com/"
+//             target="_blank"
+//             rel="noopener noreferrer"
+//           >
+//             <img
+//               src="/img/GreenLogoOnly.png"
+//               alt="Course Logo"
+//               className="course-navbar-logo"
+//             />
+//           </a>
 //           <span className="course-navbar-title">{courseTitle}</span>
 //         </div>
 //         {/* Desktop Right */}
@@ -271,7 +284,7 @@
 //       </nav>
 //       {/* Second (Green) Navbar */}
 //       <div className="course-tabs-navbar desktop-tabs">
-//         {TABS.map(tab => (
+//         {tabs.map(tab => (
 //           <button
 //             key={tab.label}
 //             className={`course-tab-btn${activeTab === tab.label ? " active" : ""}`}
@@ -291,7 +304,7 @@
 //             aria-label="Close menu"
 //           >&times;</button>
 //           <ul>
-//             {TABS.map(tab => (
+//             {tabs.map(tab => (
 //               <li key={tab.label}>
 //                 <button
 //                   className={`course-tab-btn${activeTab === tab.label ? " active" : ""}`}
@@ -312,7 +325,7 @@
 // export default CourseNavbar;
 
 
-// New Aug 12
+// === mew 
 
 // src/components/courseNavbar.jsx
 import React, { useState, useEffect, useMemo } from "react";
@@ -480,6 +493,11 @@ function CourseNavbar() {
 
   const senderId = user?._id; // used by the popup
 
+  // Handle profile navigation
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+
   return (
     <>
       {/* Top Navbar */}
@@ -531,7 +549,14 @@ function CourseNavbar() {
             <MdNotificationsNone className="course-icon" size={36} />
           </button>
           <span className="course-user-initials">{initials}</span>
-          <span className="course-user-fullname">{fullName}</span>
+          <span 
+            className="course-user-fullname clickable-name" 
+            onClick={handleProfileClick}
+            style={{ cursor: 'pointer' }}
+            title="Go to Profile"
+          >
+            {fullName}
+          </span>
           <button className="course-navbar-logout-btn" onClick={handleLogout}>
             Logout
           </button>
@@ -591,7 +616,14 @@ function CourseNavbar() {
                 </span>
               </li>
               <li>
-                <span className="course-menu-link course-user-initials" style={{ marginRight: 8 }}>{initials}</span> {fullName}
+                <span className="course-menu-link course-user-initials" style={{ marginRight: 8 }}>{initials}</span> 
+                <span 
+                  className="course-menu-link clickable-name" 
+                  onClick={() => { setMenuOpen(false); handleProfileClick(); }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {fullName}
+                </span>
               </li>
               <li>
                 <button

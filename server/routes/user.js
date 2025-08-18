@@ -295,4 +295,84 @@ router.put("/instructors/:id", async (req, res) => {
 });
 
 
+// ======================== GET PROFILE ========================
+router.get("/profile", jwtMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password -resetToken -resetTokenExpiration");
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+    res.json({ status: true, user });
+  } catch (err) {
+    console.error("Get profile error:", err);
+    res.status(500).json({ status: false, message: "Failed to fetch profile" });
+  }
+});
+
+// ======================== UPDATE PROFILE ========================
+router.put("/profile", jwtMiddleware, async (req, res) => {
+  const { firstName, lastName, email, country } = req.body;
+  
+  try {
+    // Check if email is being changed and if it's already taken
+    if (email !== req.user.email) {
+      const existingUser = await User.findOne({ 
+        email: new RegExp('^' + email + '$', 'i'),
+        _id: { $ne: req.userId }
+      });
+      if (existingUser) {
+        return res.status(400).json({ status: false, message: "Email already exists" });
+      }
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { 
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        country: country.trim()
+      },
+      { new: true }
+    ).select("-password -resetToken -resetTokenExpiration");
+
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    res.json({ status: true, message: "Profile updated successfully", user });
+  } catch (err) {
+    console.error("Update profile error:", err);
+    res.status(500).json({ status: false, message: "Failed to update profile" });
+  }
+});
+
+// ======================== CHANGE PASSWORD ========================
+router.put("/change-password", jwtMiddleware, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    // Verify current password
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+      return res.status(400).json({ status: false, message: "Current password is incorrect" });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ status: true, message: "Password changed successfully" });
+  } catch (err) {
+    console.error("Change password error:", err);
+    res.status(500).json({ status: false, message: "Failed to change password" });
+  }
+});
+  
 export { router as userRouter };

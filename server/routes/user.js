@@ -4,6 +4,7 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "../models/User.js";
+import { Certificate } from "../models/Certificate.js"; 
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { jwtMiddleware } from "../middleware/jwtMiddleware.js";
@@ -234,7 +235,6 @@ router.get("/instructors", jwtMiddleware, checkAdmin, async (req, res) => {
     }
 });
 
-
 // DELETE an instructor by ID
 router.delete("/instructors/:id", jwtMiddleware, checkAdmin, async (req, res) => {
     try {
@@ -245,7 +245,6 @@ router.delete("/instructors/:id", jwtMiddleware, checkAdmin, async (req, res) =>
         res.status(500).json({ status: false, message: err.message });
     }
 });
-
 
 // ================== UPDATE LEGAL NAME & COUNTRY AFTER PAYMENT ==================
 router.patch("/:id/legal-country", async (req, res) => {
@@ -375,4 +374,72 @@ router.put("/change-password", jwtMiddleware, async (req, res) => {
   }
 });
   
+// ========================= UPDATE LEGAL NAME (SELF) =========================
+// PATCH /api/users/legal-name
+// Body: { legalName }
+// Rules:
+//  - Cannot change if any certificate exists (Certificate.user = user._id)
+//  - Can only change once before certificates (legalNameChangeCount < 1)
+router.patch("/legal-name", jwtMiddleware, async (req, res) => {
+    try {
+      const { legalName } = req.body || {};
+      const next = String(legalName || "").trim();
+      if (next.length < 2) {
+        return res.status(400).json({ status: false, message: "Valid legalName is required" });
+      }
+  
+      const user = await User.findById(req.userId);
+      if (!user) return res.status(404).json({ status: false, message: "User not found" });
+  
+      // No-op if same value (does not consume the one-time allowance)
+      const current = String(user.legalName || "").trim();
+      if (current.toLowerCase() === next.toLowerCase()) {
+        return res.json({
+          status: true,
+          message: "Legal name unchanged",
+          legalName: user.legalName,
+          meta: {
+            hasAnyCertificate: !!(await Certificate.exists({ user: user._id })),
+            remainingLegalNameChanges: Math.max(0, 1 - (user.legalNameChangeCount || 0)),
+          }
+        });
+      }
+  
+      // Block if any certificate exists
+      const hasAnyCertificate = await Certificate.exists({ user: user._id });
+      if (hasAnyCertificate) {
+        return res.status(403).json({
+          status: false,
+          message: "Legal name cannot be changed after a certificate is generated. Please contact support."
+        });
+      }
+  
+      // Enforce one-time change
+      const used = user.legalNameChangeCount || 0;
+      if (used >= 1) {
+        return res.status(403).json({
+          status: false,
+          message: "You have already used your one-time legal name change. Please contact support for further changes."
+        });
+      }
+  
+      user.legalName = next;
+      user.legalNameChangeCount = used + 1;
+      await user.save();
+  
+      return res.json({
+        status: true,
+        message: "Legal name updated. Heads up: you can’t change it again—contact support if you need a correction.",
+        legalName: user.legalName,
+        meta: {
+          hasAnyCertificate: false,
+          remainingLegalNameChanges: Math.max(0, 1 - (user.legalNameChangeCount || 0))
+        }
+      });
+    } catch (err) {
+      console.error("PATCH /legal-name error:", err);
+      res.status(500).json({ status: false, message: "Server error" });
+    }
+  });
+
 export { router as userRouter };

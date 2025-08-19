@@ -34,6 +34,12 @@ function DashboardNavbar() {
     };
   };
 
+  const handleProfileClick = () => {
+    setMenuOpen(false);        // close mobile menu if open
+    navigate('/profile');      // go to profile
+  };
+
+
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; }
@@ -86,8 +92,31 @@ function DashboardNavbar() {
         >
           <MdNotificationsNone className="dashboard-icon" size={48} />
         </button>
-        <span className="dashboard-user-initials">{initials}</span>
-        <span className="dashboard-user-fullname">{fullName}</span>
+        {/* <span className="dashboard-user-initials">{initials}</span>
+        <span className="dashboard-user-fullname">{fullName}</span> */}
+                <span
+          className="dashboard-user-initials clickable-name"
+          onClick={handleProfileClick}
+          title="Go to Profile"
+          style={{ cursor: 'pointer' }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleProfileClick()}
+        >
+          {initials}
+        </span>
+        <span
+          className="dashboard-user-fullname clickable-name"
+          onClick={handleProfileClick}
+          title="Go to Profile"
+          style={{ cursor: 'pointer' }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleProfileClick()}
+        >
+          {fullName}
+        </span>
+
         <button className="dashboard-navbar-login-btn" onClick={handleLogout}>
           Logout
         </button>
@@ -125,9 +154,28 @@ function DashboardNavbar() {
                 <MdNotificationsNone className="dashboard-icon" style={{marginRight: 8}} size={16}/> Notifications
               </span>
             </li>
-            <li>
+            {/* <li>
               <span className="dashboard-apple-menu-link dashboard-user-initials" style={{marginRight: 8}}>{initials}</span> {fullName}
+            </li> */}
+                        <li>
+              <span
+                className="dashboard-apple-menu-link dashboard-user-initials clickable-name"
+                style={{ marginRight: 8, cursor: 'pointer' }}
+                title="Go to Profile"
+                onClick={() => { setMenuOpen(false); handleProfileClick(); }}
+              >
+                {initials}
+              </span>
+              <span
+                className="dashboard-apple-menu-link clickable-name"
+                style={{ cursor: 'pointer' }}
+                title="Go to Profile"
+                onClick={() => { setMenuOpen(false); handleProfileClick(); }}
+              >
+                {fullName}
+              </span>
             </li>
+
             <li>
               <button
                 className="dashboard-apple-menu-link"

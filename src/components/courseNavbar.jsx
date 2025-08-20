@@ -4,6 +4,7 @@
 // import axios from "axios";
 // import "../style/courseNavbar.css";
 // import { MdOutlineMail, MdNotificationsNone, MdHome } from "react-icons/md"; // <-- Add MdHome
+// import EmailComposePopup from "./EmailComposePopup";
 
 // const COURSE_API =
 //   window.location.hostname === "localhost"
@@ -32,6 +33,8 @@
 //   const [user, setUser] = useState(null);
 //   const [menuOpen, setMenuOpen] = useState(false);
 //   const [tabOpen, setTabOpen] = useState(false);
+
+//   const [showEmailPopup, setShowEmailPopup] = useState(false);
 
 //   useEffect(() => {
 //     // Get user info from localStorage
@@ -62,8 +65,10 @@
 //     // Clear all session data
 //     localStorage.removeItem("authToken");
 //     localStorage.removeItem("user");
+    
 //     // Use replace to prevent going back
 //     navigate('/login', { replace: true });
+    
 //     // Prevent back button
 //     window.history.pushState(null, '', window.location.href);
 //     window.onpopstate = function () {
@@ -146,7 +151,24 @@
 //       window.location.href = COURSE_SHELL_URL;
 //     }
 //   };
-  
+
+//   // ↓Open compose helpers
+//   const openCompose = () => {
+//     if (user?.role === "student") {
+//       setShowEmailPopup(true);
+//     } else {
+//       alert("This feature is only available for students.");
+//     }
+//   };
+//     const closeCompose = () => setShowEmailPopup(false);
+
+//   const senderId = user?._id; // used by the popup
+
+//   // Handle profile navigation
+//   const handleProfileClick = () => {
+//     navigate('/profile');
+//   };
+
 //   return (
 //     <>
 //       {/* Top Navbar */}
@@ -178,12 +200,12 @@
 //             <MdHome className="course-icon" size={36} />
 //           </button>
 //           {/* EMAIL ICON */}
-//           <button
+//            <button
 //             className="course-icon-btn"
 //             title="Email"
 //             aria-label="Email"
 //             type="button"
-//             onClick={() => alert("Email clicked!")}
+//             onClick={openCompose}
 //           >
 //             <MdOutlineMail className="course-icon" size={36} />
 //           </button>
@@ -198,7 +220,14 @@
 //             <MdNotificationsNone className="course-icon" size={36} />
 //           </button>
 //           <span className="course-user-initials">{initials}</span>
-//           <span className="course-user-fullname">{fullName}</span>
+//           <span 
+//             className="course-user-fullname clickable-name" 
+//             onClick={handleProfileClick}
+//             style={{ cursor: 'pointer' }}
+//             title="Go to Profile"
+//           >
+//             {fullName}
+//           </span>
 //           <button className="course-navbar-logout-btn" onClick={handleLogout}>
 //             Logout
 //           </button>
@@ -243,7 +272,7 @@
 //                 <span
 //                   className="course-menu-link"
 //                   style={{ display: "flex", alignItems: "center" }}
-//                   onClick={() => alert("Email clicked!")}
+//                   onClick={() => { setMenuOpen(false); openCompose(); }}
 //                 >
 //                   <MdOutlineMail className="course-icon" style={{ marginRight: 8 }} size={16} /> Email
 //                 </span>
@@ -258,7 +287,14 @@
 //                 </span>
 //               </li>
 //               <li>
-//                 <span className="course-menu-link course-user-initials" style={{ marginRight: 8 }}>{initials}</span> {fullName}
+//                 <span className="course-menu-link course-user-initials" style={{ marginRight: 8 }}>{initials}</span> 
+//                 <span 
+//                   className="course-menu-link clickable-name" 
+//                   onClick={() => { setMenuOpen(false); handleProfileClick(); }}
+//                   style={{ cursor: 'pointer' }}
+//                 >
+//                   {fullName}
+//                 </span>
 //               </li>
 //               <li>
 //                 <button
@@ -318,6 +354,14 @@
 //           </ul>
 //         </div>
 //       )}
+//    {/* Compose popup (bottom-right) */}
+//    {showEmailPopup && user?._id && (
+//         <EmailComposePopup
+//           courseId={courseId}
+//           senderId={senderId}
+//           onClose={closeCompose}
+//         />
+//       )}
 //     </>
 //   );
 // }
@@ -325,14 +369,14 @@
 // export default CourseNavbar;
 
 
-// === mew 
+// === new
 
 // src/components/courseNavbar.jsx
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import "../style/courseNavbar.css";
-import { MdOutlineMail, MdNotificationsNone, MdHome } from "react-icons/md"; // <-- Add MdHome
+import { MdOutlineMail, MdNotificationsNone, MdHome } from "react-icons/md";
 import EmailComposePopup from "./EmailComposePopup";
 
 const COURSE_API =
@@ -349,24 +393,35 @@ const COURSE_SHELL_URL =
 const BASE_TABS = [
   { label: "Content", path: "content" },
   { label: "News", path: "news" },
-  //{ label: "Evaluation", path: "evaluation" },
   { label: "Assignments", path: "assignment" },
   { label: "Gradebook", path: "grades" },
-  { label: "Discussion", path: "discussion" }
+  { label: "Discussion", path: "discussion" },
 ];
 
 function CourseNavbar() {
   const navigate = useNavigate();
   const { courseId } = useParams();
+  const location = useLocation();
+
   const [courseTitle, setCourseTitle] = useState("Course Name");
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [tabOpen, setTabOpen] = useState(false);
-
   const [showEmailPopup, setShowEmailPopup] = useState(false);
 
+  // Helper: read courseId from query string
+  const getCourseIdFromQuery = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get("courseId");
+  };
+
+  // Helper: best available courseId
+  const getUsableCourseId = () => {
+    return courseId || getCourseIdFromQuery() || localStorage.getItem("lastCourseId") || null;
+  };
+
+  // Load user
   useEffect(() => {
-    // Get user info from localStorage
     try {
       const userData = JSON.parse(localStorage.getItem("user"));
       setUser(userData);
@@ -375,31 +430,45 @@ function CourseNavbar() {
     }
   }, []);
 
+  // Remember last visited courseId whenever we can detect one (param or query)
   useEffect(() => {
-    // Fetch course title if courseId present
-    if (!courseId) return;
-    axios
-      .get(`${COURSE_API}/${courseId}`)
-      .then(res => {
-        const ct =
-          res.data?.course?.courseTitle ||
-          res.data?.courseTitle ||
-          "Course Name";
-        setCourseTitle(ct);
-      })
-      .catch(() => setCourseTitle("Course Name"));
-  }, [courseId]);
+    const fromQuery = getCourseIdFromQuery();
+    const cid = courseId || fromQuery;
+    if (cid) localStorage.setItem("lastCourseId", cid);
+  }, [courseId, location.search]);
+
+  // Navbar title logic
+  useEffect(() => {
+    // Profile page => fixed title
+    if (location.pathname.startsWith("/profile")) {
+      setCourseTitle("User Profile");
+      return;
+    }
+
+    // Try to get a course id from param, query, or last visited
+    const cid = getUsableCourseId();
+
+    if (cid) {
+      axios
+        .get(`${COURSE_API}/${cid}`)
+        .then((res) => {
+          const ct =
+            res.data?.course?.courseTitle ||
+            res.data?.courseTitle ||
+            "Course Name";
+          setCourseTitle(ct);
+        })
+        .catch(() => setCourseTitle("Course Name"));
+    } else {
+      setCourseTitle("Course Name");
+    }
+  }, [location.pathname, location.search, courseId]);
 
   const handleLogout = () => {
-    // Clear all session data
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
-    
-    // Use replace to prevent going back
-    navigate('/login', { replace: true });
-    
-    // Prevent back button
-    window.history.pushState(null, '', window.location.href);
+    navigate("/login", { replace: true });
+    window.history.pushState(null, "", window.location.href);
     window.onpopstate = function () {
       window.history.go(1);
     };
@@ -416,15 +485,15 @@ function CourseNavbar() {
   // Build tabs dynamically: insert "Class List" after Content for instructors/admins only
   const tabs = useMemo(() => {
     const arr = [...BASE_TABS];
-    const canSeeClassList = user && (user.role === "instructor" || user.role === "admin");
+    const canSeeClassList =
+      user && (user.role === "instructor" || user.role === "admin");
     if (canSeeClassList) {
-      // Insert right after "Content" (index 0)
       arr.splice(1, 0, { label: "Class List", path: "classlist" });
     }
     return arr;
   }, [user]);
 
-  // For tab highlight, check location
+  // Active tab highlight
   const currentPath = window.location.pathname;
   const getActiveTab = () => {
     for (const t of tabs) {
@@ -434,31 +503,42 @@ function CourseNavbar() {
   };
   const activeTab = getActiveTab();
 
-  // Tab navigation handler
+  // Ensure tabs work from any page (including /profile)
   const handleTabClick = (tab) => {
-    if (!courseId) return;
+    const cid = getUsableCourseId();
+
+    // If we still don't have a courseId, send to course shell
+    if (!cid) {
+      navigate("/course-shell");
+      setTabOpen(false);
+      return;
+    }
+
+    // Match the exact endpoints you listed:
+    // http://localhost:3000/course/<cid>
+    // http://localhost:3000/news?courseId=<cid>
+    // http://localhost:3000/course/<cid>/assignment
+    // http://localhost:3000/grades?courseId=<cid>
+    // http://localhost:3000/discussion?courseId=<cid>
     switch (tab) {
       case "Content":
-        navigate(`/course/${courseId}`);
+        navigate(`/course/${cid}`);
         break;
       case "Class List":
-        navigate(`/course/${courseId}/classlist`);
+        navigate(`/course/${cid}/classlist`);
         break;
       case "News":
-        navigate(`/news?courseId=${courseId}`);
+        navigate(`/news?courseId=${cid}`);
         break;
-      // case "Evaluation":
-      //   navigate(`/evaluation?courseId=${courseId}`);
-      //   break;
+      case "Assignments":
       case "Assignment":
-      case "Assignments": // handle both just in case
-        navigate(`/course/${courseId}/assignment`);
+        navigate(`/course/${cid}/assignment`);
         break;
       case "Gradebook":
-        navigate(`/grades?courseId=${courseId}`);
+        navigate(`/grades?courseId=${cid}`);
         break;
       case "Discussion":
-        navigate(`/discussion?courseId=${courseId}`);
+        navigate(`/discussion?courseId=${cid}`);
         break;
       default:
         break;
@@ -466,13 +546,14 @@ function CourseNavbar() {
     setTabOpen(false);
   };
 
-  // Hamburger body scroll lock
+  // Scroll lock for overlays
   useEffect(() => {
-    document.body.style.overflow = (menuOpen || tabOpen) ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; }
+    document.body.style.overflow = menuOpen || tabOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [menuOpen, tabOpen]);
 
-  // Home icon click handler
   const handleHomeClick = () => {
     if (user?.role === "admin") {
       navigate("/admin-dashboard");
@@ -481,7 +562,6 @@ function CourseNavbar() {
     }
   };
 
-  // ↓Open compose helpers
   const openCompose = () => {
     if (user?.role === "student") {
       setShowEmailPopup(true);
@@ -489,13 +569,12 @@ function CourseNavbar() {
       alert("This feature is only available for students.");
     }
   };
-    const closeCompose = () => setShowEmailPopup(false);
+  const closeCompose = () => setShowEmailPopup(false);
 
-  const senderId = user?._id; // used by the popup
+  const senderId = user?._id;
 
-  // Handle profile navigation
   const handleProfileClick = () => {
-    navigate('/profile');
+    navigate("/profile");
   };
 
   return (
@@ -516,9 +595,9 @@ function CourseNavbar() {
           </a>
           <span className="course-navbar-title">{courseTitle}</span>
         </div>
+
         {/* Desktop Right */}
         <div className="course-navbar-right desktop-nav">
-          {/* HOME ICON */}
           <button
             className="course-icon-btn"
             title="Home"
@@ -528,8 +607,7 @@ function CourseNavbar() {
           >
             <MdHome className="course-icon" size={36} />
           </button>
-          {/* EMAIL ICON */}
-           <button
+          <button
             className="course-icon-btn"
             title="Email"
             aria-label="Email"
@@ -538,7 +616,6 @@ function CourseNavbar() {
           >
             <MdOutlineMail className="course-icon" size={36} />
           </button>
-          {/* NOTIFICATION ICON */}
           <button
             className="course-icon-btn"
             title="Notifications"
@@ -549,10 +626,10 @@ function CourseNavbar() {
             <MdNotificationsNone className="course-icon" size={36} />
           </button>
           <span className="course-user-initials">{initials}</span>
-          <span 
-            className="course-user-fullname clickable-name" 
+          <span
+            className="course-user-fullname clickable-name"
             onClick={handleProfileClick}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: "pointer" }}
             title="Go to Profile"
           >
             {fullName}
@@ -561,19 +638,23 @@ function CourseNavbar() {
             Logout
           </button>
         </div>
-        {/* Hamburger for mobile */}
+
+        {/* Hamburger */}
         <div
           className="course-hamburger"
           onClick={() => setMenuOpen(true)}
           tabIndex={0}
           aria-label="Open navigation"
-          onKeyPress={e => { if (e.key === "Enter") setMenuOpen(true); }}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") setMenuOpen(true);
+          }}
         >
           <span />
           <span />
           <span />
         </div>
-        {/* Mobile menu */}
+
+        {/* Mobile Menu */}
         {menuOpen && (
           <div className="course-mobile-menu">
             <button
@@ -585,7 +666,6 @@ function CourseNavbar() {
             </button>
             <ul>
               <li>
-                {/* HOME ICON in mobile */}
                 <span
                   className="course-menu-link"
                   style={{ display: "flex", alignItems: "center" }}
@@ -601,7 +681,10 @@ function CourseNavbar() {
                 <span
                   className="course-menu-link"
                   style={{ display: "flex", alignItems: "center" }}
-                  onClick={() => { setMenuOpen(false); openCompose(); }}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    openCompose();
+                  }}
                 >
                   <MdOutlineMail className="course-icon" style={{ marginRight: 8 }} size={16} /> Email
                 </span>
@@ -612,15 +695,25 @@ function CourseNavbar() {
                   style={{ display: "flex", alignItems: "center" }}
                   onClick={() => alert("Notifications clicked!")}
                 >
-                  <MdNotificationsNone className="course-icon" style={{ marginRight: 8 }} size={16} /> Notifications
+                  <MdNotificationsNone
+                    className="course-icon"
+                    style={{ marginRight: 8 }}
+                    size={16}
+                  />{" "}
+                  Notifications
                 </span>
               </li>
               <li>
-                <span className="course-menu-link course-user-initials" style={{ marginRight: 8 }}>{initials}</span> 
-                <span 
-                  className="course-menu-link clickable-name" 
-                  onClick={() => { setMenuOpen(false); handleProfileClick(); }}
-                  style={{ cursor: 'pointer' }}
+                <span className="course-menu-link course-user-initials" style={{ marginRight: 8 }}>
+                  {initials}
+                </span>
+                <span
+                  className="course-menu-link clickable-name"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleProfileClick();
+                  }}
+                  style={{ cursor: "pointer" }}
                 >
                   {fullName}
                 </span>
@@ -629,7 +722,10 @@ function CourseNavbar() {
                 <button
                   className="course-menu-link"
                   style={{ background: "none", border: "none", color: "inherit" }}
-                  onClick={() => { setMenuOpen(false); handleLogout(); }}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleLogout();
+                  }}
                 >
                   Logout
                 </button>
@@ -637,8 +733,16 @@ function CourseNavbar() {
               <li>
                 <button
                   className="course-menu-link"
-                  style={{ background: "none", border: "none", color: "inherit", marginTop: 14 }}
-                  onClick={() => { setTabOpen(true); setMenuOpen(false); }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "inherit",
+                    marginTop: 14,
+                  }}
+                  onClick={() => {
+                    setTabOpen(true);
+                    setMenuOpen(false);
+                  }}
                 >
                   Course Menu
                 </button>
@@ -647,9 +751,10 @@ function CourseNavbar() {
           </div>
         )}
       </nav>
+
       {/* Second (Green) Navbar */}
       <div className="course-tabs-navbar desktop-tabs">
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <button
             key={tab.label}
             className={`course-tab-btn${activeTab === tab.label ? " active" : ""}`}
@@ -660,16 +765,19 @@ function CourseNavbar() {
           </button>
         ))}
       </div>
-      {/* Mobile Course Menu (tabs) */}
+
+      {/* Mobile Course Menu */}
       {tabOpen && (
         <div className="course-mobile-tabs-menu">
           <button
             className="course-menu-close"
             onClick={() => setTabOpen(false)}
             aria-label="Close menu"
-          >&times;</button>
+          >
+            &times;
+          </button>
           <ul>
-            {tabs.map(tab => (
+            {tabs.map((tab) => (
               <li key={tab.label}>
                 <button
                   className={`course-tab-btn${activeTab === tab.label ? " active" : ""}`}
@@ -683,10 +791,11 @@ function CourseNavbar() {
           </ul>
         </div>
       )}
-   {/* Compose popup (bottom-right) */}
-   {showEmailPopup && user?._id && (
+
+      {/* Compose popup */}
+      {showEmailPopup && user?._id && (
         <EmailComposePopup
-          courseId={courseId}
+          courseId={getUsableCourseId() || undefined}
           senderId={senderId}
           onClose={closeCompose}
         />

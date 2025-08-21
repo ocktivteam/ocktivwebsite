@@ -64,6 +64,46 @@ router.get("/by-user-course", async (req, res) => {
   }
 });
 
+// GET: /api/certificate/by-user?userId=...
+router.get("/by-user", async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ exists: false, message: "Missing userId" });
+    }
+
+    // Find all certificates for this user
+    const certs = await Certificate.find(
+      { user: userId },
+      { _id: 1, certId: 1, course: 1, issuedDate: 1, certificateUrl: 1 }
+    )
+      .populate("course", "courseTitle")
+      .lean();
+
+    if (certs && certs.length > 0) {
+      return res.json({
+        exists: true,
+        certificates: certs.map(c => ({
+          certId: c.certId,
+          courseId: c.course?._id,
+          courseName: c.course?.courseTitle,
+          issuedDate: c.issuedDate?.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }),
+          certificateUrl: c.certificateUrl,
+        })),
+      });
+    }
+
+    return res.json({ exists: false, certificates: [] });
+  } catch (err) {
+    console.error("by-user error:", err);
+    return res.status(500).json({ exists: false, message: "Server error" });
+  }
+});
+
 
 // GET: /api/certificate/:certId (JSON, for React viewer)
 router.get("/:certId", getCertificateByCertId);

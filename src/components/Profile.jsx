@@ -647,28 +647,29 @@ const Profile = () => {
       setLegalNameEditedOnce(flag);
     }
   }, [user?._id]);
-  
+
   useEffect(() => {
     if (!user?._id) return;
-  
+
     const checkCertificates = async () => {
       try {
         const res = await axios.get(`${backendURL}/api/certificate/by-user`, {
           params: { userId: user._id },
         });
-  
+
         // Defensive: support both `{ exists: true }` and `{ certificates: [...] }`
-        const exists = res.data.exists || (Array.isArray(res.data.certificates) && res.data.certificates.length > 0);
+        //const exists = res.data.exists || (Array.isArray(res.data.certificates) && res.data.certificates.length > 0);
+        const exists = res.data.exists;
         setHasAnyCertificate(exists);
       } catch (err) {
         console.error("Error checking user certificates:", err);
         setHasAnyCertificate(false);
       }
     };
-  
+
     checkCertificates();
-  }, [user?._id]);  
-  
+  }, [user?._id]);
+
 
   useEffect(() => {
     // Clear messages when view changes
@@ -836,6 +837,11 @@ const Profile = () => {
       setCurrentView("view");
       return;
     }
+
+    const confirm = window.confirm(
+      "⚠️ Are you sure you want to update your legal name? You can only update it once."
+    );
+    if (!confirm) return;
 
     try {
       const token = localStorage.getItem("authToken");

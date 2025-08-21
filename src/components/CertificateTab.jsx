@@ -987,6 +987,7 @@ export default function CertificateTab({ user, courseId }) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [effectiveUser, setEffectiveUser] = useState(user);
   const navigate = useNavigate();
+  const [pending, setPending] = useState(false);
 
   const frontendDomain =
     window.location.hostname === "localhost"
@@ -1017,15 +1018,38 @@ export default function CertificateTab({ user, courseId }) {
         userId: uid,
         courseId,
       });
-      // On success, ensure the "confirmed" flag is set (defense-in-depth)
-      if (confirmedKey) localStorage.setItem(confirmedKey, "true");
-      setCertificate(data);
-    } catch (err) {
+
+      
+    if (data?.pending) {
+      // backend signals "still generating"
+      setPending(true);
       setCertificate(null);
-    } finally {
-      setLoading(false);
+
+      // poll every 3s
+      setTimeout(fetchCertificate, 3000);
+      return;
     }
-  };
+    
+  //     // On success, ensure the "confirmed" flag is set (defense-in-depth)
+  //     if (confirmedKey) localStorage.setItem(confirmedKey, "true");
+  //     setCertificate(data);
+  //   } catch (err) {
+  //     setCertificate(null);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  if (confirmedKey) localStorage.setItem(confirmedKey, "true");
+  setCertificate(data);
+  setPending(false);
+} catch (err) {
+  console.error("Error generating certificate:", err);
+  setCertificate(null);
+  setPending(false);
+} finally {
+  setLoading(false);
+}
+};
 
   // Refresh effectiveUser from prop -> localStorage -> server (freshest)
   useEffect(() => {
@@ -1070,6 +1094,8 @@ useEffect(() => {
   if (calledRef.current || !effectiveUser?._id || !courseId) return;
 
   const key = `certConfirmed_${effectiveUser._id}_${courseId}`;
+  const nameEditedKey = `legalNameEditedOnce_${effectiveUser._id}`;
+  const alreadyEdited = localStorage.getItem(nameEditedKey) === "true";
 
   const checkCertificate = async () => {
     try {
@@ -1084,9 +1110,18 @@ useEffect(() => {
         localStorage.setItem(key, "true");
         calledRef.current = true;
       } else {
-        // Cert missing → clear flag and show modal
+        // Cert missing
         localStorage.removeItem(key);
-        setShowConfirmModal(true);
+
+        if (alreadyEdited) {
+          // Student already edited legal name once → skip modal
+          setShowConfirmModal(false);
+          calledRef.current = true;
+          fetchCertificate(); // go straight to generation
+        } else {
+          // Show modal normally
+          setShowConfirmModal(true);
+        }
       }
     } catch (err) {
       console.error("Error checking cert:", err);
@@ -1225,12 +1260,26 @@ useEffect(() => {
     );
   }
 
-  // Loading / error states
-  if (!effectiveUser || !effectiveUser._id || !courseId || loading)
-    return <p>Loading certificate info...</p>;
+  // // Loading / error states
+  // if (!effectiveUser || !effectiveUser._id || !courseId || loading)
+  //   return <p>Loading certificate info...</p>;
 
-  if (!certificate)
+  // if (!certificate)
+  //   return <p>Something went wrong. Please try again later.</p>;
+
+  // Loading state first
+  if (loading) {
+    return <p>Loading certificate info...</p>;
+  }
+  
+  if (pending) {
+    return <p>Generating your certificate… please wait.</p>;
+  }
+  
+  if (!certificate) {
     return <p>Something went wrong. Please try again later.</p>;
+  }
+  
 
   // Certificate content
   const {

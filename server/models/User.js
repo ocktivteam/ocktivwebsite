@@ -1,7 +1,7 @@
 //models/User.js
 
 import mongoose from "mongoose";
- 
+
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -32,15 +32,17 @@ const userSchema = new mongoose.Schema({
     default: null, // This makes it optional as it'll default to null
   },
 
-//Payment / Certificate Fields
-legalName: { 
-  type: String, 
-  default: "",
-},
-country:   { 
-  type: String, 
-  default: "",
- },
+  //Payment / Certificate Fields
+  legalName: {
+    type: String,
+    default: "",
+  },
+  country: {
+    type: String,
+    default: "",
+  },
+
+  legalNameChangeCount: { type: Number, default: 0 },
 
   resetToken: {
     type: String,

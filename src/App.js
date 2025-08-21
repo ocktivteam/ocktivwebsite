@@ -40,7 +40,7 @@ import CreateQuiz from './components/CreateQuiz';
 import QuizCover from "./components/QuizCover";
 import ClassList from "./components/ClassList";
 // import ClassListTable from "./components/ClassListTable";
-
+import Profile from './components/Profile';
 
 function App() {
   return (
@@ -170,6 +170,10 @@ function App() {
 {/* <Route path="/course/:courseId/classlist-table" element={
   <SessionManager><ClassListTable /></SessionManager>
 } /> */}
+
+<Route path="/profile" element={
+  <SessionManager><Profile /></SessionManager>
+} />
 
 <Route path="/course/:courseId/create-quiz" element={<CreateQuiz />} />
 

@@ -17,6 +17,7 @@ import quizRouter from "./routes/quizRoutes.js";
 import certificateRouter from "./routes/certificate.js";
 import { preventCache } from "./middleware/preventCache.js";
 import { emailRouter } from "./routes/emailRoutes.js";
+import discussionRouter from "./routes/discussionRoutes.js";
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.get('/ping', (req, res) => res.json({ pong: true, origin: req.headers.origin
 
 app.use('/auth', userRouter);
 
+app.use("/api/discussions", preventCache, discussionRouter);
 app.use("/api/enrollment", preventCache, enrollRouter);
 app.use("/api/courses", preventCache, courseRouter);
 app.use("/api/modules", preventCache, moduleRouter);

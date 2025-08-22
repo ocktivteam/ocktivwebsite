@@ -8,7 +8,7 @@ import Video from './components/video';
 import News from "./components/news";
 import Evaluation from './components/evaluation';
 import Grades from './components/Grades';
-import Discussion from './components/Discussion';
+import Discussion from './components/Discussions';
 import Groups from './components/Groups';
 import Messages from './components/messages';
 import NewMessage from './components/NewMessage';
@@ -130,6 +130,10 @@ function App() {
         <Route path="/discussion" element={
           <SessionManager><Discussion /></SessionManager>
         } />
+        <Route path="/course/:courseId/discussions" element={
+          <SessionManager><Discussion /></SessionManager>
+        } />
+
         <Route path="/groups" element={
           <SessionManager><Groups /></SessionManager>
         } />

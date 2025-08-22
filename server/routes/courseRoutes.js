@@ -38,6 +38,7 @@ import {
 
 import { jwtMiddleware } from "../middleware/jwtMiddleware.js";
 import { requireRole } from "../middleware/checkAdmin.js";
+import { getCourseNewsForUser } from "../controllers/courseController.js";
 
 const router = express.Router();
 
@@ -48,6 +49,7 @@ router.post("/test", (req, res) => {
 router.post("/", createCourse);
 router.get("/", getCourses);
 router.get("/:id", getCourseById);
+router.get("/:id/news", jwtMiddleware, getCourseNewsForUser);
 
 router.get(
   "/:id/classlist",

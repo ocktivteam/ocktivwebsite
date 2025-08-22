@@ -98,6 +98,7 @@ import { Enrollment } from "../models/Enrollment.js";
 import { ModuleProgress } from "../models/ModuleProgress.js";
 import { Certificate } from "../models/Certificate.js";
 import { Quiz } from "../models/Quiz.js";
+import { Module } from "../models/Module.js";
 import mongoose from "mongoose";
 
 
@@ -254,6 +255,76 @@ export const getCourseById = async (req, res) => {
     res.status(500).json({ status: false, message: err.message });
   }
 };
+
+// GET /api/courses/:id/news  (auth required)
+// Returns modules/quizzes added or updated AFTER the student's enrollment date.
+// Optional: ?since=ISO overrides the baseline (useful if you later add "mark all seen").
+export const getCourseNewsForUser = async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    const userId = req.user?.id || req.user?._id; // set by jwtMiddleware
+
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({ status: false, message: "Invalid course id" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(401).json({ status: false, message: "Unauthorized" });
+    }
+
+    // Find this user's enrollment in the course
+    const enrollment = await Enrollment.findOne({ course: courseId, user: userId })
+      .select("createdAt");
+    if (!enrollment) {
+      // Not enrolled -> no news
+      return res.json({ status: true, news: [] });
+    }
+
+    // Baseline: when they enrolled (or an optional ?since override)
+    const override = req.query.since ? new Date(req.query.since) : null;
+    const baseline = override && !isNaN(override.getTime()) ? override : enrollment.createdAt;
+
+    // Pull modules/quizzes, compare updatedAt to baseline
+    const [modules, quizzes] = await Promise.all([
+      Module.find({ courseId }).select("_id moduleTitle createdAt updatedAt").sort({ updatedAt: -1 }),
+      Quiz.find({ courseId, isPublished: true }).select("_id quizTitle createdAt updatedAt").sort({ updatedAt: -1 })
+    ]);
+
+    const items = [];
+
+    for (const m of modules) {
+      if (m.updatedAt > baseline) {
+        items.push({
+          type: "module",
+          id: String(m._id),
+          title: m.moduleTitle,
+          createdAt: m.createdAt,
+          updatedAt: m.updatedAt,
+          activity: m.createdAt > baseline ? "added" : "updated"
+        });
+      }
+    }
+
+    for (const q of quizzes) {
+      if (q.updatedAt > baseline) {
+        items.push({
+          type: "quiz",
+          id: String(q._id),
+          title: q.quizTitle,
+          createdAt: q.createdAt,
+          updatedAt: q.updatedAt,
+          activity: q.createdAt > baseline ? "added" : "updated"
+        });
+      }
+    }
+
+    items.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    return res.json({ status: true, news: items });
+  } catch (err) {
+    console.error("getCourseNewsForUser error:", err);
+    return res.status(500).json({ status: false, message: "Failed to load news" });
+  }
+};
+
 
 // UPDATE a course with smart filtering logic
 export const updateCourse = async (req, res) => {

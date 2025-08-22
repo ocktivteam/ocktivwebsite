@@ -41,6 +41,9 @@ import QuizCover from "./components/QuizCover";
 import ClassList from "./components/ClassList";
 // import ClassListTable from "./components/ClassListTable";
 import Profile from './components/Profile';
+import GradesBook from './components/GradesBook';
+
+
 
 function App() {
   return (
@@ -124,9 +127,22 @@ function App() {
         <Route path="/course/:courseId/assignment"  element={
           <SessionManager><Assignment /></SessionManager>
         } />
-        <Route path="/grades" element={
+        {/* <Route path="/grades" element={
           <SessionManager><Grades /></SessionManager>
-        } />
+        } /> */}
+
+{/* Param-style paths */}
+<Route path="/course-content/:courseId/grades" element={
+  <SessionManager><GradesBook /></SessionManager>
+} />
+<Route path="/course/:courseId/grades" element={
+  <SessionManager><GradesBook /></SessionManager>
+} />
+
+{/* Query-param style path (works with /grades?courseId=...) */}
+<Route path="/grades" element={
+  <SessionManager><GradesBook /></SessionManager>
+} />
         <Route path="/discussion" element={
           <SessionManager><Discussion /></SessionManager>
         } />

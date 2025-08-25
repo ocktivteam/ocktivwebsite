@@ -166,6 +166,17 @@
   font-weight: 700;
 }
 
+/* src/style/dashboardNavbar.css */
+.dashboard-icon-btn {
+  background: transparent;
+  border: none;
+  padding: 0 8px;
+  cursor: pointer;
+}
+.dashboard-navbar { color: #fff; }           /* text/icon color on green bar */
+.dashboard-icon { vertical-align: middle; }  /* aligns like in course navbar */
+
+
 @media (max-width: 900px) {
   .dashboard-navbar-title { font-size: 1.1rem; }
   .dashboard-user-fullname { font-size: 1rem; }
@@ -182,4 +193,5 @@
   .dashboard-apple-hamburger {
     display: flex;
   }
+
 }

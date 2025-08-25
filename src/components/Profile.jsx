@@ -578,7 +578,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import CourseNavbar from './courseNavbar';
+import DashboardNavbar from './dashboardNavbar';
 import "../style/profile.css";
 
 const API_BASE = window.location.hostname === "localhost"
@@ -881,7 +881,7 @@ const Profile = () => {
   if (loading) {
     return (
       <>
-        <CourseNavbar />
+        <DashboardNavbar />
         <div className="profile-container">
           <div className="profile-loading">Loading...</div>
         </div>
@@ -893,7 +893,7 @@ const Profile = () => {
 
   return (
     <>
-      <CourseNavbar />
+      <DashboardNavbar />
       <div className="profile-container">
         <div className="profile-card">
           <div className="profile-header">

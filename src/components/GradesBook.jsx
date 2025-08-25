@@ -1,5 +1,3 @@
-
-
 // import React, { useEffect, useMemo, useState } from "react";
 // import axios from "axios";
 // import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -16,6 +14,11 @@
 //   window.location.hostname === "localhost"
 //     ? "http://localhost:5050/api/quiz"
 //     : "https://ocktivwebsite-3.onrender.com/api/quiz";
+
+// const API_ROOT =
+//   window.location.hostname === "localhost"
+//     ? "http://localhost:5050"
+//     : "https://ocktivwebsite-3.onrender.com";
 
 // // Compute score & pass/fail for THIS user's attempts
 // function getQuizStatus(quiz, attemptsForUser) {
@@ -58,8 +61,18 @@
 //   const [attemptsByQuiz, setAttemptsByQuiz] = useState({});
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState("");
+//   const [modules, setModules] = useState([]);
+//   const [moduleProgress, setModuleProgress] = useState({});
 //   const navigate = useNavigate();
 
+//   const isStaff = user && (user.role === "instructor" || user.role === "admin");
+//   const isStudent = user?.role === "student";
+
+//   // prevent infinite spinner for staff
+// useEffect(() => {
+//     if (isStaff) setLoading(false);
+//   }, [isStaff]);
+  
 //   // Load current user
 //   useEffect(() => {
 //     (async () => {
@@ -75,7 +88,7 @@
 //       setLoading(false);
 //       return;
 //     }
-//     if (!user?._id) return;
+//     if (!user?._id || isStaff) return; // staff won't see the list anyway
 
 //     const run = async () => {
 //       setLoading(true);
@@ -124,11 +137,54 @@
 //     };
 
 //     run();
-//   }, [courseId, user?._id]);
+//   }, [courseId, user?._id, isStaff]);
 
-//   const isStaff = user && (user.role === "instructor" || user.role === "admin");
+//   // Load modules + this student's module progress (for unlock logic)
+//   useEffect(() => {
+//     if (!courseId || !user?._id || !isStudent) return;
 
-//   // Summary for students only
+//     (async () => {
+//       try {
+//         const token = localStorage.getItem("authToken");
+//         const headers = { Authorization: token ? `Bearer ${token}` : "" };
+
+//         // Modules in this course
+//         const modsRes = await axios.get(
+//           `${API_ROOT}/api/modules/course/${courseId}`,
+//           { headers }
+//         );
+//         const modulesArr = modsRes.data?.modules || [];
+//         setModules(modulesArr);
+
+//         // This student's progress
+//         const progRes = await axios.get(
+//           `${API_ROOT}/api/module-progress/user/${user._id}`,
+//           { headers }
+//         );
+//         const progressArray = Array.isArray(progRes.data)
+//           ? progRes.data
+//           : progRes.data.progress || [];
+//         const progressObj = {};
+//         progressArray.forEach((p) => {
+//           progressObj[String(p.moduleId)] = p;
+//         });
+//         setModuleProgress(progressObj);
+//       } catch (e) {
+//         // if anything fails, treat as not completed
+//         setModules((m) => m || []);
+//         setModuleProgress({});
+//       }
+//     })();
+//   }, [courseId, user?._id, isStudent]);
+
+//   // Are quizzes unlocked for this student? (all modules completed)
+//   const quizzesUnlocked = useMemo(() => {
+//     if (!isStudent) return true; // staff/non-students: treat as unlocked (they see staff view anyway)
+//     if (!modules.length) return true; // if course has no modules, allow
+//     return modules.every((m) => moduleProgress[m._id]?.completed === true);
+//   }, [isStudent, modules, moduleProgress]);
+
+//   // Summary (students only)
 //   const summary = useMemo(() => {
 //     if (isStaff) return { attempted: 0, passed: 0, total: 0 };
 //     let attempted = 0;
@@ -142,11 +198,16 @@
 //     return { attempted, passed, total: quizzes.length };
 //   }, [quizzes, attemptsByQuiz, isStaff]);
 
+//   const handleOpenQuiz = (quizId) => {
+//     if (!quizzesUnlocked) return;
+//     navigate(`/course-content/${courseId}/quiz/${quizId}/cover`);
+//   };
+
 //   return (
 //     <div className="gradesbook-page">
 //       <CourseNavbar courseId={courseId} activeTab="grades" />
 
-//       {/* PAGE HEADER (outside the card) */}
+//       {/* PAGE HEADER */}
 //       <div className="gradesbook-header">
 //         <h1 className="gradesbook-h1">Gradebook</h1>
 //         {!isStaff && !loading && !error && user && (
@@ -169,24 +230,26 @@
 //                 Please sign in to view your grades.
 //               </div>
 //             )}
-//             {loading && <div className="gradesbook-loading">Loading grades...</div>}
+//             {loading && (
+//               <div className="gradesbook-loading">Loading grades...</div>
+//             )}
 //             {error && <div className="gradesbook-error">{error}</div>}
 //           </>
 //         )}
 
-//         {/* Staff view: show coming-soon message */}
+//         {/* Staff view */}
 //         {!loading && !error && user && isStaff && (
 //           <div className="gradesbook-empty">
 //             <div className="gradesbook-empty-title">
 //               Posting Grades for Instructors Coming Soon.
 //             </div>
 //             <div className="gradesbook-empty-note">
-//               Note: Students enrolled in your course can view their own quiz results here.
+//               Note: Students enrolled in your course can view their quiz results here.
 //             </div>
 //           </div>
 //         )}
 
-//         {/* Student view: list */}
+//         {/* Student view */}
 //         {!loading && !error && user && !isStaff && (
 //           <div className="gradesbook-cardlist">
 //             <div className="gb-row gb-header">
@@ -200,20 +263,34 @@
 //               const s = getQuizStatus(quiz, mine);
 //               const scoreCol =
 //                 s.status === "Not started" ? "-" : `${s.score}/${s.total} - ${s.status}`;
-//               const statusCol =
-//                 s.status === "Not started"
-//                   ? "Not started"
-//                   : s.status === "PASSED"
-//                   ? "Completed"
-//                   : "Ongoing";
+
+//               // lock at the course level unless all modules completed
+//               const isLocked = !quizzesUnlocked;
+//               const statusCol = isLocked
+//                 ? "Locked"
+//                 : s.status === "Not started"
+//                 ? "Not started"
+//                 : s.status === "PASSED"
+//                 ? "Completed"
+//                 : "Ongoing";
+
+//               const rowClasses = `gb-row gb-item ${isLocked ? "locked" : ""}`;
 
 //               return (
-//                 <button
+//                 <div
 //                   key={quiz._id}
-//                   className="gb-row gb-item"
-//                   onClick={() =>
-//                     navigate(`/course-content/${courseId}/quiz/${quiz._id}/cover`)
-//                   }
+//                   className={rowClasses}
+//                   role="button"
+//                   tabIndex={isLocked ? -1 : 0}
+//                   aria-disabled={isLocked}
+//                   title={isLocked ? "Complete all modules to unlock quizzes." : undefined}
+//                   onClick={() => !isLocked && handleOpenQuiz(quiz._id)}
+//                   onKeyDown={(e) => {
+//                     if (isLocked) return;
+//                     if (e.key === "Enter" || e.key === " ") {
+//                       handleOpenQuiz(quiz._id);
+//                     }
+//                   }}
 //                 >
 //                   <div className="gb-col item">
 //                     <div className="gb-item-title">
@@ -228,7 +305,7 @@
 //                   >
 //                     {statusCol}
 //                   </div>
-//                 </button>
+//                 </div>
 //               );
 //             })}
 //           </div>
@@ -239,6 +316,9 @@
 // }
 
 
+// === new
+
+// src/components/GradesBook.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -310,10 +390,10 @@ export default function GradesBook() {
   const isStudent = user?.role === "student";
 
   // prevent infinite spinner for staff
-useEffect(() => {
+  useEffect(() => {
     if (isStaff) setLoading(false);
   }, [isStaff]);
-  
+
   // Load current user
   useEffect(() => {
     (async () => {
@@ -420,7 +500,7 @@ useEffect(() => {
 
   // Are quizzes unlocked for this student? (all modules completed)
   const quizzesUnlocked = useMemo(() => {
-    if (!isStudent) return true; // staff/non-students: treat as unlocked (they see staff view anyway)
+    if (!isStudent) return true; // staff/non-students: treat as unlocked
     if (!modules.length) return true; // if course has no modules, allow
     return modules.every((m) => moduleProgress[m._id]?.completed === true);
   }, [isStudent, modules, moduleProgress]);
@@ -507,27 +587,45 @@ useEffect(() => {
 
               // lock at the course level unless all modules completed
               const isLocked = !quizzesUnlocked;
+
+              // 🔒 NEW: disable passed quizzes completely
+              const isCompleted = s.status === "PASSED";
+              const clickable = !isLocked && !isCompleted;
+
               const statusCol = isLocked
                 ? "Locked"
                 : s.status === "Not started"
                 ? "Not started"
-                : s.status === "PASSED"
+                : isCompleted
                 ? "Completed"
                 : "Ongoing";
 
-              const rowClasses = `gb-row gb-item ${isLocked ? "locked" : ""}`;
+              const rowClasses = [
+                "gb-row",
+                "gb-item",
+                isLocked ? "locked" : "",
+                isCompleted ? "completed" : "",
+              ]
+                .filter(Boolean)
+                .join(" ");
 
               return (
                 <div
                   key={quiz._id}
                   className={rowClasses}
-                  role="button"
-                  tabIndex={isLocked ? -1 : 0}
-                  aria-disabled={isLocked}
-                  title={isLocked ? "Complete all modules to unlock quizzes." : undefined}
-                  onClick={() => !isLocked && handleOpenQuiz(quiz._id)}
+                  role={clickable ? "button" : "text"}
+                  tabIndex={clickable ? 0 : -1}
+                  aria-disabled={!clickable}
+                  title={
+                    isLocked
+                      ? "Complete all modules to unlock quizzes."
+                      : isCompleted
+                      ? "Quiz already completed."
+                      : undefined
+                  }
+                  onClick={() => clickable && handleOpenQuiz(quiz._id)}
                   onKeyDown={(e) => {
-                    if (isLocked) return;
+                    if (!clickable) return;
                     if (e.key === "Enter" || e.key === " ") {
                       handleOpenQuiz(quiz._id);
                     }

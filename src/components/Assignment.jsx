@@ -1,8 +1,11 @@
 import React from "react";
 import DashboardNavbar from "./dashboardNavbar";
 import CourseNavbar from "./courseNavbar";
+import { useSessionCheck } from "../hooks/useSessionCheck"; // Add this import
 
 export default function Assignment() {
+  useSessionCheck(); // Add this line - protects the route
+
   return (
     <div>
       <CourseNavbar />

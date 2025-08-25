@@ -182,6 +182,13 @@
     font-weight: 700;
     color: #9aa3b2;
   }
+
+  .gb-item.completed {
+    opacity: 0.6;
+    cursor: default;
+    pointer-events: none; /* hard-disable any clicks */
+  }
+  
   
   /* ===== Responsive ===== */
   @media (max-width: 720px) {

@@ -16,7 +16,7 @@
     padding: 40px;
     width: 100%;
     max-width: 800px;
-    margin-top: 20px;
+    margin-top: 80px;
   }
   
   .profile-header {
@@ -277,8 +277,19 @@
     color: #666;
   }
   
+  .mobile-home-btn {
+    display: none;
+    background: none;
+    border: none;
+    padding: 0 8px;
+    cursor: pointer;
+  }
+
   /* Responsive Design */
   @media (max-width: 768px) {
+
+    .mobile-home-btn { display: flex; align-items: center; }
+    
     .profile-container {
       padding: 20px 10px;
     }
@@ -318,6 +329,10 @@
     .profile-change-password-link,
     .profile-cancel-link {
       text-align: center;
+    }
+
+    .profile-container {
+      padding-top: 70px; /* adjust value until spacing feels right */
     }
   }
   

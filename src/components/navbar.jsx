@@ -191,12 +191,15 @@ function Navbar() {
 
       {/* Desktop links */}
       <ul className="navbar-links desktop-nav">
-        {/* ✅ Dashboard before Courses */}
-        <li>
-          <Link to="/" className="dashboard-link" aria-label="Dashboard">
-            Dashboard
-          </Link>
-        </li>
+      
+              {/* ✅ Show Dashboard only if logged in */}
+        {isLoggedIn && (
+          <li>
+            <Link to="/" className="dashboard-link" aria-label="Dashboard">
+              Dashboard
+            </Link>
+          </li>
+        )}
         <li>
           <Link to="/courses" className="active-link">Courses</Link>
         </li>
@@ -239,16 +242,18 @@ function Navbar() {
             &times;
           </button>
           <ul>
-            {/* ✅ Dashboard in mobile menu */}
-            <li>
-              <Link
-                to="/"
-                className="apple-menu-link bold"
-                onClick={() => setMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
-            </li>
+            {/* Show Dashboard only if logged in */}
+            {isLoggedIn && (
+              <li>
+                <Link
+                  to="/"
+                  className="apple-menu-link bold"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+              </li>
+            )}
             <li>
               <Link
                 to="/courses"

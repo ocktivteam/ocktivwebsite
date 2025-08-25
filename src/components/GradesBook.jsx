@@ -546,11 +546,11 @@ export default function GradesBook() {
       <div className="gradesbook-shell">
         {(!user || loading || error) && (
           <>
-            {!user && (
+            {/* {!user && (
               <div className="gradesbook-error">
                 Please sign in to view your grades.
               </div>
-            )}
+            )} */}
             {loading && (
               <div className="gradesbook-loading">Loading grades...</div>
             )}

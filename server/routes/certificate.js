@@ -1,21 +1,9 @@
-// import express from "express";
-// import { generateCertificate } from "../controllers/certificateController.js";
-
-// const router = express.Router();
-
-// router.post("/generate", generateCertificate);
-
-// export default router;
-
-
-//====july9===
-
 import express from "express";
 import {
   generateCertificate,
   redirectToCertificate,
   getPresignedCertificateUrl,
-  getCertificateByCertId, // <--- Add this
+  getCertificateByCertId, 
 } from "../controllers/certificateController.js";
 import { Certificate } from "../models/Certificate.js";
 
@@ -34,7 +22,7 @@ router.get("/by-user-course", async (req, res) => {
     }
 
     const cert = await Certificate.findOne(
-      { user: userId, course: courseId },   // ✅ important: match schema
+      { user: userId, course: courseId },  
       { _id: 1, certId: 1, user: 1, course: 1, certificateUrl: 1, issuedDate: 1 }
     ).populate("course user", "courseTitle legalName firstName lastName").lean();
 

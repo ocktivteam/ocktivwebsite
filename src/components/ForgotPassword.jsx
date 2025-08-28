@@ -85,7 +85,7 @@ export default function ForgotPassword() {
             {message && <span className="message">{message}</span>}
             <button type="submit" className="send-btn" disabled={loading}>
               {loading ? "Sending..." : "Send Email"}{" "}
-              <span className="arrow">→</span>
+              <span className="arrow"></span>
             </button>
           </form>
           <button className="back-link" onClick={() => navigate("/login")}>

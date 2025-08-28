@@ -3,8 +3,8 @@ import { Node, mergeAttributes } from "@tiptap/core";
 
 export const ResizableImage = Node.create({
   name: "resizableImage",
-  group: "inline",      // Fix for inline content
-  inline: true,         // Fix for inline content
+  group: "inline",      
+  inline: true,        
   draggable: true,
   atom: true,
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { MdDelete, MdEdit, MdMenuBook, MdInfoOutline } from "react-icons/md";
-import { useNavigate } from "react-router-dom"; // <--- ADD THIS LINE
+import { useNavigate } from "react-router-dom"; 
 import "../style/coursesGrid.css";
 
 function getInstructorName(selectedInstructor, instructors) {
@@ -15,7 +15,7 @@ function getInstructorName(selectedInstructor, instructors) {
 }
 
 function CoursesGrid({ selectedInstructor, instructors = [], courses = [], onDeleteCourse, search = "" }) {
-  const navigate = useNavigate(); // <--- ADD THIS LINE
+  const navigate = useNavigate(); 
 
   let filteredCourses = courses;
 
@@ -110,7 +110,7 @@ function CoursesGrid({ selectedInstructor, instructors = [], courses = [], onDel
                 <button
                   className="coursesgrid-delete-btn"
                   onClick={e => {
-                    e.stopPropagation();    // <--- So clicking delete does NOT trigger navigation
+                    e.stopPropagation();    
                     handleDelete(course._id);
                   }}
                   title="Delete Course"
